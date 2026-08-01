@@ -1,0 +1,275 @@
+/* ========================================= */
+/* VARIABLES ET RÉINITIALISATION GLOBALE     */
+/* ========================================= */
+:root {
+    --primary: #0284c7;      /* Bleu Englobe/Principal */
+    --primary-hover: #0369a1;
+    --success: #16a34a;      /* Vert pour Form 3 / Échantillons */
+    --success-bg: #f0fdf4;
+    --warning: #b45309;      /* Orange pour Récupération */
+    --danger: #dc2626;       /* Rouge pour Refus */
+    --danger-bg: #fef2f2;
+    --temoin: #8b5cf6;       /* Violet pour Fiche Témoin */
+    --temoin-bg: #faf5ff;
+    --bg-page: #f1f5f9;      /* Gris très clair pour le fond */
+    --bg-card: #ffffff;
+    --border: #cbd5e1;
+    --text-main: #334155;
+    --text-muted: #64748b;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+    background-color: var(--bg-page);
+    color: var(--text-main);
+    padding: 20px;
+    font-size: 16px; /* Taille de base lisible sur tablette */
+}
+
+#app-container {
+    max-width: 1200px; /* Limite la largeur sur les très grands écrans */
+    margin: 0 auto;
+    background: transparent;
+}
+
+/* ========================================= */
+/* TYPOGRAPHIE ET EN-TÊTES                   */
+/* ========================================= */
+h2 {
+    color: var(--primary);
+    margin-bottom: 15px;
+    font-size: 1.5rem;
+    border-bottom: 2px solid var(--primary);
+    padding-bottom: 5px;
+}
+
+h3 {
+    color: var(--text-main);
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+    background-color: #e2e8f0;
+    padding: 8px 12px;
+    border-radius: 4px;
+}
+
+h4 {
+    font-size: 1rem;
+    color: var(--text-main);
+}
+
+/* ========================================= */
+/* BARRE DE NAVIGATION (ONGLETS)             */
+/* ========================================= */
+#form-navigation {
+    display: flex;
+    gap: 10px;
+    background: var(--bg-card);
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 12px 20px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: var(--text-muted);
+    background-color: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+/* Vous pourrez basculer cette classe en JS plus tard pour indiquer l'onglet actif */
+.tab-btn.active, .tab-btn:hover {
+    background-color: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+/* ========================================= */
+/* SECTIONS ET CARTES (FORMULAIRES)          */
+/* ========================================= */
+.tab-section {
+    background: var(--bg-card);
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.form-section {
+    margin-bottom: 30px;
+    padding: 15px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: #f8fafc;
+}
+
+/* ========================================= */
+/* GRILLES ET ALIGNEMENTS                    */
+/* ========================================= */
+.grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+/* ========================================= */
+/* INPUTS ET CONTRÔLES (TACTILES)            */
+/* ========================================= */
+.input-group {
+    margin-bottom: 15px;
+}
+
+.input-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: var(--text-main);
+    font-size: 0.95rem;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="date"],
+input[type="time"],
+select,
+textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 1rem;
+    background-color: white;
+    transition: border-color 0.2s;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.2);
+}
+
+textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* Spécifique pour les inputs à l'intérieur d'une phrase (Form 1) */
+.inline-input {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+}
+
+.inline-input input[type="text"],
+.inline-input input[type="number"] {
+    width: auto;
+    min-width: 120px;
+    flex: 1;
+    padding: 6px 10px;
+}
+
+/* ========================================= */
+/* CASES À COCHER (CHECKBOXES)               */
+/* ========================================= */
+.checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.checkbox-group label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+/* Agrandir les cases à cocher pour les doigts */
+input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: var(--primary);
+}
+
+/* ========================================= */
+/* STYLES SPÉCIFIQUES DES CARTES             */
+/* ========================================= */
+
+/* Form 2 : Camions */
+.truck-card {
+    border: 2px solid var(--primary);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    background: #f0f9ff;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.truck-card .input-group {
+    margin-bottom: 0; /* Évite les marges superflues dans les flexbox des camions */
+}
+
+/* Form 3 : Échantillons */
+.sample-card {
+    border: 2px solid var(--success);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 25px;
+    background: var(--success-bg);
+}
+
+.sample-card h3 {
+    background-color: #dcfce7;
+    color: var(--success);
+}
+
+/* Form 3 : Fiche Témoin Indépendante */
+.temoin-only-card {
+    border: 2px solid var(--temoin);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 25px;
+    background: var(--temoin-bg);
+}
+
+.temoin-only-card h3,
+.temoin-only-card h4 {
+    background-color: #f3e8ff;
+    color: var(--temoin);
+}
+
+/* ========================================= */
+/* BOUTONS D'ACTION                          */
+/* ========================================= */
+button[onclick^="add"] {
+    padding: 12px 20px;
+    font-size: 1rem;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.1s, filter 0.2s;
+}
+
+button[onclick^="add"]:active {
+    transform: scale(0.98);
+}
+
+button[onclick^="add"]:hover {
+    filter: brightness(110%);
+}
