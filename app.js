@@ -1,4 +1,4 @@
-const APP_VERSION = 'englobe-app-v1.0.3';
+const APP_VERSION = 'englobe-app-v1.0.4';
 
 // ========================================== //
 // 1. NAVIGATION ET INTERFACE GLOBALE         //
@@ -985,13 +985,15 @@ async function exportToPDF() {
         const blob = new Blob([pdfBytes], { type: 'application/pdf' });
         const fileName = `Rapport_${noProjetVal}_${rawDateVal}_${resistanceVal}_${initialsVal}.pdf`;
 
-        // CORRECTIF : Détecter si on est sur mobile/tablette
-        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        // CORRECTIF : Détecter mobile/tablette (incluant l'iPad qui se fait passer pour un Mac)
+        const isMacTouch = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+        const isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || isMacTouch;
+        
         let attemptedShare = false;
 
         try {
             // Utiliser le menu de partage UNIQUEMENT sur mobile/tablette
-            if (isMobile && navigator.share && navigator.canShare) {
+            if (isMobileDevice && navigator.share && navigator.canShare) {
                 const file = new File([blob], fileName, { type: 'application/pdf' });
                 if (navigator.canShare({ files: [file] })) {
                     attemptedShare = true;
