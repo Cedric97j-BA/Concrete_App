@@ -1,4 +1,4 @@
-const APP_VERSION = 'englobe-app-v1.0.2';
+const APP_VERSION = 'englobe-app-v1.0.3';
 
 // ========================================== //
 // 1. NAVIGATION ET INTERFACE GLOBALE         //
@@ -985,10 +985,13 @@ async function exportToPDF() {
         const blob = new Blob([pdfBytes], { type: 'application/pdf' });
         const fileName = `Rapport_${noProjetVal}_${rawDateVal}_${resistanceVal}_${initialsVal}.pdf`;
 
-        // CORRECTIF iPAD PWA : Utilisation de l'API de Partage Natif (Share Sheet)
+        // CORRECTIF : Détecter si on est sur mobile/tablette
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
         let attemptedShare = false;
+
         try {
-            if (navigator.share && navigator.canShare) {
+            // Utiliser le menu de partage UNIQUEMENT sur mobile/tablette
+            if (isMobile && navigator.share && navigator.canShare) {
                 const file = new File([blob], fileName, { type: 'application/pdf' });
                 if (navigator.canShare({ files: [file] })) {
                     attemptedShare = true;
@@ -1002,7 +1005,7 @@ async function exportToPDF() {
             console.log("Partage annulé ou échoué:", err);
         }
 
-        // Si l'API Share n'est pas supportée (PC/Laptop), on fait le téléchargement classique
+        // Sur PC (ou si le partage mobile échoue), on télécharge directement
         if (!attemptedShare) {
             const reader = new FileReader();
             reader.readAsDataURL(blob);
