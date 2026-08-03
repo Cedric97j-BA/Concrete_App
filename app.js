@@ -1,4 +1,4 @@
-const APP_VERSION = 'englobe-app-v1.0.4';
+const APP_VERSION = 'englobe-app-v1.0.5';
 
 // ========================================== //
 // 1. NAVIGATION ET INTERFACE GLOBALE         //
