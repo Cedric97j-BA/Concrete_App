@@ -259,7 +259,13 @@ button[onclick^="add"]:hover {
 /* ========================================= */
 @media (max-width: 820px) {
     
-    /* 1. MAXIMISER L'ESPACE ÉCRAN */
+    /* 1. RÈGLE DE SÉCURITÉ JAVASCRIPT (Cache le Témoin) */
+    [style*="display: none"], 
+    [style*="display:none"] {
+        display: none !important;
+    }
+
+    /* 2. MAXIMISER L'ESPACE ÉCRAN */
     body, #app-container {
         padding: 4px !important; 
         overflow-x: hidden !important; 
@@ -268,7 +274,7 @@ button[onclick^="add"]:hover {
         padding: 15px 10px !important; 
     }
 
-    /* 2. EN-TÊTE BLEU (HEADER) */
+    /* 3. EN-TÊTE BLEU (HEADER) */
     header, .bg-primary {
         display: flex !important;
         flex-direction: column !important;
@@ -282,20 +288,13 @@ button[onclick^="add"]:hover {
         max-width: 90% !important;
     }
 
-    /* 3. MENU DE NAVIGATION */
+    /* 4. MENU DE NAVIGATION */
     #form-navigation {
         flex-direction: column !important; 
     }
     .tab-btn {
         width: 100% !important;
         margin-bottom: 8px !important;
-    }
-
-    /* 4. LA MAGIE DU GRID (Observations & Protection) */
-    /* Transforme proprement les grilles 2 colonnes en 1 colonne. */
-    /* Empile "À la récupération" et "À l'échantillonnage" sans casser aucun tableau. */
-    .grid-2 {
-        grid-template-columns: 1fr !important;
     }
 
     /* 5. CORRECTIF TRUCK CARDS (Camions) */
@@ -314,25 +313,39 @@ button[onclick^="add"]:hover {
         margin-top: 10px !important;
     }
 
-    /* 6. DÉFILEMENT HORIZONTAL CIBLÉ (Conditions Initiales UNIQUEMENT) */
-    /* On cible le premier bloc (Conditions Initiales) SANS modifier sa structure interne (display) */
-    .temoin-container > div:first-of-type,
-    .temoin-only-card > div:first-of-type {
+    /* 6. DÉFILEMENT HORIZONTAL (Uniquement pour "Conditions initiales") */
+    /* On applique le scroll uniquement au premier enfant de la fiche témoin */
+    .temoin-container > div:nth-child(1),
+    .temoin-only-card > div:nth-child(1) {
         overflow-x: auto !important;
         -webkit-overflow-scrolling: touch !important; 
-        padding-bottom: 15px !important; 
+        padding-bottom: 10px !important; 
+        width: 100% !important;
+        display: block !important;
     }
-    /* On force une largeur minimale pour déclencher le scroll, tout en gardant l'affichage grille d'origine intact */
-    .temoin-container > div:first-of-type > div,
-    .temoin-only-card > div:first-of-type > div {
+    
+    /* On force l'intérieur de "Conditions initiales" à rester large pour permettre le défilement */
+    .temoin-container > div:nth-child(1) > div,
+    .temoin-only-card > div:nth-child(1) > div {
         min-width: 750px !important; 
     }
 
-    /* 7. DESTRUCTION DES BOUTONS CACHÉS APPLE */
+    /* 7. EMPILEMENT DE "PROTECTION" ET "OBSERVATIONS" */
+    /* Cible spécifiquement les sections 2 et 3 sans toucher à la section 1 (Conditions) */
+    .temoin-container > div:nth-child(n+2) .grid-2,
+    .temoin-only-card > div:nth-child(n+2) .grid-2,
+    .sample-card > div:nth-child(n+2) .grid-2 {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 15px !important;
+    }
+
+    /* 8. CORRECTION DES BOÎTES HEURE/DATE APPLE */
     input[type="date"], input[type="time"] {
         -webkit-appearance: none !important; 
         min-width: 0 !important;
     }
+    
     input[type="time"]::-webkit-clear-button,
     input[type="time"]::-webkit-inner-spin-button,
     input[type="date"]::-webkit-clear-button,
