@@ -259,13 +259,7 @@ button[onclick^="add"]:hover {
 /* ========================================= */
 @media (max-width: 820px) {
     
-    /* 1. RÈGLE DE SÉCURITÉ JAVASCRIPT (Cache le Témoin) */
-    [style*="display: none"], 
-    [style*="display:none"] {
-        display: none !important;
-    }
-
-    /* 2. MAXIMISER L'ESPACE ÉCRAN */
+    /* 1. MAXIMISER L'ESPACE ÉCRAN */
     body, #app-container {
         padding: 4px !important; 
         overflow-x: hidden !important; 
@@ -274,7 +268,7 @@ button[onclick^="add"]:hover {
         padding: 15px 10px !important; 
     }
 
-    /* 3. EN-TÊTE BLEU (HEADER) */
+    /* 2. EN-TÊTE BLEU (HEADER) */
     header, .bg-primary {
         display: flex !important;
         flex-direction: column !important;
@@ -288,7 +282,7 @@ button[onclick^="add"]:hover {
         max-width: 90% !important;
     }
 
-    /* 4. MENU DE NAVIGATION */
+    /* 3. MENU DE NAVIGATION */
     #form-navigation {
         flex-direction: column !important; 
     }
@@ -297,55 +291,86 @@ button[onclick^="add"]:hover {
         margin-bottom: 8px !important;
     }
 
-    /* 5. CORRECTIF TRUCK CARDS (Camions) */
-    .truck-card .grid-2 {
+    /* 4. CORRECTIF TRUCK CARDS (Alignement par le bas & Partage égal) */
+    .truck-card > div {
         display: flex !important;
         flex-direction: row !important;
-        align-items: flex-end !important; 
-        flex-wrap: nowrap !important;
+        align-items: flex-end !important; /* L'ANCRE : Assure l'alignement des boîtes par le bas */
+        gap: 8px !important;
+        width: 100% !important;
+        margin-bottom: 12px !important;
     }
+    
+    /* Force les boîtes d'une même ligne à être rigoureusement égales (ex: Chargement, Début, Fin) */
     .truck-card .input-group {
         flex: 1 1 0% !important; 
         min-width: 0 !important;
-    }
-    .truck-card .input-group:has(.truck-remarques-select) {
-        flex: 1 1 100% !important;
-        margin-top: 10px !important;
-    }
-
-    /* 6. DÉFILEMENT HORIZONTAL (Uniquement pour "Conditions initiales") */
-    /* On applique le scroll uniquement au premier enfant de la fiche témoin */
-    .temoin-container > div:nth-child(1),
-    .temoin-only-card > div:nth-child(1) {
-        overflow-x: auto !important;
-        -webkit-overflow-scrolling: touch !important; 
-        padding-bottom: 10px !important; 
-        width: 100% !important;
-        display: block !important;
+        margin-bottom: 0 !important;
     }
     
-    /* On force l'intérieur de "Conditions initiales" à rester large pour permettre le défilement */
-    .temoin-container > div:nth-child(1) > div,
-    .temoin-only-card > div:nth-child(1) > div {
-        min-width: 750px !important; 
+    /* Gère la Remarque pour qu'elle prenne toute la largeur en bas */
+    .truck-card .input-group:has(.truck-remarques-select) {
+        flex: 1 1 100% !important;
+        margin-top: 5px !important;
     }
 
-    /* 7. EMPILEMENT DE "PROTECTION" ET "OBSERVATIONS" */
-    /* Cible spécifiquement les sections 2 et 3 sans toucher à la section 1 (Conditions) */
-    .temoin-container > div:nth-child(n+2) .grid-2,
-    .temoin-only-card > div:nth-child(n+2) .grid-2,
-    .sample-card > div:nth-child(n+2) .grid-2 {
+    /* Réduit la taille de la police des labels pour éviter de trop grands retours à la ligne */
+    .truck-card .input-group label {
+        font-size: 0.82rem !important;
+        white-space: normal !important;
+        line-height: 1.15 !important;
+    }
+    
+    /* Protège la ligne des cases à cocher */
+    .truck-card > div:has(input[type="checkbox"]) {
+        align-items: center !important;
+        flex-wrap: wrap !important;
+    }
+
+    /* 5. FORM 3 : ISOLATION DU SCROLL HORIZONTAL ("Conditions initiales") */
+    /* On cible UNIQUEMENT la toute première grille de la Fiche Témoin, on la transforme en carousel */
+    .temoin-container .grid-2:first-of-type,
+    .temoin-only-card .grid-2:first-of-type {
+        display: block !important; /* Retire le mode Grid pour permettre le scroll fluide */
+        width: 100% !important;
+        overflow-x: auto !important;
+        white-space: nowrap !important; /* Empêche les éléments de passer à la ligne suivante */
+        -webkit-overflow-scrolling: touch !important;
+        padding-bottom: 10px !important;
+    }
+    
+    /* Transforme les colonnes intérieures de "Conditions initiales" en blocs défilants */
+    .temoin-container .grid-2:first-of-type > div,
+    .temoin-only-card .grid-2:first-of-type > div {
+        display: inline-block !important;
+        min-width: 320px !important; /* Largeur physique des blocs intérieurs */
+        white-space: normal !important;
+        vertical-align: top !important;
+        margin-right: 15px !important;
+    }
+
+    /* 6. FORM 3 : EMPILEMENT DE "PROTECTION" ET "OBSERVATIONS" */
+    /* Stacking standard pour les échantillons normaux */
+    .sample-card .grid-2 {
         display: flex !important;
         flex-direction: column !important;
         gap: 15px !important;
     }
+    
+    /* Stacking spécifique pour la Fiche Témoin (les grilles 2 et 3) */
+    .temoin-container .grid-2:not(:first-of-type),
+    .temoin-only-card .grid-2:not(:first-of-type) {
+        display: flex !important;
+        flex-direction: column !important; /* Force "À la récupération" / "À l'échantillonnage" sur deux lignes */
+        gap: 15px !important;
+        width: 100% !important;
+    }
 
-    /* 8. CORRECTION DES BOÎTES HEURE/DATE APPLE */
+    /* 7. DESTRUCTION DES BOUTONS CACHÉS APPLE (Temps/Date) */
     input[type="date"], input[type="time"] {
         -webkit-appearance: none !important; 
         min-width: 0 !important;
     }
-    
     input[type="time"]::-webkit-clear-button,
     input[type="time"]::-webkit-inner-spin-button,
     input[type="date"]::-webkit-clear-button,
