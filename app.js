@@ -1,4 +1,4 @@
-const APP_VERSION = 'englobe-app-v1.0.1';
+const APP_VERSION = 'englobe-app-v1.0.2';
 
 // ========================================== //
 // 1. NAVIGATION ET INTERFACE GLOBALE         //
@@ -183,9 +183,10 @@ function syncForm3UI() {
                 const f3TechHtml = card.querySelector('.sample-prelev-tech');
                 const f3TimeHtml = card.querySelector('.sample-prelev-time');
 
-                if (f3DateHtml && !f3DateHtml.value) f3DateHtml.value = globalDate;
-                if (f3TechHtml && !f3TechHtml.value) f3TechHtml.value = techInitials;
-                if (f3TimeHtml && !f3TimeHtml.value) f3TimeHtml.value = tTime;
+                // CORRECTIF TIME SYNC : Écrase toujours F3 avec les données de F2 (le maître)
+                if (f3DateHtml) f3DateHtml.value = globalDate;
+                if (f3TechHtml) f3TechHtml.value = techInitials;
+                if (f3TimeHtml) f3TimeHtml.value = tTime;
             }
         }
     });
@@ -589,7 +590,6 @@ function saveReport() {
     localStorage.setItem(saveKey, JSON.stringify(reportData));
     currentActiveReportKey = saveKey; 
     
-    alert(`Rapport sauvegardé sous :\n${saveKey.replace('englobe_', '')}`);
     updateDropdown();
     
     const dropdown = document.getElementById('saved-reports-dropdown');
@@ -983,24 +983,44 @@ async function exportToPDF() {
 
         const pdfBytes = await mergedPdf.save();
         const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-        
-        const reader = new FileReader();
-        reader.readAsDataURL(blob);
-        reader.onloadend = function() {
-            const base64data = reader.result;
-            const link = document.createElement('a');
-            link.href = base64data;
-            link.download = `Rapport_${noProjetVal}_${rawDateVal}_${resistanceVal}_${initialsVal}.pdf`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            if (btn) {
-                btn.textContent = originalText;
-                btn.disabled = false;
+        const fileName = `Rapport_${noProjetVal}_${rawDateVal}_${resistanceVal}_${initialsVal}.pdf`;
+
+        // CORRECTIF iPAD PWA : Utilisation de l'API de Partage Natif (Share Sheet)
+        let attemptedShare = false;
+        try {
+            if (navigator.share && navigator.canShare) {
+                const file = new File([blob], fileName, { type: 'application/pdf' });
+                if (navigator.canShare({ files: [file] })) {
+                    attemptedShare = true;
+                    await navigator.share({
+                        files: [file],
+                        title: fileName
+                    });
+                }
             }
-            alert("Export PDF généré avec succès !");
-        };
+        } catch (err) {
+            console.log("Partage annulé ou échoué:", err);
+        }
+
+        // Si l'API Share n'est pas supportée (PC/Laptop), on fait le téléchargement classique
+        if (!attemptedShare) {
+            const reader = new FileReader();
+            reader.readAsDataURL(blob);
+            reader.onloadend = function() {
+                const base64data = reader.result;
+                const link = document.createElement('a');
+                link.href = base64data;
+                link.download = fileName;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            };
+        }
+        
+        if (btn) {
+            btn.textContent = originalText;
+            btn.disabled = false;
+        }
 
     } catch (error) {
         console.error("Erreur lors de l'export multi-template :", error);
