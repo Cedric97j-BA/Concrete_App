@@ -259,7 +259,7 @@ button[onclick^="add"]:hover {
 /* ========================================= */
 @media (max-width: 820px) {
     
-    /* 1. PROTECTION ABSOLUE DU JAVASCRIPT (Empêche l'affichage intempestif du Témoin) */
+    /* 1. PROTECTION ABSOLUE DU JAVASCRIPT */
     .temoin-container[style*="display: none"],
     .temoin-container[style*="display:none"],
     *[style*="display: none"], 
@@ -297,11 +297,11 @@ button[onclick^="add"]:hover {
         margin-bottom: 8px !important;
     }
 
-    /* 4. TRUCK CARDS : ALIGNEMENT PAR LE BAS DES BOÎTES (Évite le décalage des inputs) */
+    /* 4. TRUCK CARDS : ALIGNEMENT PAR LE BAS DE TOUTES LES LIGNES */
     .truck-card > div {
         display: flex !important;
         flex-direction: row !important;
-        align-items: flex-end !important; /* Aligne strictement les bas de boîtes */
+        align-items: flex-end !important; 
         gap: 6px !important;
         width: 100% !important;
         margin-bottom: 10px !important;
@@ -312,7 +312,6 @@ button[onclick^="add"]:hover {
         min-width: 0 !important;
         margin-bottom: 0 !important;
     }
-    /* Remarque sur sa propre ligne */
     .truck-card .input-group:has(.truck-remarques-select) {
         flex: 1 1 100% !important;
         margin-top: 8px !important;
@@ -327,34 +326,48 @@ button[onclick^="add"]:hover {
         flex-wrap: wrap !important;
     }
 
-    /* 5. FORM 3 : CORRECTION DE LA SECTION "CONDITIONS INITIALES" (Cramponnement résolu) */
-    /* Cible spécifiquement la grille inline à 2 colonnes dans Form 3 et l'empile proprement */
+    /* 4.1. ALIGNEMENT SPÉCIFIQUE DES INPUTS D'ÉCHANTILLON DANS LA CARTE CAMION */
+    .truck-sample-fields > div {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: flex-end !important;
+        gap: 10px !important;
+    }
+    .truck-sample-fields > div > div {
+        flex: 1 1 0% !important;
+        min-width: 0 !important;
+    }
+    .truck-sample-fields label {
+        font-size: 0.8rem !important;
+        line-height: 1.15 !important;
+        margin-bottom: 4px !important;
+    }
+
+    /* 5. FORM 3 : CONDITIONS INITIALES ET SOUS-SECTIONS */
     .sample-card .form-section div[style*="grid-template-columns: 1fr 1fr"],
     .temoin-only-card div[style*="grid-template-columns: 1fr 1fr"] {
         display: flex !important;
         flex-direction: column !important;
         gap: 15px !important;
     }
-
-    /* 6. FORM 3 : OBSERVATIONS & PROTECTION (Empilement des sous-sections) */
     .grid-2 {
         display: flex !important;
         flex-direction: column !important;
         gap: 15px !important;
     }
 
-    /* 7. FICHE TÉMOIN : SCROLL HORIZONTAL UNIQUEMENT SUR LE TABLEAU */
-    /* Cible le bloc de tableau HTML complexe dans la fiche témoin pour activer le scroll latéral */
-    .temoin-container div[style*="grid-template-columns: auto auto auto"],
-    .temoin-only-card div[style*="grid-template-columns: auto auto auto"] {
+    /* 6. FICHE TÉMOIN : DÉFILEMENT HORIZONTAL CORRIGÉ POUR LA GRILLE COMPLEXE */
+    /* Cible précisément le conteneur de la grille à 8 colonnes du tableau Témoin */
+    .temoin-container div[style*="grid-template-columns: auto"],
+    .temoin-only-card div[style*="grid-template-columns: auto"] {
+        display: grid !important;
         overflow-x: auto !important;
         -webkit-overflow-scrolling: touch !important;
-        display: grid !important;
-        min-width: 700px !important; /* Force l'apparition du scroll sans casser la structure */
+        min-width: 750px !important;
         padding-bottom: 10px !important;
     }
 
-    /* 8. NETTOYAGE DES INPUTS TEMPS/DATE APPLE */
+    /* 7. NETTOYAGE DES INPUTS TEMPS/DATE APPLE */
     input[type="date"], input[type="time"] {
         -webkit-appearance: none !important; 
         min-width: 0 !important;
