@@ -326,7 +326,7 @@ button[onclick^="add"]:hover {
         flex-wrap: wrap !important;
     }
 
-    /* 4.1. ALIGNEMENT SPÉCIFIQUE DES INPUTS D'ÉCHANTILLON DANS LA CARTE CAMION */
+    /* 4.1. ALIGNEMENT DES INPUTS D'ÉCHANTILLON DANS LA CARTE CAMION */
     .truck-sample-fields > div {
         display: flex !important;
         flex-direction: row !important;
@@ -356,18 +356,7 @@ button[onclick^="add"]:hover {
         gap: 15px !important;
     }
 
-    /* 6. FICHE TÉMOIN : DÉFILEMENT HORIZONTAL CORRIGÉ POUR LA GRILLE COMPLEXE */
-    /* Cible précisément le conteneur de la grille à 8 colonnes du tableau Témoin */
-    .temoin-container div[style*="grid-template-columns: auto"],
-    .temoin-only-card div[style*="grid-template-columns: auto"] {
-        display: grid !important;
-        overflow-x: auto !important;
-        -webkit-overflow-scrolling: touch !important;
-        min-width: 750px !important;
-        padding-bottom: 10px !important;
-    }
-
-    /* 7. NETTOYAGE DES INPUTS TEMPS/DATE APPLE */
+    /* 6. NETTOYAGE DES INPUTS TEMPS/DATE APPLE */
     input[type="date"], input[type="time"] {
         -webkit-appearance: none !important; 
         min-width: 0 !important;

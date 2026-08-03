@@ -37,7 +37,7 @@
         <div style="display: flex; flex-direction: column; gap: 5px;">
             <h1 style="margin: 0; font-size: 1.5rem; letter-spacing: 0.5px;">Registre de Bétonnage et Échantillonnage</h1>
             <div>
-                <span id="app-version" style="font-size: 0.95rem; font-weight: bold; background: #0369a1; padding: 3px 10px; border-radius: 12px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);">v1.0.9.13</span>
+                <span id="app-version" style="font-size: 0.95rem; font-weight: bold; background: #0369a1; padding: 3px 10px; border-radius: 12px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);">v1.0.9.14</span>
             </div>
         </div>
         
@@ -737,35 +737,141 @@
 
                     <div style="margin-bottom: 15px;">
                         <h4 style="text-align: center; background: #e2e8f0; padding: 5px; margin: 0 0 10px 0;">Conditions initiales de cure et d'entreposage</h4>
-                        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
                             <label style="font-weight:bold; width: 100px;">Prélèvement</label>
                             <div style="flex: 1; display: flex; gap: 5px;"><label>date</label><input type="date" class="temoin-prelev-date" style="flex:1;"></div>
                             <div style="flex: 1; display: flex; gap: 5px;"><label>heure</label><input type="time" class="temoin-prelev-time" style="flex:1;"></div>
                             <div style="flex: 1; display: flex; gap: 5px;"><label>par</label><input type="text" class="temoin-prelev-tech" style="flex:1;"></div>
                         </div>
 
-                        <div style="display: grid; grid-template-columns: auto auto auto auto auto auto auto auto; gap: 1px; background: #ccc; border: 1px solid #ccc; font-size: 0.85rem; text-align: center;">
-                            <div style="background: #f3f4f6; padding: 5px; grid-row: span 2; display: flex; align-items: center; justify-content: center;">Témoin n°</div>
-                            <div style="background: #f3f4f6; padding: 5px; grid-row: span 2; display: flex; align-items: center; justify-content: center;">N° éch.</div>
-                            <div style="background: #f3f4f6; padding: 5px; grid-row: span 2; display: flex; align-items: center; justify-content: center;">Bris prévue<br>(jours)</div>
-                            <div style="background: #f3f4f6; padding: 5px; grid-column: span 2;">Température</div>
-                            <div style="background: #f3f4f6; padding: 5px; grid-column: span 3;">Récupération</div>
-                            
-                            <div style="background: #f3f4f6; padding: 5px;">début</div>
-                            <div style="background: #f3f4f6; padding: 5px;">fin</div>
-                            <div style="background: #f3f4f6; padding: 5px;">date</div>
-                            <div style="background: #f3f4f6; padding: 5px;">heure</div>
-                            <div style="background: #f3f4f6; padding: 5px;">par</div>
-
-                            <input type="text" class="temoin-a-num" style="border:none; width:100%; text-align:center;"><div style="background: white; padding: 2px; text-align:center;">a</div><input type="number" class="temoin-a-bris" style="border:none; width:100%;"><input type="number" class="temoin-a-temp-debut" style="border:none; width:100%;"><input type="number" class="temoin-a-temp-fin" style="border:none; width:100%;"><input type="date" class="temoin-a-recup-date" style="border:none; width:100%;"><input type="time" class="temoin-a-recup-heure" style="border:none; width:100%;"><input type="text" class="temoin-a-recup-par" style="border:none; width:100%;">
-                            <input type="text" class="temoin-b-num" style="border:none; width:100%; text-align:center;"><div style="background: white; padding: 2px; text-align:center;">b</div><input type="number" class="temoin-b-bris" style="border:none; width:100%;"><input type="number" class="temoin-b-temp-debut" style="border:none; width:100%;"><input type="number" class="temoin-b-temp-fin" style="border:none; width:100%;"><input type="date" class="temoin-b-recup-date" style="border:none; width:100%;"><input type="time" class="temoin-b-recup-heure" style="border:none; width:100%;"><input type="text" class="temoin-b-recup-par" style="border:none; width:100%;">
-                            <input type="text" class="temoin-c-num" style="border:none; width:100%; text-align:center;"><div style="background: white; padding: 2px; text-align:center;">c</div><input type="number" class="temoin-c-bris" style="border:none; width:100%;"><input type="number" class="temoin-c-temp-debut" style="border:none; width:100%;"><input type="number" class="temoin-c-temp-fin" style="border:none; width:100%;"><input type="date" class="temoin-c-recup-date" style="border:none; width:100%;"><input type="time" class="temoin-c-recup-heure" style="border:none; width:100%;"><input type="text" class="temoin-c-recup-par" style="border:none; width:100%;">
-                            <input type="text" class="temoin-d-num" style="border:none; width:100%; text-align:center;"><div style="background: white; padding: 2px; text-align:center;">d</div><input type="number" class="temoin-d-bris" style="border:none; width:100%;"><input type="number" class="temoin-d-temp-debut" style="border:none; width:100%;"><input type="number" class="temoin-d-temp-fin" style="border:none; width:100%;"><input type="date" class="temoin-d-recup-date" style="border:none; width:100%;"><input type="time" class="temoin-d-recup-heure" style="border:none; width:100%;"><input type="text" class="temoin-d-recup-par" style="border:none; width:100%;">
-                            <input type="text" class="temoin-e-num" style="border:none; width:100%; text-align:center;"><div style="background: white; padding: 2px; text-align:center;">e</div><input type="number" class="temoin-e-bris" style="border:none; width:100%;"><input type="number" class="temoin-e-temp-debut" style="border:none; width:100%;"><input type="number" class="temoin-e-temp-fin" style="border:none; width:100%;"><input type="date" class="temoin-e-recup-date" style="border:none; width:100%;"><input type="time" class="temoin-e-recup-heure" style="border:none; width:100%;"><input type="text" class="temoin-e-recup-par" style="border:none; width:100%;">
-                            <input type="text" class="temoin-f-num" style="border:none; width:100%; text-align:center;"><div style="background: white; padding: 2px; text-align:center;">f</div><input type="number" class="temoin-f-bris" style="border:none; width:100%;"><input type="number" class="temoin-f-temp-debut" style="border:none; width:100%;"><input type="number" class="temoin-f-temp-fin" style="border:none; width:100%;"><input type="date" class="temoin-f-recup-date" style="border:none; width:100%;"><input type="time" class="temoin-f-recup-heure" style="border:none; width:100%;"><input type="text" class="temoin-f-recup-par" style="border:none; width:100%;">
-                            <input type="text" class="temoin-g-num" style="border:none; width:100%; text-align:center;"><div style="background: white; padding: 2px; text-align:center;">g</div><input type="number" class="temoin-g-bris" style="border:none; width:100%;"><input type="number" class="temoin-g-temp-debut" style="border:none; width:100%;"><input type="number" class="temoin-g-temp-fin" style="border:none; width:100%;"><input type="date" class="temoin-g-recup-date" style="border:none; width:100%;"><input type="time" class="temoin-g-recup-heure" style="border:none; width:100%;"><input type="text" class="temoin-g-recup-par" style="border:none; width:100%;">
-                            <input type="text" class="temoin-h-num" style="border:none; width:100%; text-align:center;"><div style="background: white; padding: 2px; text-align:center;">h</div><input type="number" class="temoin-h-bris" style="border:none; width:100%;"><input type="number" class="temoin-h-temp-debut" style="border:none; width:100%;"><input type="number" class="temoin-h-temp-fin" style="border:none; width:100%;"><input type="date" class="temoin-h-recup-date" style="border:none; width:100%;"><input type="time" class="temoin-h-recup-heure" style="border:none; width:100%;"><input type="text" class="temoin-h-recup-par" style="border:none; width:100%;">
-                            <input type="text" class="temoin-i-num" style="border:none; width:100%; text-align:center;"><div style="background: white; padding: 2px; text-align:center;">i</div><input type="number" class="temoin-i-bris" style="border:none; width:100%;"><input type="number" class="temoin-i-temp-debut" style="border:none; width:100%;"><input type="number" class="temoin-i-temp-fin" style="border:none; width:100%;"><input type="date" class="temoin-i-recup-date" style="border:none; width:100%;"><input type="time" class="temoin-i-recup-heure" style="border:none; width:100%;"><input type="text" class="temoin-i-recup-par" style="border:none; width:100%;">
+                        <!-- ACCORDION ROWS POUR MOBILE ET BUREAU -->
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <!-- Ligne a -->
+                            <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
+                                <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne a</summary>
+                                <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                    <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-a-num"></div>
+                                    <div class="input-group"><label>N° éch.</label><input type="text" value="a" readonly style="background:#f3f4f6; text-align:center;"></div>
+                                    <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-a-bris"></div>
+                                    <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-a-temp-debut" step="0.1"></div>
+                                    <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-a-temp-fin" step="0.1"></div>
+                                    <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-a-recup-date"></div>
+                                    <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-a-recup-heure"></div>
+                                    <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-a-recup-par"></div>
+                                </div>
+                            </details>
+                            <!-- Ligne b -->
+                            <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
+                                <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne b</summary>
+                                <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                    <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-b-num"></div>
+                                    <div class="input-group"><label>N° éch.</label><input type="text" value="b" readonly style="background:#f3f4f6; text-align:center;"></div>
+                                    <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-b-bris"></div>
+                                    <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-b-temp-debut" step="0.1"></div>
+                                    <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-b-temp-fin" step="0.1"></div>
+                                    <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-b-recup-date"></div>
+                                    <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-b-recup-heure"></div>
+                                    <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-b-recup-par"></div>
+                                </div>
+                            </details>
+                            <!-- Ligne c -->
+                            <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
+                                <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne c</summary>
+                                <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                    <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-c-num"></div>
+                                    <div class="input-group"><label>N° éch.</label><input type="text" value="c" readonly style="background:#f3f4f6; text-align:center;"></div>
+                                    <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-c-bris"></div>
+                                    <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-c-temp-debut" step="0.1"></div>
+                                    <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-c-temp-fin" step="0.1"></div>
+                                    <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-c-recup-date"></div>
+                                    <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-c-recup-heure"></div>
+                                    <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-c-recup-par"></div>
+                                </div>
+                            </details>
+                            <!-- Ligne d -->
+                            <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
+                                <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne d</summary>
+                                <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                    <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-d-num"></div>
+                                    <div class="input-group"><label>N° éch.</label><input type="text" value="d" readonly style="background:#f3f4f6; text-align:center;"></div>
+                                    <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-d-bris"></div>
+                                    <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-d-temp-debut" step="0.1"></div>
+                                    <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-d-temp-fin" step="0.1"></div>
+                                    <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-d-recup-date"></div>
+                                    <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-d-recup-heure"></div>
+                                    <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-d-recup-par"></div>
+                                </div>
+                            </details>
+                            <!-- Ligne e -->
+                            <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
+                                <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne e</summary>
+                                <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                    <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-e-num"></div>
+                                    <div class="input-group"><label>N° éch.</label><input type="text" value="e" readonly style="background:#f3f4f6; text-align:center;"></div>
+                                    <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-e-bris"></div>
+                                    <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-e-temp-debut" step="0.1"></div>
+                                    <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-e-temp-fin" step="0.1"></div>
+                                    <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-e-recup-date"></div>
+                                    <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-e-recup-heure"></div>
+                                    <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-e-recup-par"></div>
+                                </div>
+                            </details>
+                            <!-- Ligne f -->
+                            <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
+                                <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne f</summary>
+                                <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                    <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-f-num"></div>
+                                    <div class="input-group"><label>N° éch.</label><input type="text" value="f" readonly style="background:#f3f4f6; text-align:center;"></div>
+                                    <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-f-bris"></div>
+                                    <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-f-temp-debut" step="0.1"></div>
+                                    <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-f-temp-fin" step="0.1"></div>
+                                    <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-f-recup-date"></div>
+                                    <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-f-recup-heure"></div>
+                                    <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-f-recup-par"></div>
+                                </div>
+                            </details>
+                            <!-- Ligne g -->
+                            <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
+                                <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne g</summary>
+                                <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                    <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-g-num"></div>
+                                    <div class="input-group"><label>N° éch.</label><input type="text" value="g" readonly style="background:#f3f4f6; text-align:center;"></div>
+                                    <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-g-bris"></div>
+                                    <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-g-temp-debut" step="0.1"></div>
+                                    <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-g-temp-fin" step="0.1"></div>
+                                    <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-g-recup-date"></div>
+                                    <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-g-recup-heure"></div>
+                                    <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-g-recup-par"></div>
+                                </div>
+                            </details>
+                            <!-- Ligne h -->
+                            <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
+                                <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne h</summary>
+                                <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                    <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-h-num"></div>
+                                    <div class="input-group"><label>N° éch.</label><input type="text" value="h" readonly style="background:#f3f4f6; text-align:center;"></div>
+                                    <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-h-bris"></div>
+                                    <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-h-temp-debut" step="0.1"></div>
+                                    <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-h-temp-fin" step="0.1"></div>
+                                    <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-h-recup-date"></div>
+                                    <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-h-recup-heure"></div>
+                                    <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-h-recup-par"></div>
+                                </div>
+                            </details>
+                            <!-- Ligne i -->
+                            <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
+                                <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne i</summary>
+                                <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                    <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-i-num"></div>
+                                    <div class="input-group"><label>N° éch.</label><input type="text" value="i" readonly style="background:#f3f4f6; text-align:center;"></div>
+                                    <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-i-bris"></div>
+                                    <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-i-temp-debut" step="0.1"></div>
+                                    <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-i-temp-fin" step="0.1"></div>
+                                    <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-i-recup-date"></div>
+                                    <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-i-recup-heure"></div>
+                                    <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-i-recup-par"></div>
+                                </div>
+                            </details>
                         </div>
                     </div>
 
@@ -860,28 +966,144 @@
                         <div style="flex: 1; display: flex; gap: 5px;"><label>par</label><input type="text" class="temoin-prelev-tech" style="flex:1;"></div>
                     </div>
 
-                    <div style="display: grid; grid-template-columns: auto auto auto auto auto auto auto auto; gap: 1px; background: #ccc; border: 1px solid #ccc; font-size: 0.85rem; text-align: center;">
-                        <div style="background: #f3f4f6; padding: 5px; grid-row: span 2; display: flex; align-items: center; justify-content: center;">Témoin n°</div>
-                        <div style="background: #f3f4f6; padding: 5px; grid-row: span 2; display: flex; align-items: center; justify-content: center;">N° éch.</div>
-                        <div style="background: #f3f4f6; padding: 5px; grid-row: span 2; display: flex; align-items: center; justify-content: center;">Bris prévue<br>(jours)</div>
-                        <div style="background: #f3f4f6; padding: 5px; grid-column: span 2;">Température</div>
-                        <div style="background: #f3f4f6; padding: 5px; grid-column: span 3;">Récupération</div>
-                        
-                        <div style="background: #f3f4f6; padding: 5px;">début</div>
-                        <div style="background: #f3f4f6; padding: 5px;">fin</div>
-                        <div style="background: #f3f4f6; padding: 5px;">date</div>
-                        <div style="background: #f3f4f6; padding: 5px;">heure</div>
-                        <div style="background: #f3f4f6; padding: 5px;">par</div>
+                     <div style="margin-bottom: 15px;">
+                        <h4 style="text-align: center; background: #e2e8f0; padding: 5px; margin: 0 0 10px 0;">Conditions initiales de cure et d'entreposage</h4>
+                        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                            <label style="font-weight:bold; width: 100px;">Prélèvement</label>
+                            <div style="flex: 1; display: flex; gap: 5px;"><label>date</label><input type="date" class="temoin-prelev-date" style="flex:1;"></div>
+                            <div style="flex: 1; display: flex; gap: 5px;"><label>heure</label><input type="time" class="temoin-prelev-time" style="flex:1;"></div>
+                            <div style="flex: 1; display: flex; gap: 5px;"><label>par</label><input type="text" class="temoin-prelev-tech" style="flex:1;"></div>
+                        </div>
 
-                        <input type="text" class="temoin-a-num" style="border:none; width:100%; text-align:center;"><div style="background: white; padding: 2px; text-align:center;">a</div><input type="number" class="temoin-a-bris" style="border:none; width:100%;"><input type="number" class="temoin-a-temp-debut" style="border:none; width:100%;"><input type="number" class="temoin-a-temp-fin" style="border:none; width:100%;"><input type="date" class="temoin-a-recup-date" style="border:none; width:100%;"><input type="time" class="temoin-a-recup-heure" style="border:none; width:100%;"><input type="text" class="temoin-a-recup-par" style="border:none; width:100%;">
-                        <input type="text" class="temoin-b-num" style="border:none; width:100%; text-align:center;"><div style="background: white; padding: 2px; text-align:center;">b</div><input type="number" class="temoin-b-bris" style="border:none; width:100%;"><input type="number" class="temoin-b-temp-debut" style="border:none; width:100%;"><input type="number" class="temoin-b-temp-fin" style="border:none; width:100%;"><input type="date" class="temoin-b-recup-date" style="border:none; width:100%;"><input type="time" class="temoin-b-recup-heure" style="border:none; width:100%;"><input type="text" class="temoin-b-recup-par" style="border:none; width:100%;">
-                        <input type="text" class="temoin-c-num" style="border:none; width:100%; text-align:center;"><div style="background: white; padding: 2px; text-align:center;">c</div><input type="number" class="temoin-c-bris" style="border:none; width:100%;"><input type="number" class="temoin-c-temp-debut" style="border:none; width:100%;"><input type="number" class="temoin-c-temp-fin" style="border:none; width:100%;"><input type="date" class="temoin-c-recup-date" style="border:none; width:100%;"><input type="time" class="temoin-c-recup-heure" style="border:none; width:100%;"><input type="text" class="temoin-c-recup-par" style="border:none; width:100%;">
-                        <input type="text" class="temoin-d-num" style="border:none; width:100%; text-align:center;"><div style="background: white; padding: 2px; text-align:center;">d</div><input type="number" class="temoin-d-bris" style="border:none; width:100%;"><input type="number" class="temoin-d-temp-debut" style="border:none; width:100%;"><input type="number" class="temoin-d-temp-fin" style="border:none; width:100%;"><input type="date" class="temoin-d-recup-date" style="border:none; width:100%;"><input type="time" class="temoin-d-recup-heure" style="border:none; width:100%;"><input type="text" class="temoin-d-recup-par" style="border:none; width:100%;">
-                        <input type="text" class="temoin-e-num" style="border:none; width:100%; text-align:center;"><div style="background: white; padding: 2px; text-align:center;">e</div><input type="number" class="temoin-e-bris" style="border:none; width:100%;"><input type="number" class="temoin-e-temp-debut" style="border:none; width:100%;"><input type="number" class="temoin-e-temp-fin" style="border:none; width:100%;"><input type="date" class="temoin-e-recup-date" style="border:none; width:100%;"><input type="time" class="temoin-e-recup-heure" style="border:none; width:100%;"><input type="text" class="temoin-e-recup-par" style="border:none; width:100%;">
-                        <input type="text" class="temoin-f-num" style="border:none; width:100%; text-align:center;"><div style="background: white; padding: 2px; text-align:center;">f</div><input type="number" class="temoin-f-bris" style="border:none; width:100%;"><input type="number" class="temoin-f-temp-debut" style="border:none; width:100%;"><input type="number" class="temoin-f-temp-fin" style="border:none; width:100%;"><input type="date" class="temoin-f-recup-date" style="border:none; width:100%;"><input type="time" class="temoin-f-recup-heure" style="border:none; width:100%;"><input type="text" class="temoin-f-recup-par" style="border:none; width:100%;">
-                        <input type="text" class="temoin-g-num" style="border:none; width:100%; text-align:center;"><div style="background: white; padding: 2px; text-align:center;">g</div><input type="number" class="temoin-g-bris" style="border:none; width:100%;"><input type="number" class="temoin-g-temp-debut" style="border:none; width:100%;"><input type="number" class="temoin-g-temp-fin" style="border:none; width:100%;"><input type="date" class="temoin-g-recup-date" style="border:none; width:100%;"><input type="time" class="temoin-g-recup-heure" style="border:none; width:100%;"><input type="text" class="temoin-g-recup-par" style="border:none; width:100%;">
-                        <input type="text" class="temoin-h-num" style="border:none; width:100%; text-align:center;"><div style="background: white; padding: 2px; text-align:center;">h</div><input type="number" class="temoin-h-bris" style="border:none; width:100%;"><input type="number" class="temoin-h-temp-debut" style="border:none; width:100%;"><input type="number" class="temoin-h-temp-fin" style="border:none; width:100%;"><input type="date" class="temoin-h-recup-date" style="border:none; width:100%;"><input type="time" class="temoin-h-recup-heure" style="border:none; width:100%;"><input type="text" class="temoin-h-recup-par" style="border:none; width:100%;">
-                        <input type="text" class="temoin-i-num" style="border:none; width:100%; text-align:center;"><div style="background: white; padding: 2px; text-align:center;">i</div><input type="number" class="temoin-i-bris" style="border:none; width:100%;"><input type="number" class="temoin-i-temp-debut" style="border:none; width:100%;"><input type="number" class="temoin-i-temp-fin" style="border:none; width:100%;"><input type="date" class="temoin-i-recup-date" style="border:none; width:100%;"><input type="time" class="temoin-i-recup-heure" style="border:none; width:100%;"><input type="text" class="temoin-i-recup-par" style="border:none; width:100%;">
+                        <!-- ACCORDION ROWS POUR MOBILE ET BUREAU -->
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <!-- Ligne a -->
+                            <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
+                                <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne a</summary>
+                                <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                    <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-a-num"></div>
+                                    <div class="input-group"><label>N° éch.</label><input type="text" value="a" readonly style="background:#f3f4f6; text-align:center;"></div>
+                                    <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-a-bris"></div>
+                                    <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-a-temp-debut" step="0.1"></div>
+                                    <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-a-temp-fin" step="0.1"></div>
+                                    <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-a-recup-date"></div>
+                                    <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-a-recup-heure"></div>
+                                    <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-a-recup-par"></div>
+                                </div>
+                            </details>
+                            <!-- Ligne b -->
+                            <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
+                                <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne b</summary>
+                                <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                    <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-b-num"></div>
+                                    <div class="input-group"><label>N° éch.</label><input type="text" value="b" readonly style="background:#f3f4f6; text-align:center;"></div>
+                                    <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-b-bris"></div>
+                                    <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-b-temp-debut" step="0.1"></div>
+                                    <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-b-temp-fin" step="0.1"></div>
+                                    <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-b-recup-date"></div>
+                                    <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-b-recup-heure"></div>
+                                    <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-b-recup-par"></div>
+                                </div>
+                            </details>
+                            <!-- Ligne c -->
+                            <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
+                                <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne c</summary>
+                                <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                    <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-c-num"></div>
+                                    <div class="input-group"><label>N° éch.</label><input type="text" value="c" readonly style="background:#f3f4f6; text-align:center;"></div>
+                                    <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-c-bris"></div>
+                                    <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-c-temp-debut" step="0.1"></div>
+                                    <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-c-temp-fin" step="0.1"></div>
+                                    <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-c-recup-date"></div>
+                                    <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-c-recup-heure"></div>
+                                    <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-c-recup-par"></div>
+                                </div>
+                            </details>
+                            <!-- Ligne d -->
+                            <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
+                                <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne d</summary>
+                                <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                    <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-d-num"></div>
+                                    <div class="input-group"><label>N° éch.</label><input type="text" value="d" readonly style="background:#f3f4f6; text-align:center;"></div>
+                                    <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-d-bris"></div>
+                                    <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-d-temp-debut" step="0.1"></div>
+                                    <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-d-temp-fin" step="0.1"></div>
+                                    <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-d-recup-date"></div>
+                                    <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-d-recup-heure"></div>
+                                    <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-d-recup-par"></div>
+                                </div>
+                            </details>
+                            <!-- Ligne e -->
+                            <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
+                                <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne e</summary>
+                                <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                    <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-e-num"></div>
+                                    <div class="input-group"><label>N° éch.</label><input type="text" value="e" readonly style="background:#f3f4f6; text-align:center;"></div>
+                                    <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-e-bris"></div>
+                                    <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-e-temp-debut" step="0.1"></div>
+                                    <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-e-temp-fin" step="0.1"></div>
+                                    <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-e-recup-date"></div>
+                                    <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-e-recup-heure"></div>
+                                    <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-e-recup-par"></div>
+                                </div>
+                            </details>
+                            <!-- Ligne f -->
+                            <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
+                                <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne f</summary>
+                                <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                    <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-f-num"></div>
+                                    <div class="input-group"><label>N° éch.</label><input type="text" value="f" readonly style="background:#f3f4f6; text-align:center;"></div>
+                                    <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-f-bris"></div>
+                                    <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-f-temp-debut" step="0.1"></div>
+                                    <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-f-temp-fin" step="0.1"></div>
+                                    <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-f-recup-date"></div>
+                                    <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-f-recup-heure"></div>
+                                    <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-f-recup-par"></div>
+                                </div>
+                            </details>
+                            <!-- Ligne g -->
+                            <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
+                                <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne g</summary>
+                                <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                    <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-g-num"></div>
+                                    <div class="input-group"><label>N° éch.</label><input type="text" value="g" readonly style="background:#f3f4f6; text-align:center;"></div>
+                                    <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-g-bris"></div>
+                                    <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-g-temp-debut" step="0.1"></div>
+                                    <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-g-temp-fin" step="0.1"></div>
+                                    <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-g-recup-date"></div>
+                                    <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-g-recup-heure"></div>
+                                    <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-g-recup-par"></div>
+                                </div>
+                            </details>
+                            <!-- Ligne h -->
+                            <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
+                                <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne h</summary>
+                                <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                    <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-h-num"></div>
+                                    <div class="input-group"><label>N° éch.</label><input type="text" value="h" readonly style="background:#f3f4f6; text-align:center;"></div>
+                                    <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-h-bris"></div>
+                                    <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-h-temp-debut" step="0.1"></div>
+                                    <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-h-temp-fin" step="0.1"></div>
+                                    <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-h-recup-date"></div>
+                                    <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-h-recup-heure"></div>
+                                    <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-h-recup-par"></div>
+                                </div>
+                            </details>
+                            <!-- Ligne i -->
+                            <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
+                                <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne i</summary>
+                                <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                    <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-i-num"></div>
+                                    <div class="input-group"><label>N° éch.</label><input type="text" value="i" readonly style="background:#f3f4f6; text-align:center;"></div>
+                                    <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-i-bris"></div>
+                                    <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-i-temp-debut" step="0.1"></div>
+                                    <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-i-temp-fin" step="0.1"></div>
+                                    <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-i-recup-date"></div>
+                                    <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-i-recup-heure"></div>
+                                    <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-i-recup-par"></div>
+                                </div>
+                            </details>
+                        </div>
                     </div>
 
                     <div style="margin-bottom: 15px;">
@@ -948,7 +1170,7 @@
 <!-- LE CERVEAU (JAVASCRIPT)                    -->
 <!-- ========================================== -->
 <script src="pdf_templates.js"></script>
-<script src="app.js?v=1.0.9.13"></script>
+<script src="app.js?v=1.0.9.14"></script>
 
 </body>
 </html>
