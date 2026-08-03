@@ -2,16 +2,16 @@
 /* VARIABLES ET RÉINITIALISATION GLOBALE     */
 /* ========================================= */
 :root {
-    --primary: #0284c7;      /* Bleu Englobe/Principal */
+    --primary: #0284c7;      
     --primary-hover: #0369a1;
-    --success: #16a34a;      /* Vert pour Form 3 / Échantillons */
+    --success: #16a34a;      
     --success-bg: #f0fdf4;
-    --warning: #b45309;      /* Orange pour Récupération */
-    --danger: #dc2626;       /* Rouge pour Refus */
+    --warning: #b45309;      
+    --danger: #dc2626;       
     --danger-bg: #fef2f2;
-    --temoin: #8b5cf6;       /* Violet pour Fiche Témoin */
+    --temoin: #8b5cf6;       
     --temoin-bg: #faf5ff;
-    --bg-page: #f1f5f9;      /* Gris très clair pour le fond */
+    --bg-page: #f1f5f9;      
     --bg-card: #ffffff;
     --border: #cbd5e1;
     --text-main: #334155;
@@ -81,7 +81,7 @@ h4 {
     font-size: 1.1rem;
     font-weight: bold;
     color: #1e293b;
-    /* CORRECTIF UI : Couleur de base distincte pour se démarquer du fond */
+    /* Boutons gris/bleu-ardoise pour se démarquer du fond blanc */
     background-color: #cbd5e1; 
     border: 2px solid #94a3b8;
     border-radius: 6px;
@@ -189,7 +189,7 @@ textarea {
     cursor: pointer;
 }
 
-/* CORRECTIF LAPTOP : Fixe la taille strictement et empêche l'étirement flexbox */
+/* Fixe la taille de toutes les cases à cocher pour éviter les étirements Flexbox */
 input[type="checkbox"] {
     width: 22px !important;
     height: 22px !important;
@@ -274,7 +274,7 @@ button[onclick^="add"]:hover {
         padding: 15px 10px !important; 
     }
 
-    /* 2. CORRECTION DE L'EN-TÊTE BLEU (HEADER) */
+    /* 2. EN-TÊTE BLEU (HEADER) */
     header, div[style*="background-color"], .bg-primary {
         display: flex !important;
         flex-direction: column !important;
@@ -291,7 +291,7 @@ button[onclick^="add"]:hover {
         max-width: 90% !important;
     }
 
-    /* 3. MENU DE NAVIGATION (3 LIGNES SÉPARÉES SUR MOBILE) */
+    /* 3. MENU DE NAVIGATION (3 LIGNES SÉPARÉES) */
     #form-navigation {
         display: flex !important;
         flex-direction: column !important; 
@@ -305,31 +305,60 @@ button[onclick^="add"]:hover {
         padding: 14px !important;
     }
 
-    /* 4. CORRECTIF TRUCK CARD : ISOLE LES HEURES SUR LEUR PROPRE LIGNE */
-    /* Laisse les autres boîtes (Volume, Eau) côte à côte, mais force les boîtes de temps à prendre 100% */
-    .truck-card .input-group:has(input[type="time"]) {
-        grid-column: 1 / -1 !important; /* Force la ligne complète dans une grille */
-        flex: 1 1 100% !important;      /* Force la ligne complète dans un flexbox */
+    /* 4. CORRECTIF FORMULAIRE 3 : EMPILEMENT VERTICAL ISOLÉ */
+    /* Empile Intérieur/Extérieur, Observations et place Température min/max sous les heures */
+    .sample-card > div,
+    .temoin-only-card > div,
+    .form-section > div {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 15px !important;
+    }
+    .sample-card > div > div,
+    .temoin-only-card > div > div,
+    .form-section > div > div {
         width: 100% !important;
-        margin-bottom: 15px !important;
+        min-width: 100% !important;
+        margin-bottom: 5px !important;
     }
 
-    /* 5. GESTION DES ESPACES iOS (DATE/HEURE) */
-    /* Empêche les champs date/heure de forcer un dépassement d'écran, sans détruire la grille de Form 3 */
+    /* 5. CORRECTIF FORMULAIRE 2 (TRUCK CARDS) : ALIGNEMENT PAR LE BAS */
+    /* Maintient les champs des camions côte à côte, mais les aligne par le bas pour compenser les titres longs */
+    .truck-card > div,
+    .truck-card .grid-2 {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: flex-end !important; /* L'ANCRE : Aligne parfaitement les boîtes de texte ensemble au bas */
+        gap: 6px !important;
+        flex-wrap: nowrap !important;
+        width: 100% !important;
+        margin-bottom: 12px !important;
+    }
+
+    /* Gère la ligne des cases à cocher ("Camion refusé") indépendamment */
+    .truck-card > div:has(input[type="checkbox"]) {
+        align-items: center !important;
+        flex-wrap: wrap !important;
+    }
+
+    /* Empêche les boîtes d'heure iOS de gonfler et d'écraser les autres boîtes */
+    .truck-card .input-group {
+        flex: 1 1 0% !important; /* Le 0% force un partage mathématiquement égal de l'espace, peu importe le contenu */
+        min-width: 0 !important;
+        margin-bottom: 0 !important; 
+    }
+
+    /* Ajustement des titres dans les cartes de camions sur mobile */
+    .truck-card .input-group label {
+        font-size: 0.82rem !important;
+        white-space: normal !important;
+        line-height: 1.15 !important;
+        text-align: left !important;
+    }
+
+    /* 6. CORRECTION DES CHAMPS DATE/HEURE APPLE */
     input[type="date"], input[type="time"] {
         -webkit-appearance: none !important;
         min-width: 0 !important;
-    }
-
-    /* 6. CORRECTION DES CHECKBOX INTÉRIEUR/EXTÉRIEUR (FORM 3) */
-    /* Permet aux longues listes de cases à cocher de se placer correctement sans déborder */
-    .checkbox-group {
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: flex-start !important; 
-    }
-    
-    .grid-2 {
-        gap: 10px !important; /* Réduit l'espace mort entre les colonnes sur mobile */
     }
 }
