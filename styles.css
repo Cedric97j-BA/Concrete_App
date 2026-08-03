@@ -259,158 +259,84 @@ button[onclick^="add"]:hover {
 /* ========================================= */
 @media (max-width: 820px) {
     
-    /* 1. RÈGLE DE SÉCURITÉ JAVASCRIPT CORRIGÉE */
-    .temoin-container[style*="display: none"],
-    .temoin-container[style*="display:none"],
-    *[style*="display: none"], 
-    *[style*="display:none"] {
-        display: none !important;
-    }
-
-    /* 2. MAXIMISER L'ESPACE ÉCRAN */
-    body, html, #app-container {
-        overflow-x: hidden !important; 
+    /* 1. MAXIMISER L'ESPACE ÉCRAN */
+    body, #app-container {
         padding: 4px !important; 
-        margin: 0 !important;
-        width: 100% !important;
-        max-width: 100% !important;
+        overflow-x: hidden !important; 
     }
-
     .tab-section {
         padding: 15px 10px !important; 
     }
 
-    /* 3. EN-TÊTE BLEU (HEADER) */
-    header, div[style*="background-color"], .bg-primary {
+    /* 2. EN-TÊTE BLEU (HEADER) */
+    header, .bg-primary {
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
         text-align: center !important;
         height: auto !important;
         padding: 15px 10px !important;
-        box-sizing: border-box !important;
-        width: 100% !important;
     }
     #main-logo {
         margin: 0 auto 10px auto !important;
-        display: block !important;
         max-width: 90% !important;
     }
 
-    /* 4. MENU DE NAVIGATION */
+    /* 3. MENU DE NAVIGATION */
     #form-navigation {
-        display: flex !important;
         flex-direction: column !important; 
-        padding: 10px !important;
-        gap: 8px !important;
     }
     .tab-btn {
-        flex: 1 1 100% !important; 
-        width: 100% !important;
-        margin-bottom: 0 !important;
-        padding: 14px !important;
-    }
-
-    /* 5. DÉFILEMENT HORIZONTAL CIBLÉ (Uniquement le premier bloc de la Fiche Témoin) */
-    .temoin-container, .temoin-only-card {
-        width: 100% !important;
-        overflow-x: hidden !important; /* Force le conteneur principal à ne jamais scroller */
-    }
-    
-    /* Active le scroll UNIQUEMENT sur la section Conditions Initiales */
-    .temoin-container > div:first-child, 
-    .temoin-only-card > div:first-child {
-        overflow-x: auto !important;
-        -webkit-overflow-scrolling: touch !important; 
-        padding-bottom: 15px !important; 
-        width: 100% !important;
-        display: block !important;
-    }
-    
-    /* Force l'intérieur de Conditions Initiales à être très large pour déclencher le scroll */
-    .temoin-container > div:first-child > div, 
-    .temoin-only-card > div:first-child > div {
-        min-width: 850px !important; 
-        padding-right: 15px !important;
-    }
-
-    /* 6. EMPILEMENT VERTICAL COMPLET POUR LE RESTE DE LA CARTE */
-    /* Empilement pour la carte d'échantillon classique */
-    .sample-card > div:not(.temoin-container) {
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 10px !important;
-    }
-    .sample-card > div:not(.temoin-container) > div {
-        display: block !important;
-        width: 100% !important;
-        margin-bottom: 10px !important;
-    }
-
-    /* Empilement agressif pour "Observations" et "Protection" dans la Fiche Témoin */
-    /* On cible tout SAUF le premier bloc (Conditions initiales) */
-    .temoin-container > div:not(:first-child),
-    .temoin-only-card > div:not(:first-child) {
-        display: flex !important;
-        flex-direction: column !important;
-        margin-top: 15px !important;
-    }
-
-    /* Force "À la récupération" et "À l'échantillonnage" à s'afficher comme des blocs empilés */
-    .temoin-container > div:not(:first-child) div,
-    .temoin-only-card > div:not(:first-child) div {
-        display: block !important;
         width: 100% !important;
         margin-bottom: 8px !important;
     }
 
-    /* 7. CORRECTIF ABSOLU TRUCK CARDS (Camions) */
-    .truck-card > div {
+    /* 4. LA MAGIE DU GRID (Observations & Protection) */
+    /* Transforme proprement les grilles 2 colonnes en 1 colonne. */
+    /* Empile "À la récupération" et "À l'échantillonnage" sans casser aucun tableau. */
+    .grid-2 {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* 5. CORRECTIF TRUCK CARDS (Camions) */
+    .truck-card .grid-2 {
         display: flex !important;
         flex-direction: row !important;
         align-items: flex-end !important; 
-        gap: 6px !important;
         flex-wrap: nowrap !important;
-        width: 100% !important;
-        margin-bottom: 12px !important;
     }
-    .truck-card > div:has(input[type="checkbox"]) {
-        align-items: center !important;
-        flex-wrap: wrap !important;
-    }
-
-    /* Partage d'espace mathématiquement égal pour toutes les boîtes */
     .truck-card .input-group {
         flex: 1 1 0% !important; 
         min-width: 0 !important;
-        width: 0 !important; 
-        margin-bottom: 0 !important; 
     }
     .truck-card .input-group:has(.truck-remarques-select) {
         flex: 1 1 100% !important;
-        width: 100% !important;
-        max-width: 100% !important;
         margin-top: 10px !important;
     }
-    .truck-card .input-group label {
-        font-size: 0.82rem !important;
-        white-space: normal !important;
-        line-height: 1.15 !important;
-        text-align: left !important;
+
+    /* 6. DÉFILEMENT HORIZONTAL CIBLÉ (Conditions Initiales UNIQUEMENT) */
+    /* On cible le premier bloc (Conditions Initiales) SANS modifier sa structure interne (display) */
+    .temoin-container > div:first-of-type,
+    .temoin-only-card > div:first-of-type {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important; 
+        padding-bottom: 15px !important; 
+    }
+    /* On force une largeur minimale pour déclencher le scroll, tout en gardant l'affichage grille d'origine intact */
+    .temoin-container > div:first-of-type > div,
+    .temoin-only-card > div:first-of-type > div {
+        min-width: 750px !important; 
     }
 
-    /* 8. DESTRUCTION DES BOUTONS CACHÉS APPLE */
+    /* 7. DESTRUCTION DES BOUTONS CACHÉS APPLE */
     input[type="date"], input[type="time"] {
         -webkit-appearance: none !important; 
         min-width: 0 !important;
-        width: 100% !important;
     }
-    
     input[type="time"]::-webkit-clear-button,
     input[type="time"]::-webkit-inner-spin-button,
     input[type="date"]::-webkit-clear-button,
     input[type="date"]::-webkit-inner-spin-button {
         display: none !important;
-        -webkit-appearance: none !important;
     }
 }
