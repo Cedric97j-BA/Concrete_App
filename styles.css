@@ -122,7 +122,7 @@ h4 {
 }
 
 /* ========================================= */
-/* INPUTS ET CONTRÔLES (TACTILES)            */
+/* INPUTS ET CONTRÔLES                         */
 /* ========================================= */
 .input-group {
     margin-bottom: 15px;
@@ -136,7 +136,6 @@ h4 {
     font-size: 0.95rem;
 }
 
-/* CORRECTIF HAUTEUR ET DÉBORDEMENT: Application de min-width, max-width et height fixes */
 input[type="text"],
 input[type="number"],
 input[type="date"],
@@ -144,7 +143,7 @@ input[type="time"],
 select,
 textarea {
     width: 100%;
-    height: 44px; /* Standard Apple tap-target size, force tous les inputs à être identiques */
+    height: 44px; /* Standard Apple tap-target size */
     padding: 10px 12px;
     border: 1px solid var(--border);
     border-radius: 4px;
@@ -152,7 +151,7 @@ textarea {
     background-color: white;
     transition: border-color 0.2s;
     box-sizing: border-box;
-    min-width: 0; /* Empêche les champs de forcer l'élargissement de l'écran */
+    min-width: 0; 
     max-width: 100%;
 }
 
@@ -167,24 +166,7 @@ textarea:focus {
 textarea {
     resize: vertical;
     min-height: 80px;
-    height: auto; /* Les textareas gardent leur capacité à s'étirer verticalement */
-}
-
-/* Spécifique pour les inputs à l'intérieur d'une phrase (Form 1) */
-.inline-input {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-bottom: 8px;
-}
-
-.inline-input input[type="text"],
-.inline-input input[type="number"] {
-    width: auto;
-    min-width: 120px;
-    flex: 1;
-    padding: 6px 10px;
+    height: auto; 
 }
 
 /* ========================================= */
@@ -205,7 +187,6 @@ textarea {
     cursor: pointer;
 }
 
-/* Agrandir les cases à cocher pour les doigts */
 input[type="checkbox"] {
     width: 20px;
     height: 20px;
@@ -216,8 +197,6 @@ input[type="checkbox"] {
 /* ========================================= */
 /* STYLES SPÉCIFIQUES DES CARTES             */
 /* ========================================= */
-
-/* Form 2 : Camions */
 .truck-card {
     border: 2px solid var(--primary);
     border-radius: 8px;
@@ -226,12 +205,10 @@ input[type="checkbox"] {
     background: #f0f9ff;
     transition: background-color 0.3s, border-color 0.3s;
 }
-
 .truck-card .input-group {
     margin-bottom: 0; 
 }
 
-/* Form 3 : Échantillons */
 .sample-card {
     border: 2px solid var(--success);
     border-radius: 8px;
@@ -239,13 +216,11 @@ input[type="checkbox"] {
     margin-bottom: 25px;
     background: var(--success-bg);
 }
-
 .sample-card h3 {
     background-color: #dcfce7;
     color: var(--success);
 }
 
-/* Form 3 : Fiche Témoin Indépendante */
 .temoin-only-card {
     border: 2px solid var(--temoin);
     border-radius: 8px;
@@ -253,7 +228,6 @@ input[type="checkbox"] {
     margin-bottom: 25px;
     background: var(--temoin-bg);
 }
-
 .temoin-only-card h3,
 .temoin-only-card h4 {
     background-color: #f3e8ff;
@@ -270,63 +244,94 @@ button[onclick^="add"] {
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     transition: transform 0.1s, filter 0.2s;
 }
-
 button[onclick^="add"]:active {
     transform: scale(0.98);
 }
-
 button[onclick^="add"]:hover {
     filter: brightness(110%);
 }
 
 /* ========================================= */
-/* RESPONSIVITÉ MOBILE (CORRECTIFS iPAD/iPHONE)*/
+/* RESPONSIVITÉ MOBILE (CORRECTIFS iPHONE/iPAD)*/
 /* ========================================= */
 @media (max-width: 820px) {
     
-    /* Force les grilles à passer en 1 seule colonne */
-    .grid-2 {
-        grid-template-columns: 1fr;
+    /* 1. CORRECTION DE L'EN-TÊTE BLEU (HEADER) */
+    /* Cible l'en-tête pour empiler le logo et le texte, et ajuste la hauteur automatiquement */
+    header, div[style*="background-color"], .bg-primary {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        text-align: center !important;
+        height: auto !important;
+        padding: 20px 10px !important;
+        box-sizing: border-box !important;
+    }
+    #main-logo {
+        margin: 0 auto 15px auto !important; /* Centre le logo et ajoute un espace en dessous */
+        display: block !important;
+        max-width: 100% !important;
     }
 
-    /* Corrige les textes qui sortent des cartes (Form 3) en forçant le retour à la ligne */
-    .sample-card, .temoin-only-card, .form-section, .truck-card {
-        overflow-wrap: break-word;
-        word-wrap: break-word;
-        word-break: break-word;
+    /* 2. EMPÊCHER LES DÉBORDEMENTS GLOBAUX */
+    body, html, #app-container {
+        overflow-x: hidden !important; 
+        padding: 10px !important;
     }
 
-    /* Force les éléments alignés horizontalement (comme les 3 boîtes de temps) à s'empiler s'ils manquent d'espace */
+    /* 3. DÉSACTIVER LES GRILLES CÔTE À CÔTE */
+    .grid-2, .grid-3, .grid-4 {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 15px !important;
+    }
+
+    /* 4. CORRECTION DES BOÎTES DE TEMPS (CAMIONS) & SECTIONS (FORM 3) */
+    /* Force TOUS les groupes d'inputs à prendre 100% de la largeur pour qu'ils s'empilent naturellement */
+    .input-group {
+        flex: 1 1 100% !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin-bottom: 12px !important;
+    }
+
+    /* Cible les div internes (Intérieur/Extérieur, À la récupération/À l'échantillonnage) pour les forcer à la ligne */
     .truck-card div, 
     .sample-card div, 
-    .form-section div {
+    .form-section div, 
+    .temoin-only-card div {
         flex-wrap: wrap !important;
     }
 
-    /* Force chaque groupe d'input à prendre toute la largeur pour éviter les écrasements */
-    .input-group {
+    /* Force les conteneurs side-by-side de Form 3 à prendre 100% de largeur */
+    .sample-card > div > div, 
+    .form-section > div > div {
+        min-width: 100% !important;
         flex: 1 1 100% !important;
-        min-width: 100%;
-        margin-bottom: 10px;
+        margin-bottom: 10px !important;
     }
 
-    /* Ajuste le menu de navigation pour les petits écrans */
+    /* 5. PROTÉGER LES CASES À COCHER */
+    /* Évite que les cases à cocher soient déformées par la règle des 100% */
+    .checkbox-group {
+        min-width: auto !important;
+        flex: 1 1 auto !important;
+    }
+    .checkbox-group label {
+        flex-wrap: nowrap !important; 
+        margin-bottom: 8px !important;
+    }
+
+    /* 6. AJUSTEMENT DU MENU ONGLET */
     #form-navigation {
-        flex-wrap: wrap;
+        flex-wrap: wrap !important;
+        display: flex !important;
+        padding: 8px !important;
     }
-    
     .tab-btn {
-        padding: 10px;
-        font-size: 0.95rem;
-        flex: 1 1 45%; 
-    }
-
-    /* Réduit un peu les marges globales pour maximiser l'espace écran */
-    body {
-        padding: 10px;
-    }
-    
-    .tab-section {
-        padding: 15px;
+        flex: 1 1 45% !important; /* 2 boutons par ligne */
+        margin-bottom: 8px !important;
+        padding: 10px !important;
+        font-size: 0.95rem !important;
     }
 }
