@@ -259,114 +259,110 @@ button[onclick^="add"]:hover {
 /* ========================================= */
 @media (max-width: 820px) {
     
-    /* 1. RÈGLE DE SÉCURITÉ JAVASCRIPT */
-    /* Empêche les règles Flexbox d'afficher les éléments que le JS veut garder invisibles */
-    *[style*="display: none"], *[style*="display:none"] {
+    /* 1. PROTECTION ABSOLUE DU JAVASCRIPT (Empêche l'affichage intempestif du Témoin) */
+    .temoin-container[style*="display: none"],
+    .temoin-container[style*="display:none"],
+    *[style*="display: none"], 
+    *[style*="display:none"] {
         display: none !important;
     }
 
-    /* 2. MAXIMISER L'ESPACE ÉCRAN */
-    body, html, #app-container {
-        overflow-x: hidden !important; 
+    /* 2. ESPACE GLOBAL */
+    body, #app-container {
         padding: 4px !important; 
-        margin: 0 !important;
-        width: 100% !important;
-        max-width: 100% !important;
+        overflow-x: hidden !important; 
     }
-
     .tab-section {
         padding: 15px 10px !important; 
     }
 
-    /* 3. EN-TÊTE BLEU (HEADER) */
-    header, div[style*="background-color"], .bg-primary {
+    /* 3. EN-TÊTE ET NAVIGATION */
+    header, .bg-primary {
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
         text-align: center !important;
         height: auto !important;
         padding: 15px 10px !important;
-        box-sizing: border-box !important;
-        width: 100% !important;
     }
     #main-logo {
         margin: 0 auto 10px auto !important;
-        display: block !important;
         max-width: 90% !important;
     }
-
-    /* 4. MENU DE NAVIGATION */
     #form-navigation {
-        display: flex !important;
         flex-direction: column !important; 
-        padding: 10px !important;
-        gap: 8px !important;
     }
     .tab-btn {
-        flex: 1 1 100% !important; 
         width: 100% !important;
-        margin-bottom: 0 !important;
-        padding: 14px !important;
+        margin-bottom: 8px !important;
     }
 
-    /* 5. CORRECTIF FORMULAIRE 3 : EMPILEMENT VERTICAL */
-    .sample-card > div,
-    .temoin-only-card > div,
-    .form-section > div {
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 15px !important;
-    }
-    .sample-card > div > div,
-    .temoin-only-card > div > div,
-    .form-section > div > div {
-        width: 100% !important;
-        min-width: 100% !important;
-        margin-bottom: 5px !important;
-    }
-
-    /* 6. CORRECTIF FORMULAIRE 2 (TRUCK CARDS) */
-    .truck-card > div,
-    .truck-card .grid-2 {
+    /* 4. TRUCK CARDS : ALIGNEMENT PAR LE BAS DES BOÎTES (Évite le décalage des inputs) */
+    .truck-card > div {
         display: flex !important;
         flex-direction: row !important;
-        align-items: flex-end !important; 
+        align-items: flex-end !important; /* Aligne strictement les bas de boîtes */
         gap: 6px !important;
-        flex-wrap: nowrap !important;
         width: 100% !important;
-        margin-bottom: 12px !important;
+        margin-bottom: 10px !important;
+        flex-wrap: nowrap !important;
     }
-
+    .truck-card .input-group {
+        flex: 1 1 0% !important;
+        min-width: 0 !important;
+        margin-bottom: 0 !important;
+    }
+    /* Remarque sur sa propre ligne */
+    .truck-card .input-group:has(.truck-remarques-select) {
+        flex: 1 1 100% !important;
+        margin-top: 8px !important;
+    }
+    .truck-card .input-group label {
+        font-size: 0.8rem !important;
+        line-height: 1.15 !important;
+        margin-bottom: 4px !important;
+    }
     .truck-card > div:has(input[type="checkbox"]) {
         align-items: center !important;
         flex-wrap: wrap !important;
     }
 
-    /* Empêche les boîtes d'heure iOS de gonfler une fois remplies */
-    .truck-card .input-group {
-        flex: 1 1 0% !important; 
-        min-width: 0 !important;
-        width: 0 !important; /* Force mathématiquement la largeur, bloque les ajouts d'espace d'iOS */
-        margin-bottom: 0 !important; 
+    /* 5. FORM 3 : CORRECTION DE LA SECTION "CONDITIONS INITIALES" (Cramponnement résolu) */
+    /* Cible spécifiquement la grille inline à 2 colonnes dans Form 3 et l'empile proprement */
+    .sample-card .form-section div[style*="grid-template-columns: 1fr 1fr"],
+    .temoin-only-card div[style*="grid-template-columns: 1fr 1fr"] {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 15px !important;
     }
 
-    /* Isole la Remarque pour qu'elle descende toujours tout en bas */
-    .truck-card .input-group:has(.truck-remarques-select) {
-        flex: 1 1 100% !important;
-        width: 100% !important;
-        margin-top: 10px !important;
+    /* 6. FORM 3 : OBSERVATIONS & PROTECTION (Empilement des sous-sections) */
+    .grid-2 {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 15px !important;
     }
 
-    .truck-card .input-group label {
-        font-size: 0.82rem !important;
-        white-space: normal !important;
-        line-height: 1.15 !important;
-        text-align: left !important;
+    /* 7. FICHE TÉMOIN : SCROLL HORIZONTAL UNIQUEMENT SUR LE TABLEAU */
+    /* Cible le bloc de tableau HTML complexe dans la fiche témoin pour activer le scroll latéral */
+    .temoin-container div[style*="grid-template-columns: auto auto auto"],
+    .temoin-only-card div[style*="grid-template-columns: auto auto auto"] {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        display: grid !important;
+        min-width: 700px !important; /* Force l'apparition du scroll sans casser la structure */
+        padding-bottom: 10px !important;
     }
 
-    /* 7. CORRECTION GLOBALE DES CHAMPS DATE/HEURE APPLE */
+    /* 8. NETTOYAGE DES INPUTS TEMPS/DATE APPLE */
     input[type="date"], input[type="time"] {
-        -webkit-appearance: none !important;
+        -webkit-appearance: none !important; 
         min-width: 0 !important;
+    }
+    input[type="time"]::-webkit-clear-button,
+    input[type="time"]::-webkit-inner-spin-button,
+    input[type="date"]::-webkit-clear-button,
+    input[type="date"]::-webkit-inner-spin-button {
+        display: none !important;
     }
 }
