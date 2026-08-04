@@ -37,7 +37,7 @@
         <div style="display: flex; flex-direction: column; gap: 5px;">
             <h1 style="margin: 0; font-size: 1.5rem; letter-spacing: 0.5px;">Registre de Bétonnage et Échantillonnage</h1>
             <div>
-                <span id="app-version" style="font-size: 0.95rem; font-weight: bold; background: #0369a1; padding: 3px 10px; border-radius: 12px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);">v1.0.9.14</span>
+                <span id="app-version" style="font-size: 0.95rem; font-weight: bold; background: #0369a1; padding: 3px 10px; border-radius: 12px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);">v1.1.0.0</span>
             </div>
         </div>
         
@@ -103,7 +103,7 @@
         </div>
         
         <div class="input-group">
-            <label>Date Globale</label>
+            <label>Date</label>
             <input type="date" id="global-date">
         </div>
     </section>
@@ -112,9 +112,9 @@
     <!-- BARRE DE NAVIGATION (TABS)                 -->
     <!-- ========================================== -->
     <nav id="form-navigation" style="margin-bottom: 20px;">
-        <button type="button" class="tab-btn" onclick="showTab('tab-form1')">Form 1: Pré-coulée</button>
-        <button type="button" class="tab-btn" onclick="showTab('tab-form2')">Form 2: Coulée</button>
-        <button type="button" class="tab-btn" onclick="showTab('tab-form3')">Form 3: Échantillons</button>
+        <button type="button" class="tab-btn" onclick="showTab('tab-form1')">Contrôle de bétonnage</button>
+        <button type="button" class="tab-btn" onclick="showTab('tab-form2')">Contrôle du béton de ciment</button>
+        <button type="button" class="tab-btn" onclick="showTab('tab-form3')">Conditions initiales de cure</button>
     </nav>
 
     <!-- ========================================== -->
@@ -123,12 +123,20 @@
     <section id="tab-form1" class="tab-section">
         <h2>Formulaire 1 : Vérification</h2>
 
+        <!-- Légende des abréviations -->
+        <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px 15px; margin-bottom: 20px; font-size: 0.9rem; color: #334155; display: flex; gap: 20px; flex-wrap: wrap; text-align: right;">
+            <strong style="color: var(--primary);" >Légende :</strong>
+            <span><strong>N/V</strong> : Non vérifié</span>
+            <span><strong>N/O</strong> : Non observé</span>
+            <span><strong>N/A</strong> : Non applicable</span>
+        </div>
+
         <!-- SECTION 1 : Conditions atmosphériques -->
         <div class="form-section">
-            <h3>Section 1 - Conditions atmosphériques</h3>
+            <h3>Conditions atmosphériques</h3>
             <div class="input-group">
                 <label>Température extérieure (°C)</label>
-                <input type="number" id="f1-s1-temp" placeholder="°C">
+                <input type="number" id="f1-s1-temp" placeholder="°C" style="width: 80px; display: inline-block;">
             </div>
             <div class="checkbox-group">
                 <label><input type="checkbox" id="f1-s1-ensoleille"> Ensoleillé</label>
@@ -144,7 +152,7 @@
 
         <!-- SECTION 2 : Fond d'excavation -->
         <div class="form-section">
-            <h3>Section 2 - Fond d'excavation</h3>
+            <h3>Fond d'excavation</h3>
             <div class="checkbox-group">
                 <label><input type="checkbox" id="f1-s2-na"> N/A</label>
                 <label><input type="checkbox" id="f1-s2-no"> N/O</label>
@@ -154,7 +162,7 @@
                 
                 <label class="inline-input">
                     <input type="checkbox" id="f1-s2-remblai-check"> Remblai compacté à 
-                    <input type="text" id="f1-s2-remblai-val" placeholder="Spécifier"> % tel que requis au devis
+                    <input type="text" id="f1-s2-remblai-val" placeholder="" style="width: 80px; display: inline-block;"> % tel que requis au devis
                 </label>
                 
                 <label><input type="checkbox" id="f1-s2-englobe"> Contrôle de compactage non effectué par Englobe</label>
@@ -166,7 +174,7 @@
 
         <!-- SECTION 3 : Coffrages -->
         <div class="form-section">
-            <h3>Section 3 - Coffrages</h3>
+            <h3>Coffrages</h3>
             <div class="checkbox-group">
                 <label><input type="checkbox" id="f1-s3-na"> N/A</label>
                 <label><input type="checkbox" id="f1-s3-no"> N/O</label>
@@ -188,14 +196,14 @@
 
         <!-- SECTION 4 : Armatures -->
         <div class="form-section">
-            <h3>Section 4 - Armatures</h3>
+            <h3>Armatures</h3>
             <div class="checkbox-group">
                 <label><input type="checkbox" id="f1-s4-nv"> N/V</label>
                 <label><input type="checkbox" id="f1-s4-na"> N/A</label>
                 
                 <label class="inline-input">
                     <input type="checkbox" id="f1-s4-verif-check"> Quantité, dimensions et positions vérifiés par 
-                    <input type="text" id="f1-s4-verif-val" placeholder="Nom/Entité">
+                    <input type="text" id="f1-s4-verif-val" placeholder="Nom/Entité" style="width: 250px; display: inline-block;">
                 </label>
                 
                 <label><input type="checkbox" id="f1-s4-attachees"> Bien attachées</label>
@@ -208,7 +216,7 @@
 
         <!-- SECTION 5 : Mise en place -->
         <div class="form-section">
-            <h3>Section 5 - Mise en place</h3>
+            <h3>Mise en place</h3>
             <div class="checkbox-group">
                 <label><input type="checkbox" id="f1-s5-goulotte"> Goulotte du camion</label>
                 <label><input type="checkbox" id="f1-s5-pompe"> Pompe</label>
@@ -222,7 +230,7 @@
                 
                 <label class="inline-input">
                     <input type="checkbox" id="f1-s5-hauteur-check"> Hauteur de chute 
-                    <input type="number" id="f1-s5-hauteur-val" placeholder="m"> m
+                    <input type="number" id="f1-s5-hauteur-val" placeholder="" style="width: 80px; display: inline-block;"> m
                 </label>
 
                 <label><input type="checkbox" id="f1-s5-remarques-check" class="remarque-trigger" onchange="toggleRemarque('f1-s5-remarques-text', this)"> Voir remarques</label>
@@ -232,17 +240,17 @@
 
         <!-- SECTION 6 : Protection et murissement -->
         <div class="form-section">
-            <h3>Section 6 - Protection et murissement</h3>
+            <h3>Protection et murissement</h3>
             <div class="checkbox-group">
 
                 <label class="inline-input">
                     <input type="checkbox" id="f1-s6-surface-check"> Surface de béton recouverte de 
-                    <input type="text" id="f1-s6-surface-val" placeholder="Spécifier"> (jute humide, polythène, etc.)
+                    <input type="text" id="f1-s6-surface-val" placeholder="Spécifier" style="width: 500px; display: inline-block;"> (jute humide, polythène, etc.)
                 </label>
 
                 <label class="inline-input">
                     <input type="checkbox" id="f1-s6-cure"> Cure humide, prévue pendant
-                    <input type="text" id="f1-s6-cure-val" placeholder="Spécifier"> 
+                    <input type="text" id="f1-s6-cure-val" placeholder="Spécifier" style="width: 500px; display: inline-block;"> 
                 </label>
 
                 <label><input type="checkbox" id="f1-s6-aucpro1"> Aucune protection ou cure observée à notre départ du chantier</label>
@@ -251,17 +259,17 @@
 
                 <label class="inline-input">
                     <input type="checkbox" id="f1-s6-couv"> Couvertures isolantes d'une épaisseur de
-                    <input type="text" id="f1-s6-couv-val" placeholder="Spécifier"> 
+                    <input type="text" id="f1-s6-couv-val" placeholder="Spécifier" style="width: 500px; display: inline-block;"> 
                 </label>
 
                 <label class="inline-input">
                     <input type="checkbox" id="f1-s6-prot"> Béton protégé par un isolant de type 
-                    <input type="text" id="f1-s6-prot-val" placeholder="Spécifier"> 
+                    <input type="text" id="f1-s6-prot-val" placeholder="Spécifier" style="width: 500px; display: inline-block;"> 
                 </label>
 
                 <label class="inline-input">
                     <input type="checkbox" id="f1-s6-abri"> Abri chauffé; température approximative 
-                    <input type="text" id="f1-s6-abri-val" placeholder="Spécifier">  °C
+                    <input type="text" id="f1-s6-abri-val" placeholder="" style="width: 50px; display: inline-block;">  °C
                 </label>
 
                 <label><input type="checkbox" id="f1-s6-vapo"> Produit de cure vaporisé</label>
@@ -273,26 +281,26 @@
 
         <!-- SECTION 7 : Éprouvettes prélevées -->
         <div class="form-section">
-            <h3>Section 7 - Éprouvettes prélevées</h3>
+            <h3>Éprouvettes prélevées</h3>
             <div class="checkbox-group">
 
                 <label class="inline-input">
                     <input type="checkbox" id="f1-s7-cylnor"> 
-                    <input type="text" id="f1-s7-cylnor1-val" placeholder="Spécifier"> cylindres normalisés (
-                    <input type="text" id="f1-s7-cylnor2-val" placeholder="Spécifier"> x 
-                    <input type="text" id="f1-s7-cylnor3-val" placeholder="Spécifier"> mm)
+                    <input type="text" id="f1-s7-cylnor1-val" placeholder="" style="width: 50px; display: inline-block;"> cylindres normalisés (
+                    <input type="text" id="f1-s7-cylnor2-val" placeholder="" style="width: 75px; display: inline-block;"> x 
+                    <input type="text" id="f1-s7-cylnor3-val" placeholder="" style="width: 75px; display: inline-block;"> mm)
                 </label>
 
                 <label class="inline-input">
                     <input type="checkbox" id="f1-s7-cylmur"> 
-                    <input type="text" id="f1-s7-cylmur1-val" placeholder="Spécifier"> cylindres mûris en conditions de chantier (
-                    <input type="text" id="f1-s7-cylmur2-val" placeholder="Spécifier"> x 
-                    <input type="text" id="f1-s7-cylmur3-val" placeholder="Spécifier"> mm)
+                    <input type="text" id="f1-s7-cylmur1-val" placeholder="" style="width: 50px; display: inline-block;"> cylindres mûris en conditions de chantier (
+                    <input type="text" id="f1-s7-cylmur2-val" placeholder="" style="width: 75px; display: inline-block;"> x 
+                    <input type="text" id="f1-s7-cylmur3-val" placeholder="" style="width: 75px; display: inline-block;"> mm)
                 </label>
 
                 <label class="inline-input">
                     <input type="checkbox" id="f1-s7-cylpre"> 
-                    <input type="text" id="f1-s7-cylpre-val" placeholder="Spécifier"> cylindres prélevés dans un chargement non conforme
+                    <input type="text" id="f1-s7-cylpre-val" placeholder="" style="width: 50px; display: inline-block;"> cylindres prélevés dans un chargement non conforme
                 </label>
 
                 <label><input type="checkbox" id="f1-s7-auccyl"> Aucun cylindre n'a été prélevé</label>
@@ -308,43 +316,43 @@
         
         <!-- SECTION 8 : Procédures -->
         <div class="form-section">
-            <h3>Section 8 - Procédures</h3>
+            <h3>Procédures</h3>
             <div class="checkbox-group">
 
                 <label class="inline-input">
                     <input type="checkbox" id="f1-s8-rapsom"> Rapport sommaire d'essais remis à
-                    <input type="text" id="f1-s8-rapsom-val" placeholder="Spécifier"> 
+                    <input type="text" id="f1-s8-rapsom-val" placeholder="Spécifier" style="width: 400px; display: inline-block;"> 
                 </label>
 
                 <label class="inline-input">
                     <input type="checkbox" id="f1-s8-betcoul1"> Béton coulé malgré la non-conformité à la demande de l'entrepreneur
-                    <input type="text" id="f1-s8-betcoul1-val" placeholder="Spécifier"> 
+                    <input type="text" id="f1-s8-betcoul1-val" placeholder="Spécifier" style="width: 400px; display: inline-block;"> 
                 </label>
 
                 <label class="inline-input">
                     <input type="checkbox" id="f1-s8-betcoul2"> Béton coulé malgré la non-conformité parce que jugé acceptable par le représentant de 
-                    <input type="text" id="f1-s8-betcoul2-val" placeholder="Spécifier"> 
+                    <input type="text" id="f1-s8-betcoul2-val" placeholder="Spécifier" style="width: 400px; display: inline-block;"> 
                 </label>
 
                 <label class="inline-input">
                     <input type="checkbox" id="f1-s8-memo"> Mémo (s)
-                    <input type="text" id="f1-s8-memo1-val" placeholder="Spécifier"> remis à 
-                    <input type="text" id="f1-s8-memo2-val" placeholder="Spécifier">
+                    <input type="text" id="f1-s8-memo1-val" placeholder="Spécifier" style="width: 100px; display: inline-block;"> remis à 
+                    <input type="text" id="f1-s8-memo2-val" placeholder="Spécifier" style="width: 400px; display: inline-block;">
                 </label>
 
                 <label class="inline-input">
                     <input type="checkbox" id="f1-s8-ajoutsup"> Ajout de superplastifiant en chantier
-                    <input type="text" id="f1-s8-ajoutsup-val" placeholder="Spécifier"> l/m³
+                    <input type="text" id="f1-s8-ajoutsup-val" placeholder="" style="width: 50px; display: inline-block;"> l/m³
                 </label>
 
                 <label class="inline-input">
                     <input type="checkbox" id="f1-s8-ajoutair"> Ajout d'entraîneur d'air en chantier
-                    <input type="text" id="f1-s8-ajoutair-val" placeholder="Spécifier"> l/m³
+                    <input type="text" id="f1-s8-ajoutair-val" placeholder="" style="width: 50px; display: inline-block;"> l/m³
                 </label>
 
                 <label class="inline-input">
                     <input type="checkbox" id="f1-s8-chargnum"> Chargement numéro
-                    <input type="text" id="f1-s8-chargnum-val" placeholder=""> retourné
+                    <input type="text" id="f1-s8-chargnum-val" placeholder="" style="width: 80px; display: inline-block;"> retourné
                 </label>
 
                 <label><input type="checkbox" id="f1-s8-remarques-check" class="remarque-trigger" onchange="toggleRemarque('f1-s8-remarques-text', this)"> Voir remarques</label>
@@ -354,7 +362,7 @@
 
         <!-- SECTION 9 : Remarques Globales -->
         <div class="form-section">
-            <h3>Section 9 - Remarques</h3>
+            <h3>Remarques</h3>
             <p style="font-size: 0.85rem; color: gray;">(Ce champ sera auto-généré par les cases "Voir remarques" cochées ci-dessus lors de l'export)</p>
             <textarea id="f1-s9-remarques-compilation" rows="4" style="width: 100%;" disabled></textarea>
         </div>
@@ -364,11 +372,11 @@
             <h3>Préparé par </h3>
             <div class="input-group">
                 <label>Nom du technicien</label>
-                <input type="text" id="f1-tech-name" placeholder="Max Coulombe">
+                <input type="text" id="f1-tech-name" placeholder="Max Coulombe" style="width: 250px; display: inline-block;">
             </div>
             <div class="input-group">
                 <label>Date</label>
-                <input type="date" id="f1-verif-date">
+                <input type="date" id="f1-verif-date" style="width: 200px; display: inline-block;">
             </div>
         </div>
     </section>
@@ -417,19 +425,19 @@
         <!-- SECTION : Totaux (Calculés automatiquement plus tard) -->
         <div class="form-section">
             <h3>Quantités</h3>
-            <div class="input-group"><label>Total coulée</label><input type="number" id="f2-total-coulee" readonly style="background: #f3f4f6;">(m³)</div>
-            <div class="input-group"><label>Total refusé</label><input type="number" id="f2-total-refuse" readonly style="background: #f3f4f6;">(m³)</div>
-            <div class="input-group"><label>Total vérifié</label><input type="number" id="f2-total-verifie" readonly style="background: #f3f4f6;">(m³)</div>
+            <div class="input-group"><label>Total coulée</label><input type="number" id="f2-total-coulee" readonly style="background: #f3f4f6; width: 100px; display: inline-block;">(m³)</div>
+            <div class="input-group"><label>Total refusé</label><input type="number" id="f2-total-refuse" readonly style="background: #f3f4f6; width: 100px; display: inline-block;">(m³)</div>
+            <div class="input-group"><label>Total vérifié</label><input type="number" id="f2-total-verifie" readonly style="background: #f3f4f6; width: 100px; display: inline-block;">(m³)</div>
         </div>
 
         <!-- SECTION : Équipements utilisés -->
         <div class="form-section">
             <h3>Équipements (Numéros de série)</h3>
-            <div class="input-group"><label>Thermomètre </label><input type="text" id="f2-equip-thermo"></div>
-            <div class="input-group"><label>Airmètre </label><input type="text" id="f2-equip-airmetre"></div>
-            <div class="input-group"><label>Cône d'affaissement </label><input type="text" id="f2-equip-cone"></div>
-            <div class="input-group"><label>Bourroir (16 mm) </label><input type="text" id="f2-equip-bourroir16"></div>
-            <div class="input-group"><label>Bourroir (10 mm) </label><input type="text" id="f2-equip-bourroir10"></div>
+            <div class="input-group"><label>Thermomètre </label><input type="text" id="f2-equip-thermo" style="width: 100px; display: inline-block;"></div>
+            <div class="input-group"><label>Airmètre </label><input type="text" id="f2-equip-airmetre" style="width: 100px; display: inline-block;"></div>
+            <div class="input-group"><label>Cône d'affaissement </label><input type="text" id="f2-equip-cone" style="width: 100px; display: inline-block;"></div>
+            <div class="input-group"><label>Bourroir (16 mm) </label><input type="text" id="f2-equip-bourroir16" style="width: 100px; display: inline-block;"></div>
+            <div class="input-group"><label>Bourroir (10 mm) </label><input type="text" id="f2-equip-bourroir10" style="width: 100px; display: inline-block;"></div>
         </div>
 
         <!-- SECTION : Remarques Générales Formulaire 2 -->
@@ -441,8 +449,8 @@
         <!-- SIGNATURE TECHNICIEN -->
         <div class="form-section" style="border-top: 2px solid #ccc; padding-top: 15px;">
             <h3>Vérification</h3>
-            <div class="input-group"><label>Nom du technicien</label><input type="text" id="f2-tech-name"></div>
-            <div class="input-group"><label>Date</label><input type="date" id="f2-verif-date"></div>
+            <div class="input-group"><label>Nom du technicien</label><input type="text" id="f2-tech-name" style="width: 250px; display: inline-block;"></div>
+            <div class="input-group"><label>Date</label><input type="date" id="f2-verif-date" style="width: 200px; display: inline-block;"></div>
         </div>
     </section>
 
@@ -569,8 +577,8 @@
                         <label style="font-weight:bold;">Dimensions (mm)</label>
                         <label><input type="checkbox" class="sample-dim-100"> 100 x 200</label>
                         <label><input type="checkbox" class="sample-dim-150"> 150 x 300</label>
-                        <label><input type="checkbox" class="sample-dim-poutre"> poutre</label>
-                        <label><input type="checkbox" class="sample-dim-cube"> cube</label>
+                        <label><input type="checkbox" class="sample-dim-poutre"> Poutre</label>
+                        <label><input type="checkbox" class="sample-dim-cube"> Cube</label>
                     </div>
                     <div class="checkbox-group">
                         <label style="font-weight:bold;">Méthode / Cure</label>
@@ -730,15 +738,15 @@
                             <label style="font-weight:bold;">Dimensions (mm):</label>
                             <label><input type="checkbox" class="temoin-dim-100"> 100 x 200</label>
                             <label><input type="checkbox" class="temoin-dim-150"> 150 x 300</label>
-                            <label><input type="checkbox" class="temoin-dim-poutre"> poutre</label>
-                            <label><input type="checkbox" class="temoin-dim-cube"> cube</label>
+                            <label><input type="checkbox" class="temoin-dim-poutre"> Poutre</label>
+                            <label><input type="checkbox" class="temoin-dim-cube"> Cube</label>
                         </div>
                     </div>
 
                     <div style="margin-bottom: 15px;">
                         <h4 style="text-align: center; background: #e2e8f0; padding: 5px; margin: 0 0 10px 0;">Conditions initiales de cure et d'entreposage</h4>
                         <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                            <label style="font-weight:bold; width: 100px;">Prélèvement</label>
+                            <label style="font-weight:bold; width: 100px; ">Prélèvement</label>
                             <div style="flex: 1; display: flex; gap: 5px;"><label>date</label><input type="date" class="temoin-prelev-date" style="flex:1;"></div>
                             <div style="flex: 1; display: flex; gap: 5px;"><label>heure</label><input type="time" class="temoin-prelev-time" style="flex:1;"></div>
                             <div style="flex: 1; display: flex; gap: 5px;"><label>par</label><input type="text" class="temoin-prelev-tech" style="flex:1;"></div>
@@ -952,8 +960,8 @@
                         <label style="font-weight:bold;">Dimensions (mm):</label>
                         <label><input type="checkbox" class="temoin-dim-100"> 100 x 200</label>
                         <label><input type="checkbox" class="temoin-dim-150"> 150 x 300</label>
-                        <label><input type="checkbox" class="temoin-dim-poutre"> poutre</label>
-                        <label><input type="checkbox" class="temoin-dim-cube"> cube</label>
+                        <label><input type="checkbox" class="temoin-dim-poutre"> Poutre</label>
+                        <label><input type="checkbox" class="temoin-dim-cube"> Cube</label>
                     </div>
                 </div>
 
@@ -1170,7 +1178,7 @@
 <!-- LE CERVEAU (JAVASCRIPT)                    -->
 <!-- ========================================== -->
 <script src="pdf_templates.js"></script>
-<script src="app.js?v=1.0.9.14"></script>
+<script src="app.js?v=1.1.0.0"></script>
 
 </body>
 </html>
