@@ -1,4 +1,4 @@
-const APP_VERSION = 'v1.0.9.14';
+const APP_VERSION = 'v1.1.0.0';
 
 // ========================================== //
 // 1. NAVIGATION ET INTERFACE GLOBALE         //
