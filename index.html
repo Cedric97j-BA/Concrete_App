@@ -37,7 +37,7 @@
         <div style="display: flex; flex-direction: column; gap: 5px;">
             <h1 style="margin: 0; font-size: 1.5rem; letter-spacing: 0.5px;">Bétonnage et Échantillonnage</h1>
             <div>
-                <span id="app-version" style="font-size: 0.95rem; font-weight: bold; background: #0369a1; padding: 3px 10px; border-radius: 12px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);">v1.1.0.0</span>
+                <span id="app-version" style="font-size: 0.95rem; font-weight: bold; background: #0369a1; padding: 3px 10px; border-radius: 12px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);">v1.1.0.1</span>
             </div>
         </div>
         
@@ -111,10 +111,18 @@
     <!-- ========================================== -->
     <!-- BARRE DE NAVIGATION (TABS)                 -->
     <!-- ========================================== -->
+
+    <small id="form-instructions" style=" display: block;  margin-bottom: 35px;  margin-left: auto; margin-right: auto; max-width: 600px;">
+    </small>
+
+    <small style="color: #242930; font-size: 0.8rem; display: block; margin-top: 3px; margin-bottom: 5px; text-align: center; margin-left: auto; margin-right: auto; max-width: 600px;">
+        Cliquez sur les onglets pour naviguer entre les sections du formulaire. Les informations sont sauvegardées automatiquement. Vous pouvez passer d'une section à l'autre. Cependant prenez soin de bien sauvegarder votre rapport avant de quitter la page ou de fermer l'application.
+    </small>
+
     <nav id="form-navigation" style="margin-bottom: 20px;">
-        <button type="button" class="tab-btn" onclick="showTab('tab-form1')">Contrôle de bétonnage</button>
-        <button type="button" class="tab-btn" onclick="showTab('tab-form2')">Contrôle du béton de ciment</button>
-        <button type="button" class="tab-btn" onclick="showTab('tab-form3')">Conditions initiales de cure</button>
+        <button type="button" class="tab-btn" onclick="showTab('tab-form1')">1. Contrôle de bétonnage</button>
+        <button type="button" class="tab-btn" onclick="showTab('tab-form2')">2. Contrôle du béton de ciment</button>
+        <button type="button" class="tab-btn" onclick="showTab('tab-form3')">3. Conditions initiales de cure</button>
     </nav>
 
     <!-- ========================================== -->
@@ -379,6 +387,13 @@
                 <input type="date" id="f1-verif-date" style="width: 200px; display: inline-block;">
             </div>
         </div>
+
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="javascript:void(0);" onclick="scrollToSection('form-instructions')" style="color: var(--primary); font-weight: bold; text-decoration: none; font-size: 1rem; padding: 10px 20px; background: #e2e8f0; border-radius: 6px; display: inline-block;">
+                ⬆️ Retour aux sections du formulaire
+            </a>
+        </div>
+
     </section>
 
     <!-- ========================================== -->
@@ -399,18 +414,18 @@
         <!-- SECTION : Spécifications (Informatives) -->
         <div class="form-section">
             <h3>Spécifications au devis</h3>
-            <div class="input-group"><label>Spécification (n°)</label><input type="text" id="f2-spec-no"></div>
-            <div class="input-group"><label>Affaissement</label><input type="text" id="f2-spec-affaissement"></div>
-            <div class="input-group"><label>Teneur en air</label><input type="text" id="f2-spec-air"></div>
-            <div class="input-group"><label>Résistance</label><input type="text" id="f2-spec-resistance"></div>
-            <div class="input-group"><label>Granulats</label><input type="text" id="f2-spec-granulat"></div>
+            <div class="input-group"><label>Spécification (n°)</label><input type="text" id="f2-spec-no" placeholder="Ex: 5"></div>
+            <div class="input-group"><label>Affaissement</label><input type="text" id="f2-spec-affaissement" placeholder="Ex: 80 ± 30"></div>
+            <div class="input-group"><label>Teneur en air</label><input type="text" id="f2-spec-air" placeholder="Ex: 5 @ 8"></div>
+            <div class="input-group"><label>Résistance</label><input type="text" id="f2-spec-resistance" placeholder="Ex: 35 MPa"></div>
+            <div class="input-group"><label>Granulats</label><input type="text" id="f2-spec-granulat" placeholder="Ex: 5-20"></div>
         </div>
 
         <!-- SECTION : Localisation de l'ouvrage -->
         <div class="form-section">
             <h3>Localisation</h3>
-            <div class="input-group"><label>Partie bétonnée (Ex: Mur de fondation)</label><input type="text" id="f2-partie-betonnee"></div>
-            <div class="input-group"><label>Localisation du prélèvement</label><input type="text" id="f2-loc-prelevement"></div>
+            <div class="input-group"><label>Partie bétonnée</label><input type="text" id="f2-partie-betonnee" placeholder="Ex: Mur de fondation"></div>
+            <div class="input-group"><label>Localisation du prélèvement</label><input type="text" id="f2-loc-prelevement" placeholder="Ex : Entre axe A et B"></div>
         </div>
 
         <!-- SECTION : GRILLE DES CAMIONS (Dynamique) -->
@@ -452,6 +467,13 @@
             <div class="input-group"><label>Nom du technicien</label><input type="text" id="f2-tech-name" style="width: 250px; display: inline-block;"></div>
             <div class="input-group"><label>Date</label><input type="date" id="f2-verif-date" style="width: 200px; display: inline-block;"></div>
         </div>
+
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="javascript:void(0);" onclick="scrollToSection('form-instructions')" style="color: var(--primary); font-weight: bold; text-decoration: none; font-size: 1rem; padding: 10px 20px; background: #e2e8f0; border-radius: 6px; display: inline-block;">
+                ⬆️ Retour aux sections du formulaire
+            </a>
+        </div>
+
     </section>
 
         <!-- TEMPLATE INVISIBLE POUR LES CAMIONS -->
@@ -478,6 +500,10 @@
                     <div style="flex: 1;"><label>Eau ajoutée (l/m³)</label><input type="number" class="truck-water" placeholder="Qté"></div>
                     <div style="flex: 1;"><label>Superplastifiant (l/m³)</label><input type="number" class="truck-plast" placeholder="Qté"></div>
                 </div>
+
+                <small  style="color: #242930; font-size: 0.8rem; display: block; margin-top: 3px; margin-bottom: 5px; text-align: center; margin-left: auto; margin-right: auto; max-width: 600px;">                           
+                    Notez le deuxième test si le premier est non-conforme pour la teneur en air et l'affaissement.
+                </small>
 
                 <!-- Teneur en air et Température -->
                 <div style="display: flex; gap: 10px; margin-bottom: 10px;">
@@ -553,6 +579,13 @@
         <div id="samples-container">
             <!-- Les fiches d'échantillons s'ajouteront ici dynamiquement -->
         </div>
+
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="javascript:void(0);" onclick="scrollToSection('form-instructions')" style="color: var(--primary); font-weight: bold; text-decoration: none; font-size: 1rem; padding: 10px 20px; background: #e2e8f0; border-radius: 6px; display: inline-block;">
+                ⬆️ Retour aux sections du formulaire
+            </a>
+        </div>
+
     </section>
 
     <!-- TEMPLATE INVISIBLE POUR LES FICHES D'ÉCHANTILLONS (FORM 3) -->
@@ -1178,7 +1211,17 @@
 <!-- LE CERVEAU (JAVASCRIPT)                    -->
 <!-- ========================================== -->
 <script src="pdf_templates.js"></script>
-<script src="app.js?v=1.1.0.0"></script>
+<script src="app.js?v=1.1.0.1"></script>
+
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('Service Worker bétonnage actif !', reg))
+                .catch(err => console.log('Échec Service Worker :', err));
+        });
+    }
+</script>
 
 </body>
 </html>
