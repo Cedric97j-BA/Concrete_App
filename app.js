@@ -1,4 +1,4 @@
-const APP_VERSION = 'v1.1.0.0';
+const APP_VERSION = 'v1.1.0.1';
 
 // ========================================== //
 // 1. NAVIGATION ET INTERFACE GLOBALE         //
@@ -24,6 +24,14 @@ function showTab(tabId) {
         tab.style.display = 'none';
     });
     document.getElementById(tabId).style.display = 'block';
+
+    // Gère l'état actif du bouton pour qu'il reste bleu
+    const allButtons = document.querySelectorAll('.tab-btn');
+    allButtons.forEach(btn => btn.classList.remove('active'));
+    if (event && event.currentTarget) {
+        event.currentTarget.classList.add('active');
+    }
+
     syncForm3UI();
 }
 
@@ -488,6 +496,13 @@ function loadReport() {
     alert("Rapport chargé avec succès.");
 }
 
+function scrollToSection(sectionId) {
+    const element = document.getElementById(sectionId);
+    if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+
 function saveReport() {
     const noProjet = document.getElementById('global-no-projet').value.trim() || 'SANS-NUMERO';
     const rawDate = document.getElementById('global-date').value || new Date().toISOString().split('T')[0];
@@ -495,7 +510,17 @@ function saveReport() {
     const techName = document.getElementById('f2-tech-name')?.value || document.getElementById('f1-tech-name')?.value || '';
     const techInitials = techName.split(' ').filter(n => n).map(n => n[0].toUpperCase()).join('') || 'TECH';
     
-    const baseName = `englobe_${noProjet}_${rawDate}_${resistance}_${techInitials}`;
+    // Modèle automatique par défaut
+    const defaultBaseName = `englobe_${rawDate}_${noProjet}_${resistance}_${techInitials}`;
+    
+    // Boîte de dialogue pour valider ou personnaliser le nom
+    let userPromptName = prompt("Nom de sauvegarde du rapport (modifiable) :", defaultBaseName);
+    if (userPromptName === null) return; // Annulation
+    
+    let baseName = userPromptName.trim() || defaultBaseName;
+    if (!baseName.startsWith('englobe_')) {
+        baseName = `englobe_${baseName}`;
+    }
     
     if (currentActiveReportKey && !currentActiveReportKey.startsWith(baseName)) {
         currentActiveReportKey = null;
@@ -549,29 +574,13 @@ function saveReport() {
         samplesData.push(data);
     });
 
-    if (!currentActiveReportKey) {
-        let maxIndex = 0;
-        let latestKey = null;
-        for (let i = 0; i < localStorage.length; i++) {
-            const key = localStorage.key(i);
-            if (key && key.startsWith(baseName)) {
-                const parts = key.split('_');
-                const idx = parseInt(parts[parts.length - 1]);
-                if (!isNaN(idx) && idx > maxIndex) {
-                    maxIndex = idx;
-                    latestKey = key;
-                }
-            }
-        }
-    }
-
     let saveKey = currentActiveReportKey;
     if (!saveKey) {
         let maxIndex = 0;
         for (let i = 0; i < localStorage.length; i++) {
             const key = localStorage.key(i);
             if (key && key.startsWith(baseName)) {
-                const parts = key.split('_');
+                const parts = key.path ? key.split('_') : key.split('_');
                 const idx = parseInt(parts[parts.length - 1]);
                 if (!isNaN(idx) && idx > maxIndex) maxIndex = idx;
             }
@@ -594,6 +603,7 @@ function saveReport() {
     
     const dropdown = document.getElementById('saved-reports-dropdown');
     if (dropdown) dropdown.value = saveKey;
+    alert("Rapport sauvegardé avec succès sous : " + saveKey);
 }
 
 let deleteArmed = false;
