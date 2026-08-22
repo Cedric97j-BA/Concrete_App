@@ -37,7 +37,7 @@
         <div style="display: flex; flex-direction: column; gap: 5px;">
             <h1 style="margin: 0; font-size: 1.5rem; letter-spacing: 0.5px;">Bétonnage et Échantillonnage</h1>
             <div>
-                <span id="app-version" style="font-size: 0.95rem; font-weight: bold; background: #0369a1; padding: 3px 10px; border-radius: 12px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);">v1.1.0.2</span>
+                <span id="app-version" style="font-size: 0.95rem; font-weight: bold; background: #0369a1; padding: 3px 10px; border-radius: 12px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);">v1.1.0.3</span>
             </div>
         </div>
         
@@ -372,7 +372,7 @@
         <div class="form-section">
             <h3>Remarques</h3>
             <p style="font-size: 0.85rem; color: gray;">(Ce champ sera auto-généré par les cases "Voir remarques" cochées ci-dessus lors de l'export)</p>
-            <textarea id="f1-s9-remarques-compilation" rows="4" style="width: 100%;" disabled></textarea>
+            <textarea id="f1-s9-remarques-compilation" rows="4" style="width: 100%;"></textarea>
         </div>
 
         <!-- SIGNATURE TECHNICIEN -->
@@ -459,6 +459,7 @@
         <div class="form-section">
             <h3>Remarques (Suivi de coulée)</h3>
             <textarea id="f2-remarques-globales" rows="3" style="width: 100%;" placeholder="Notes additionnelles..."></textarea>
+            <button type="button" onclick="editGlobalRemarkPrompt()" style="margin-top: 10px; background: #f59e0b; color: white; border: none; padding: 8px 12px; border-radius: 4px; font-weight: bold; cursor: pointer;">✏️ Modifier un commentaire existant</button>
         </div>
 
         <!-- SIGNATURE TECHNICIEN -->
@@ -545,15 +546,16 @@
                         </div>
                     </div>
 
-                    <!-- Nouveau système de remarques (Seulement les lettres) -->
+                    <!-- Système de remarques Multiples -->
                     <div class="input-group" style="margin-top: 10px;">
-                        <label>Remarque (Lettre)</label>
+                        <label>Remarques attachées</label>
                         <div style="display: flex; gap: 5px;">
-                            <select class="truck-remarques-select" style="flex: 1; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px; background: white;">
-                                <option value="">-- Aucune --</option>
-                            </select>
-                            <button type="button" onclick="createNewRemark(this)" style="background: #0284c7; color: white; border: none; border-radius: 4px; padding: 0 10px; font-weight: bold; cursor: pointer;">+ Nouvelle Lettre</button>
+                            <input type="text" class="truck-remarques-list" readonly placeholder="Aucune" style="flex: 1; background: #f3f4f6; font-weight: bold; color: var(--primary);">
+                            <button type="button" onclick="createNewRemark(this)" style="background: #0284c7; color: white; border: none; border-radius: 4px; padding: 0 10px; font-weight: bold; cursor: pointer;">+ Ajouter</button>
+                            <button type="button" onclick="clearTruckRemarks(this)" style="background: #ef4444; color: white; border: none; border-radius: 4px; padding: 0 10px; font-weight: bold; cursor: pointer;">Effacer</button>
                         </div>
+                        <!-- Preview direct des remarques dans la carte -->
+                        <div class="truck-remarks-preview" style="margin-top: 8px; font-size: 0.85rem; color: #475569; line-height: 1.4;"></div>
                     </div>
                 </div>
             </div>
@@ -1211,7 +1213,7 @@
 <!-- LE CERVEAU (JAVASCRIPT)                    -->
 <!-- ========================================== -->
 <script src="pdf_templates.js"></script>
-<script src="app.js?v=1.1.0.2"></script>
+<script src="app.js?v=1.1.0.3"></script>
 
 <script>
     if ('serviceWorker' in navigator) {
@@ -1222,6 +1224,8 @@
         });
     }
 </script>
+
+<button type="button" onclick="saveReport()" style="position: fixed; bottom: 30px; right: 30px; z-index: 9999; background: #10b981; color: white; border: none; width: 60px; height: 60px; border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.3); font-size: 1.5rem; cursor: pointer; display: flex; justify-content: center; align-items: center;">💾</button>
 
 </body>
 </html>

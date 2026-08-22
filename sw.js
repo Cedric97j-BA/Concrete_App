@@ -1,4 +1,4 @@
-const CACHE_NAME = 'betonnage-app-v1.1.0.2';
+const CACHE_NAME = 'betonnage-app-v1.1.0.3';
 const ASSETS = [
     './',
     './index.html',

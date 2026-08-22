@@ -1,4 +1,4 @@
-const APP_VERSION = 'v1.1.0.2';
+const APP_VERSION = 'v1.1.0.3';
 
 // ========================================== //
 // 1. NAVIGATION ET INTERFACE GLOBALE         //
@@ -114,13 +114,28 @@ function toggleSampleFields(checkbox) {
 
 function toggleRefuse(checkbox) {
     const card = checkbox.closest('.truck-card');
+    const remarkInput = card.querySelector('.truck-remarques-list');
+
     if (checkbox.checked) {
         card.style.borderColor = '#dc2626'; 
-        card.style.backgroundColor = '#fef2f2'; 
+        card.style.backgroundColor = '#fef2f2';
+        
+        if (remarkInput) {
+            let current = remarkInput.value.split(',').map(s=>s.trim()).filter(s=>s!=="");
+            if (!current.includes("N/C")) current.unshift("N/C"); 
+            if (current.length > 2) current = [current[0], current[1]]; // Limite à N/C + 1 lettre
+            remarkInput.value = current.join(',');
+        }
     } else {
         card.style.borderColor = '#0284c7'; 
         card.style.backgroundColor = '#f8fafc'; 
+        
+        if (remarkInput) {
+            let current = remarkInput.value.split(',').map(s=>s.trim()).filter(s=>s!=="N/C" && s!=="");
+            remarkInput.value = current.join(',');
+        }
     }
+    updateAllTruckPreviews();
     calculateTotals();
 }
 
@@ -206,26 +221,134 @@ function syncForm3UI() {
 
 let currentRemarkCharCode = 65; 
 
-function createNewRemark(btn) {
-    const detail = prompt("Entrez les détails de la remarque :");
-    if (!detail) return; 
-
-    const letter = String.fromCharCode(currentRemarkCharCode);
-    currentRemarkCharCode++; 
-
-    const globalRemarks = document.getElementById('f2-remarques-globales');
-    globalRemarks.value += (globalRemarks.value ? '\n' : '') + letter + ' - ' + detail;
-
-    const allSelects = document.querySelectorAll('.truck-remarques-select');
-    allSelects.forEach(select => {
-        const option = document.createElement('option');
-        option.value = letter;
-        option.textContent = letter; 
-        select.appendChild(option);
+function getRemarksDict() {
+    const text = document.getElementById('f2-remarques-globales').value || "";
+    const dict = {};
+    text.split(';').forEach(part => {
+        const match = part.trim().match(/^([A-Z])\.\s*(.*)/);
+        if (match) dict[match[1]] = match[2].trim();
     });
+    return dict;
+}
 
-    const currentSelect = btn.closest('.input-group').querySelector('.truck-remarques-select');
-    currentSelect.value = letter;
+function rebuildGlobalRemarks(dict) {
+    let lines = [];
+    Object.keys(dict).sort().forEach(k => {
+        lines.push(`${k}. ${dict[k]}`); // Exactement un espace après le point
+    });
+    const el = document.getElementById('f2-remarques-globales');
+    el.value = lines.join('; ') + (lines.length > 0 ? ';' : '');
+    el.style.height = 'auto';
+    el.style.height = (el.scrollHeight) + 'px';
+}
+
+function updateAllTruckPreviews() {
+    const dict = getRemarksDict();
+    document.querySelectorAll('.truck-card').forEach(card => {
+        const input = card.querySelector('.truck-remarques-list');
+        const preview = card.querySelector('.truck-remarks-preview');
+        if (input && preview) {
+            if (input.value.trim() !== "") {
+                let letters = input.value.split(',').map(s=>s.trim());
+                let previewHtml = letters.map(l => {
+                    if (l === 'N/C') return "<strong>N/C</strong>. Non conforme";
+                    return dict[l] ? `<strong>${l}</strong>. ${dict[l]}` : "";
+                }).filter(x => x);
+                preview.innerHTML = previewHtml.join('<br/>');
+            } else {
+                preview.innerHTML = "";
+            }
+        }
+    });
+}
+
+function createNewRemark(btn) {
+    const card = btn.closest('.truck-card');
+    const input = card.querySelector('.truck-remarques-list');
+    const isRefused = card.querySelector('.truck-refuse').checked;
+    
+    let currentList = input.value ? input.value.split(',').map(s => s.trim()).filter(s => s !== "") : [];
+    let lettersOnly = currentList.filter(l => l !== 'N/C');
+
+    if (isRefused && lettersOnly.length >= 1) {
+        alert("Un camion refusé (N/C) ne peut avoir qu'une seule remarque supplémentaire.");
+        return;
+    }
+    if (!isRefused && lettersOnly.length >= 4) {
+        alert("Maximum de 4 remarques par camion atteint.");
+        return;
+    }
+
+    let dict = getRemarksDict();
+    let existingLetters = Object.keys(dict).sort().join(',');
+    
+    let msg = "AJOUTER UNE REMARQUE\n\n";
+    if (existingLetters) {
+        msg += `👉 Pour RÉUTILISER : Tapez une lettre existante (${existingLetters})\n`;
+    }
+    msg += `👉 Pour CRÉER : Tapez directement la nouvelle description :`;
+
+    const ans = prompt(msg);
+    if (!ans || ans.trim() === "") return;
+
+    let userInput = ans.trim();
+    let letterToAdd = "";
+
+    if (userInput.length === 1 && userInput.toUpperCase().match(/^[A-Z]$/)) {
+        let L = userInput.toUpperCase();
+        if (dict[L]) {
+            letterToAdd = L; 
+        } else {
+            alert(`La remarque ${L} n'existe pas encore. Tapez une description complète pour la créer.`);
+            return;
+        }
+    } else {
+        // CALCUL DYNAMIQUE : Repart à 'A' si la boîte est vide, sinon prend la lettre suivante
+        let nextCharCode = 65; 
+        let keys = Object.keys(dict);
+        if (keys.length > 0) {
+            let maxCode = Math.max(...keys.map(k => k.charCodeAt(0)));
+            nextCharCode = maxCode + 1;
+        }
+        letterToAdd = String.fromCharCode(nextCharCode);
+        
+        dict[letterToAdd] = userInput;
+        rebuildGlobalRemarks(dict);
+    }
+    
+    if (!currentList.includes(letterToAdd)) {
+        currentList.push(letterToAdd);
+        input.value = currentList.join(','); 
+        updateAllTruckPreviews();
+    } else {
+        alert(`La remarque ${letterToAdd} est déjà assignée à ce camion.`);
+    }
+}
+
+function clearTruckRemarks(btn) {
+    const card = btn.closest('.truck-card');
+    const input = card.querySelector('.truck-remarques-list');
+    const isRefused = card.querySelector('.truck-refuse').checked;
+    input.value = isRefused ? "N/C" : "";
+    updateAllTruckPreviews();
+}
+
+function editGlobalRemarkPrompt() {
+    let letter = prompt("Quelle lettre voulez-vous modifier ? (Ex: A)");
+    if (!letter) return;
+    letter = letter.trim().toUpperCase();
+    
+    let dict = getRemarksDict();
+    if (dict[letter]) {
+        let newText = prompt(`Nouveau texte pour la remarque ${letter} :`, dict[letter]);
+        if (newText !== null && newText.trim() !== "") {
+            dict[letter] = newText.trim();
+            rebuildGlobalRemarks(dict);
+            updateAllTruckPreviews(); 
+        }
+    } else {
+        alert(`La remarque ${letter} n'existe pas.`);
+    }
 }
 
 // ========================================== //
@@ -402,9 +525,9 @@ function loadReport() {
         }
         
         const globalRem = reportData.static['f2-remarques-globales'] || '';
-        const matches = globalRem.match(/^[A-Z](?=\s*-)/gm);
+        const matches = globalRem.match(/([A-Z])\./g);
         if (matches && matches.length > 0) {
-            const maxLetter = matches.sort().pop();
+            const maxLetter = matches.map(m => m[0]).sort().pop();
             currentRemarkCharCode = maxLetter.charCodeAt(0) + 1; 
         }
     }
@@ -447,7 +570,11 @@ function loadReport() {
 
             card.querySelector('.truck-sample-num').value = truckInfo.sampleNum || '';
             card.querySelector('.truck-sample-time').value = truckInfo.sampleTime || '';
-            card.querySelector('.truck-remarques-select').value = truckInfo.remarqueSelect || '';
+            const rmInput = card.querySelector('.truck-remarques-list');
+            if (rmInput) {
+                let rawVal = truckInfo.remarquesList || truckInfo.remarqueSelect || '';
+                rmInput.value = rawVal.split(',').map(s => s.trim()).filter(s => s !== "").join(',');
+            }
         });
         calculateTotals();
     }
@@ -493,6 +620,7 @@ function loadReport() {
     syncForm3UI(); 
     currentActiveReportKey = selectedKey; 
     dropdown.value = selectedKey;
+    updateAllTruckPreviews();
     alert("Rapport chargé avec succès.");
 }
 
@@ -554,7 +682,7 @@ function saveReport() {
             sampleCheck: card.querySelector('.truck-sample-check').checked,
             sampleNum: card.querySelector('.truck-sample-num').value,
             sampleTime: card.querySelector('.truck-sample-time').value,
-            remarqueSelect: card.querySelector('.truck-remarques-select').value
+            remarquesList: card.querySelector('.truck-remarques-list')?.value || ''
         });
     });
 
@@ -652,6 +780,7 @@ function deleteReport() {
     updateDropdown(); 
 }
 
+
 // === MOTEUR D'EXPORT MULTI-TEMPLATE (OFFLINE BASE64) === //
 async function exportToPDF() {
     try {
@@ -667,12 +796,14 @@ async function exportToPDF() {
             const check = document.getElementById(`f1-s${i}-remarques-check`);
             const text = document.getElementById(`f1-s${i}-remarques-text`);
             if (check && check.checked && text && text.value.trim() !== "") {
-                compiledRemarks.push(`Section ${i} : ${text.value.trim()}`);
+                compiledRemarks.push(`${i}. ${text.value.trim()}`);
             }
         }
-        const compilationBox = document.getElementById('f1-s9-remarques-compilation');
-        if (compilationBox) {
-            compilationBox.value = compiledRemarks.join('   '); 
+        
+        let userS9Text = document.getElementById('f1-s9-remarques-compilation')?.value.trim() || "";
+        let finalS9Text = userS9Text;
+        if (compiledRemarks.length > 0) {
+            finalS9Text = userS9Text ? (userS9Text + "\n\n" + compiledRemarks.join('; ')) : compiledRemarks.join('; ');
         }
 
         const mergedPdf = await PDFLib.PDFDocument.create();
@@ -700,7 +831,9 @@ async function exportToPDF() {
             const el = document.getElementById(name);
             if (el) {
                 try {
-                    if (el.type === 'checkbox') {
+                    if (name === 'f1-s9-remarques-compilation') {
+                        formF1.getTextField(name).setText(finalS9Text);
+                    } else if (el.type === 'checkbox') {
                         el.checked ? formF1.getCheckBox(name).check() : formF1.getCheckBox(name).uncheck();
                     } else {
                         formF1.getTextField(name).setText(el.value || "");
@@ -730,12 +863,12 @@ async function exportToPDF() {
         const remarksDict = {};
         const generalText = [];
         
-        allRemarksText.split('\n').forEach(line => {
-            const match = line.trim().match(/^([A-Z])\s*-\s*(.*)/);
+        allRemarksText.split(';').forEach(part => {
+            const match = part.trim().match(/^([A-Z])\.\s*(.*)/);
             if (match) {
-                remarksDict[match[1]] = line.trim();
-            } else if (line.trim() !== "") {
-                generalText.push(line.trim());
+                remarksDict[match[1]] = `${match[1]}. ${match[2].trim()}`;
+            } else if (part.trim() !== "") {
+                generalText.push(part.trim());
             }
         });
 
@@ -804,25 +937,29 @@ async function exportToPDF() {
                 trySetF2('.truck-sample-num', `truck-${row}-sample-num`);
                 trySetF2('.truck-sample-time', `truck-${row}-sample-time`);
                 
+                const elRem = card.querySelector('.truck-remarques-list');
+                
                 if (isRefused) {
                     try { formF2.getCheckBox(`truck-${row}-refuse`).check(); } catch(e) {}
+                }
+                
+                if (elRem && elRem.value) {
+                    let cleanText = elRem.value.split(',').map(s=>s.trim()).filter(s=>s!=="").join(',');
+                    try { formF2.getTextField(`truck-${row}-remarque`).setText(cleanText); } 
+                    catch(e1) { try { formF2.getDropdown(`truck-${row}-remarque`).select(cleanText); } catch(e2) {} }
+                    
+                    elRem.value.split(',').forEach(l => {
+                        let cleanL = l.trim();
+                        if(cleanL !== "N/C" && cleanL !== "") pageRemarksSet.add(cleanL);
+                    });
+                } else if (isRefused) { 
                     try { formF2.getTextField(`truck-${row}-remarque`).setText("N/C"); } 
                     catch(e1) { try { formF2.getDropdown(`truck-${row}-remarque`).select("N/C"); } catch(e2) {} }
-                } else {
-                    const elRem = card.querySelector('.truck-remarques-select');
-                    if (elRem && elRem.value) {
-                        try { formF2.getTextField(`truck-${row}-remarque`).setText(elRem.value); } 
-                        catch(e1) { try { formF2.getDropdown(`truck-${row}-remarque`).select(elRem.value); } catch(e2) {} }
-                        
-                        if (elRem.value !== "N/C") {
-                            pageRemarksSet.add(elRem.value); 
-                        }
-                    }
                 }
             });
 
             const pageNotes = Array.from(pageRemarksSet).sort().map(L => remarksDict[L]).filter(x => x);
-            const finalRemarksText = [...generalText, ...pageNotes].join('   '); 
+            const finalRemarksText = [...generalText, ...pageNotes].join('; ') + (pageNotes.length > 0 || generalText.length > 0 ? ';' : ''); 
             try { formF2.getTextField('f2-remarques-globales').setText(finalRemarksText); } catch(e) {}
 
             try {
@@ -993,7 +1130,7 @@ async function exportToPDF() {
 
         const pdfBytes = await mergedPdf.save();
         const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-        const fileName = `Rapport_${noProjetVal}_${rawDateVal}_${resistanceVal}_${initialsVal}.pdf`;
+        const fileName = `Rapport_${rawDateVal}_${noProjetVal}_${resistanceVal}_${initialsVal}.pdf`;
 
         // CORRECTIF : Détecter mobile/tablette (incluant l'iPad qui se fait passer pour un Mac)
         const isMacTouch = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
