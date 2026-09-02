@@ -10,6 +10,8 @@ files_to_convert = {
     "TEMPLATE_F2": os.path.join(BASE_DIR, "templates", "template_f2.pdf"),
     "TEMPLATE_F3": os.path.join(BASE_DIR, "templates", "template_f3.pdf"),
     "TEMPLATE_TEMOIN": os.path.join(BASE_DIR, "templates", "template_temoin.pdf"),
+    "TEMPLATE_COMPACTION": os.path.join(BASE_DIR, "templates", "template_compaction.pdf"),
+    "TEMPLATE_PLANCHE": os.path.join(BASE_DIR, "templates", "template_planche.pdf"),
     "TAHOMA_FONT": os.path.join(BASE_DIR, "fonts", "tahoma.ttf") 
 }
 

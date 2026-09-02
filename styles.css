@@ -237,6 +237,32 @@ input[type="checkbox"] {
     color: var(--temoin);
 }
 
+/* --- ACCORDÉONS --- */
+.accordion-header {
+    background-color: #e0f2fe;
+    padding: 12px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    border-bottom: 1px solid #bae6fd;
+}
+.accordion-content {
+    display: none;
+    padding: 15px;
+}
+.accordion-content.active {
+    display: block;
+}
+.chevron {
+    transition: transform 0.3s ease;
+    font-size: 1.2rem;
+    color: #0284c7;
+}
+.chevron.rotated {
+    transform: rotate(180deg);
+}
+
 /* ========================================= */
 /* BOUTONS D'ACTION                          */
 /* ========================================= */
@@ -367,4 +393,51 @@ button[onclick^="add"]:hover {
     input[type="date"]::-webkit-inner-spin-button {
         display: none !important;
     }
+}
+
+/* ========================================== */
+/* STYLES DU DASHBOARD (HUB PRINCIPAL)        */
+/* ========================================== */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 10px 0;
+}
+.app-card {
+    background: white;
+    border-radius: 12px;
+    padding: 30px 20px;
+    text-align: center;
+    text-decoration: none;
+    color: #334155;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    border: 2px solid transparent;
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+.app-card:active, .app-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+    border-color: #97c6b9; 
+}
+.app-icon-img { 
+    width: 65px; 
+    height: 65px; 
+    object-fit: contain; 
+}
+.app-title { font-size: 1.2rem; font-weight: bold; margin: 0; }
+.app-desc { font-size: 0.9rem; color: #64748b; margin: 0; }
+
+.new-app-card {
+    background: #f8fafc;
+    border: 2px dashed #cbd5e1;
+    box-shadow: none;
+}
+.new-app-card:hover, .new-app-card:active {
+    border-color: #97c6b9;
+    background: #f0fdfa;
 }
