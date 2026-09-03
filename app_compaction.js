@@ -1,4 +1,4 @@
-const APP_VERSION = 'v1.0.0.4';
+const APP_VERSION = 'v1.0.0.5';
 
 // ========================================== //
 // 1. NAVIGATION ET INITIALISATION            //
@@ -12,8 +12,29 @@ document.addEventListener('DOMContentLoaded', () => {
     if (document.getElementById('essais-container').children.length === 0) {
         addEssai();
     }
+
+    if (localStorage.getItem('darkMode') === 'enabled') {
+        document.body.classList.add('dark-mode');
+    }
     updateDropdown();
 });
+
+// 2. La fonction reliée au bouton
+function toggleDarkMode() {
+    // Ajoute ou retire la classe "dark-mode" sur le corps de la page
+    document.body.classList.toggle('dark-mode');
+    
+    // Vérifie si le mode est activé ou non
+    const isDark = document.body.classList.contains('dark-mode');
+    
+    // Sauvegarde le choix dans la tablette
+    localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
+    
+    // Si vous avez gardé la fonction Toast, on peut l'utiliser !
+    if (typeof showToast === "function") {
+        showToast(isDark ? "Mode Nuit activé" : "Mode Jour activé", "info");
+    }
+}
 
 // Fonction globale pour afficher un Toast
 function showToast(message, type = 'success') {
