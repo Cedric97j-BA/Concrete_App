@@ -324,10 +324,11 @@ button[onclick^="add"]:hover {
     }
 
     /* 4. TRUCK CARDS : ALIGNEMENT PAR LE BAS DE TOUTES LES LIGNES */
-    .truck-card > div {
+    .truck-card > div:not(.accordion-content):not(.accordion-header),
+    .truck-card .accordion-content > div {
         display: flex !important;
         flex-direction: row !important;
-        align-items: flex-end !important; 
+        align-items: flex-end !important;
         gap: 6px !important;
         width: 100% !important;
         margin-bottom: 10px !important;
