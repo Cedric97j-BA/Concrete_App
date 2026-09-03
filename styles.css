@@ -480,3 +480,81 @@ button[onclick^="add"]:hover {
     from { bottom: 40px; opacity: 1; }
     to { bottom: 40px; opacity: 0; }
 }
+
+/* --- MODE NUIT (CORRIGÉ) --- */
+body.dark-mode {
+    background-color: #0f172a; 
+    color: #f8fafc;
+}
+
+/* 1. Main containers and cards */
+body.dark-mode #form-navigation,
+body.dark-mode .tab-section,
+body.dark-mode .form-section,
+body.dark-mode .app-card,
+body.dark-mode .new-app-card {
+    background-color: #1e293b;
+    border-color: #334155;
+}
+
+/* 2. Specific forms (Keeping the color hierarchy but dark) */
+body.dark-mode .truck-card {
+    background-color: #172554; /* Very dark blue */
+    border-color: #1e3a8a;
+}
+body.dark-mode .sample-card {
+    background-color: #064e3b; /* Very dark green */
+    border-color: #047857;
+}
+body.dark-mode .temoin-only-card {
+    background-color: #3b0764; /* Very dark purple */
+    border-color: #6b21a8;
+}
+
+/* 3. Headers and Accordions */
+body.dark-mode h2 { border-bottom-color: #38bdf8; color: #38bdf8; }
+body.dark-mode h3 { background-color: #334155; color: #f8fafc; }
+body.dark-mode h4 { color: #f8fafc; }
+body.dark-mode .sample-card h3 { background-color: #047857; color: white; }
+body.dark-mode .temoin-only-card h3, 
+body.dark-mode .temoin-only-card h4 { background-color: #6b21a8; color: white; }
+body.dark-mode .accordion-header { background-color: #1e3a8a; border-bottom-color: #172554; }
+
+/* 4. Navigation Tabs */
+body.dark-mode .tab-btn { background-color: #334155; color: #cbd5e1; border-color: #475569; }
+body.dark-mode .tab-btn.active, 
+body.dark-mode .tab-btn:hover { background-color: #0284c7; color: white; border-color: #0284c7; }
+
+/* 5. Inputs and Textareas */
+body.dark-mode input, 
+body.dark-mode select, 
+body.dark-mode textarea {
+    background-color: #0f172a;
+    color: #ffffff;
+    border-color: #475569;
+}
+body.dark-mode input:focus,
+body.dark-mode select:focus,
+body.dark-mode textarea:focus {
+    border-color: #38bdf8;
+    box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
+}
+
+/* 6. Text and Labels */
+body.dark-mode label, 
+body.dark-mode .app-desc, 
+body.dark-mode .accordion-header {
+    color: #cbd5e1;
+}
+body.dark-mode .app-title,
+body.dark-mode .chevron {
+    color: #f8fafc;
+}
+
+/* 7. Forcer l'écrasement des couleurs écrites directement dans le HTML */
+body.dark-mode #global-header,
+body.dark-mode [style*="background"] {
+    background: #1e293b !important;
+    color: #f8fafc !important;
+    border-color: #334155 !important;
+}
