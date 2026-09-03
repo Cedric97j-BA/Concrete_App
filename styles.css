@@ -441,3 +441,42 @@ button[onclick^="add"]:hover {
     border-color: #97c6b9;
     background: #f0fdfa;
 }
+
+/* --- NOTIFICATIONS TOAST --- */
+.toast-notification {
+    visibility: hidden;
+    min-width: 250px;
+    background-color: #1e293b; /* Gris très foncé */
+    color: #f8fafc;
+    text-align: center;
+    border-radius: 8px;
+    padding: 16px;
+    position: fixed;
+    z-index: 10000;
+    left: 50%;
+    bottom: 40px;
+    transform: translateX(-50%);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+/* Couleurs selon le contexte */
+.toast-success { border-bottom: 4px solid #22c55e; } /* Vert */
+.toast-error { border-bottom: 4px solid #ef4444; } /* Rouge */
+.toast-info { border-bottom: 4px solid #0ea5e9; } /* Bleu */
+
+/* Animation d'apparition et disparition */
+.toast-notification.show {
+    visibility: visible;
+    animation: slideInUp 0.4s ease-out, fadeOut 0.5s ease-in 2.5s;
+}
+
+@keyframes slideInUp {
+    from { bottom: 0; opacity: 0; }
+    to { bottom: 40px; opacity: 1; }
+}
+@keyframes fadeOut {
+    from { bottom: 40px; opacity: 1; }
+    to { bottom: 40px; opacity: 0; }
+}

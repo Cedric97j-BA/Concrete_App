@@ -23,6 +23,27 @@ document.addEventListener('DOMContentLoaded', () => {
     updateDropdown();
 });
 
+// Fonction globale pour afficher un Toast
+function showToast(message, type = 'success') {
+    // 1. Création de l'élément
+    const toast = document.createElement('div');
+    toast.className = `toast-notification toast-${type} show`;
+    toast.innerText = message;
+    
+    // 2. Ajout à la page
+    document.body.appendChild(toast);
+    
+    // 3. Destruction après 3 secondes (2.5s d'affichage + 0.5s d'animation de sortie)
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => {
+            if (document.body.contains(toast)) {
+                toast.remove();
+            }
+        }, 500);
+    }, 3000);
+}
+
 function showTab(tabId) {
     const allTabs = document.querySelectorAll('.tab-section');
     allTabs.forEach(tab => {
@@ -387,7 +408,7 @@ function newReportPrompt() {
     const dropdown = document.getElementById('saved-reports-dropdown');
     if (dropdown) dropdown.value = ""; 
 
-    alert("Écran réinitialisé. Vous pouvez commencer un nouveau rapport de planche.");
+    showToast("Écran réinitialisé. Vous pouvez commencer un nouveau rapport de planche.", "info");
 }
 
 function loadReport() {
@@ -396,7 +417,7 @@ function loadReport() {
     const selectedKey = dropdown.value;
 
     if (!selectedKey) {
-        alert("Veuillez d'abord sélectionner un rapport sauvegardé dans la liste déroulante.");
+        showToast("Veuillez d'abord sélectionner un rapport sauvegardé dans la liste déroulante.", "error");
         return;
     }
 
@@ -448,7 +469,7 @@ function loadReport() {
 
     currentActiveReportKey = selectedKey; 
     dropdown.value = selectedKey;
-    alert("Rapport chargé avec succès.");
+    showToast("Rapport chargé avec succès.", "success");
 }
 
 function scrollToSection(sectionId) {
@@ -531,7 +552,7 @@ function saveReport(isDuplicate = false) {
     const dropdown = document.getElementById('saved-reports-dropdown');
     if (dropdown) dropdown.value = saveKey;
     
-    alert(isDuplicate ? "Copie sauvegardée avec succès sous : " + baseName : "Planche mise à jour : " + baseName);
+    showToast(isDuplicate ? "Copie sauvegardée avec succès sous : " + baseName : "Planche mise à jour : " + baseName);
 }
 
 let deleteArmed = false;
@@ -542,7 +563,7 @@ function deleteReport() {
     const targetKey = currentActiveReportKey || (dropdown ? dropdown.value : null);
 
     if (!targetKey) {
-        alert("Veuillez sélectionner un rapport sauvegardé dans la liste pour le supprimer.");
+        showToast("Veuillez sélectionner un rapport sauvegardé dans la liste pour le supprimer.", "info");
         return;
     }
 
@@ -572,7 +593,7 @@ function deleteReport() {
     }
 
     localStorage.removeItem(targetKey); 
-    alert("Le rapport a été supprimé avec succès.");
+    showToast("Le rapport a été supprimé avec succès.", "success");
     
     currentActiveReportKey = null; 
     clearForm(); 
@@ -837,7 +858,7 @@ async function exportToPDF() {
         }
 
     } catch (error) {
-        alert("Erreur lors de l'export PDF. Vérifiez la console.");
+        showToast("Erreur lors de l'export PDF. Vérifiez la console.", "error");
         const btn = document.querySelector('button[onclick="exportToPDF()"]');
         if (btn) {
             btn.textContent = "📄 Exporter en PDF";

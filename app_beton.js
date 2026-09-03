@@ -18,6 +18,27 @@ document.addEventListener('DOMContentLoaded', () => {
     updateDropdown();
 });
 
+// Fonction globale pour afficher un Toast
+function showToast(message, type = 'success') {
+    // 1. Création de l'élément
+    const toast = document.createElement('div');
+    toast.className = `toast-notification toast-${type} show`;
+    toast.innerText = message;
+    
+    // 2. Ajout à la page
+    document.body.appendChild(toast);
+    
+    // 3. Destruction après 3 secondes (2.5s d'affichage + 0.5s d'animation de sortie)
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => {
+            if (document.body.contains(toast)) {
+                toast.remove();
+            }
+        }, 500);
+    }, 3000);
+}
+
 function showTab(tabId) {
     const allTabs = document.querySelectorAll('.tab-section');
     allTabs.forEach(tab => {
@@ -294,11 +315,11 @@ function createNewRemark(btn) {
     let lettersOnly = currentList.filter(l => l !== 'N/C');
 
     if (isRefused && lettersOnly.length >= 1) {
-        alert("Un camion refusé (N/C) ne peut avoir qu'une seule remarque supplémentaire.");
+        showToast("Un camion refusé (N/C) ne peut avoir qu'une seule remarque supplémentaire.", "info");
         return;
     }
     if (!isRefused && lettersOnly.length >= 4) {
-        alert("Maximum de 4 remarques par camion atteint.");
+        showToast("Maximum de 4 remarques par camion atteint.");
         return;
     }
 
@@ -322,7 +343,7 @@ function createNewRemark(btn) {
         if (dict[L]) {
             letterToAdd = L; 
         } else {
-            alert(`La remarque ${L} n'existe pas encore. Tapez une description complète pour la créer.`);
+            showToast(`La remarque ${L} n'existe pas encore. Tapez une description complète pour la créer.`, "info");
             return;
         }
     } else {
@@ -344,7 +365,7 @@ function createNewRemark(btn) {
         input.value = currentList.join(','); 
         updateAllTruckPreviews();
     } else {
-        alert(`La remarque ${letterToAdd} est déjà assignée à ce camion.`);
+        showToast(`La remarque ${letterToAdd} est déjà assignée à ce camion.`, "info");
     }
 }
 
@@ -370,7 +391,7 @@ function editGlobalRemarkPrompt() {
             updateAllTruckPreviews(); 
         }
     } else {
-        alert(`La remarque ${letter} n'existe pas.`);
+        showToast(`La remarque ${letter} n'existe pas.`, "info");
     }
 }
 
@@ -535,7 +556,7 @@ function newReportPrompt() {
     const dropdown = document.getElementById('saved-reports-dropdown');
     if (dropdown) dropdown.value = ""; 
 
-    alert("Écran réinitialisé. Vous pouvez commencer un nouveau rapport.");
+    showToast("Écran réinitialisé. Vous pouvez commencer un nouveau rapport.", "success");
 }
 
 function loadReport() {
@@ -544,7 +565,7 @@ function loadReport() {
     const selectedKey = dropdown.value;
 
     if (!selectedKey) {
-        alert("Veuillez d'abord sélectionner un rapport sauvegardé dans la liste déroulante.");
+        showToast("Veuillez d'abord sélectionner un rapport sauvegardé dans la liste déroulante.", "info");
         return;
     }
 
@@ -664,7 +685,7 @@ function loadReport() {
     currentActiveReportKey = selectedKey; 
     dropdown.value = selectedKey;
     updateAllTruckPreviews();
-    alert("Rapport chargé avec succès.");
+    showToast("Rapport chargé avec succès.", "success");
 }
 
 function scrollToSection(sectionId) {
@@ -768,7 +789,7 @@ function saveReport(isDuplicate = false) {
     
     const dropdown = document.getElementById('saved-reports-dropdown');
     if (dropdown) dropdown.value = saveKey;
-    alert(isDuplicate ? "Copie sauvegardée avec succès sous : " + baseName : "Rapport mis à jour : " + baseName);
+    showToast(isDuplicate ? "Copie sauvegardée avec succès sous : " + baseName : "Rapport mis à jour : " + baseName, "success");
 }
 
 let deleteArmed = false;
@@ -779,7 +800,7 @@ function deleteReport() {
     const targetKey = currentActiveReportKey || (dropdown ? dropdown.value : null);
 
     if (!targetKey) {
-        alert("Veuillez sélectionner un rapport sauvegardé dans la liste pour le supprimer.");
+        showToast("Veuillez sélectionner un rapport sauvegardé dans la liste pour le supprimer.", "info");
         return;
     }
 
@@ -810,7 +831,7 @@ function deleteReport() {
     }
 
     localStorage.removeItem(targetKey); 
-    alert(`Le rapport a été supprimé avec succès.`);
+    showToast(`Le rapport a été supprimé avec succès.`, "success");
     
     currentActiveReportKey = null; 
     clearForm(); 
@@ -1211,7 +1232,7 @@ async function exportToPDF() {
 
     } catch (error) {
         console.error("Erreur lors de l'export multi-template :", error);
-        alert("Erreur lors de l'export PDF. Vérifiez la console.");
+        showToast("Erreur lors de l'export PDF. Vérifiez la console.", "error");
         const btn = document.querySelector('button[onclick="exportToPDF()"]');
         if(btn) {
             btn.textContent = "📄 Exporter en PDF";
