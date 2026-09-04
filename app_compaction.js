@@ -1,4 +1,4 @@
-const APP_VERSION = 'v1.0.0.5';
+const APP_VERSION = 'v1.1.0.7a';
 
 // ========================================== //
 // 1. NAVIGATION ET INITIALISATION            //
@@ -567,6 +567,7 @@ async function exportToPDF() {
         const fileName = `Compactage_${noProjetVal}_${rawDateVal}_${initialsVal}.pdf`;
 
         // Logique de partage iOS/Android
+        // CORRECTIF ANDROID : Gestion plus robuste du partage et du téléchargement
         const isMacTouch = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
         const isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || isMacTouch;
         
@@ -584,20 +585,24 @@ async function exportToPDF() {
             }
         } catch (err) {
             console.log("Partage annulé ou échoué:", err);
+            // Si Android fait planter le partage, on force le téléchargement direct
+            if (err.name !== 'AbortError') {
+                attemptedShare = false;
+            }
         }
 
+        // TÉLÉCHARGEMENT DIRECT (Amélioré pour Android avec ObjectURL)
         if (!attemptedShare) {
-            const reader = new FileReader();
-            reader.readAsDataURL(blob);
-            reader.onloadend = function() {
-                const base64data = reader.result;
-                const link = document.createElement('a');
-                link.href = base64data;
-                link.download = fileName;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            };
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Nettoyage de la mémoire après 100ms
+            setTimeout(() => window.URL.revokeObjectURL(url), 100);
         }
         
         if (btn) {

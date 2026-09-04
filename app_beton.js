@@ -1,4 +1,4 @@
-const APP_VERSION = 'v1.1.0.7';
+const APP_VERSION = 'v1.1.0.7a';
 
 // ========================================== //
 // 1. NAVIGATION ET INTERFACE GLOBALE         //
@@ -1290,7 +1290,7 @@ async function exportToPDF() {
         const blob = new Blob([pdfBytes], { type: 'application/pdf' });
         const fileName = `Rapport_${rawDateVal}_${noProjetVal}_${resistanceVal}_${initialsVal}.pdf`;
 
-        // CORRECTIF : Détecter mobile/tablette (incluant l'iPad qui se fait passer pour un Mac)
+        // CORRECTIF ANDROID : Gestion plus robuste du partage et du téléchargement
         const isMacTouch = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
         const isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || isMacTouch;
         
@@ -1308,21 +1308,24 @@ async function exportToPDF() {
             }
         } catch (err) {
             console.log("Partage annulé ou échoué:", err);
+            // Si Android fait planter le partage, on force le téléchargement direct
+            if (err.name !== 'AbortError') {
+                attemptedShare = false;
+            }
         }
 
-        // Sur PC (ou si le partage mobile échoue), on télécharge directement
+        // TÉLÉCHARGEMENT DIRECT (Amélioré pour Android avec ObjectURL)
         if (!attemptedShare) {
-            const reader = new FileReader();
-            reader.readAsDataURL(blob);
-            reader.onloadend = function() {
-                const base64data = reader.result;
-                const link = document.createElement('a');
-                link.href = base64data;
-                link.download = fileName;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            };
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Nettoyage de la mémoire après 100ms
+            setTimeout(() => window.URL.revokeObjectURL(url), 100);
         }
         
         if (btn) {
@@ -1331,10 +1334,10 @@ async function exportToPDF() {
         }
 
     } catch (error) {
-        console.error("Erreur lors de l'export multi-template :", error);
+        console.error("Erreur lors de l'export PDF :", error);
         showToast("Erreur lors de l'export PDF. Vérifiez la console.", "error");
         const btn = document.querySelector('button[onclick="exportToPDF()"]');
-        if(btn) {
+        if (btn) {
             btn.textContent = "📄 Exporter en PDF";
             btn.disabled = false;
         }
