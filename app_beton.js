@@ -1,4 +1,4 @@
-const APP_VERSION = 'v1.1.0.5';
+const APP_VERSION = 'v1.1.0.7';
 
 // ========================================== //
 // 1. NAVIGATION ET INTERFACE GLOBALE         //
@@ -115,6 +115,9 @@ function addTruck() {
     }
     
     container.appendChild(clone);
+    currentTruckPage = Math.max(1, Math.ceil(truckCount / TRUCKS_PER_PAGE));
+    updateTruckPagination();
+
 }
 
 // Fonction pour ouvrir ou fermer la carte du camion
@@ -203,6 +206,79 @@ function toggleRefuse(checkbox) {
     }
     updateAllTruckPreviews();
     calculateTotals();
+}
+
+// Variables globales pour la pagination
+let currentTruckPage = 1;
+const TRUCKS_PER_PAGE = 17;
+
+// Fonction 1 : Gère l'affichage selon la page actuelle
+function updateTruckPagination() {
+    const trucks = document.querySelectorAll('.truck-card');
+    const totalTrucks = trucks.length;
+    const paginationBar = document.getElementById('truck-pagination-controls');
+    
+    // S'il n'y a pas de camions, on cache la barre
+    if (totalTrucks === 0) {
+        paginationBar.style.display = 'none';
+        return;
+    }
+    
+    const totalPages = Math.max(1, Math.ceil(totalTrucks / TRUCKS_PER_PAGE));
+    
+    // Sécurité : si on supprime un camion et qu'on perd une page
+    if (currentTruckPage > totalPages) currentTruckPage = totalPages;
+    
+    // Afficher la barre de pagination
+    paginationBar.style.display = 'flex';
+    document.getElementById('current-page-display').textContent = currentTruckPage;
+    document.getElementById('total-pages-display').textContent = totalPages;
+    
+    // Griser les boutons si on est au début ou à la fin
+    document.getElementById('btn-prev-page').disabled = (currentTruckPage === 1);
+    document.getElementById('btn-prev-page').style.opacity = (currentTruckPage === 1) ? "0.5" : "1";
+    
+    document.getElementById('btn-next-page').disabled = (currentTruckPage === totalPages);
+    document.getElementById('btn-next-page').style.opacity = (currentTruckPage === totalPages) ? "0.5" : "1";
+    
+    // Cacher/Afficher les camions
+    const startIndex = (currentTruckPage - 1) * TRUCKS_PER_PAGE;
+    const endIndex = currentTruckPage * TRUCKS_PER_PAGE;
+    
+    trucks.forEach((truck, index) => {
+        if (index >= startIndex && index < endIndex) {
+            truck.style.display = 'block'; // Affiché
+        } else {
+            truck.style.display = 'none'; // Caché
+        }
+    });
+}
+
+// Fonction 2 : Les boutons Précédent/Suivant
+function changeTruckPage(direction) {
+    const totalTrucks = document.querySelectorAll('.truck-card').length;
+    const totalPages = Math.max(1, Math.ceil(totalTrucks / TRUCKS_PER_PAGE));
+    
+    currentTruckPage += direction;
+    
+    // Limites
+    if (currentTruckPage < 1) currentTruckPage = 1;
+    if (currentTruckPage > totalPages) currentTruckPage = totalPages;
+    
+    updateTruckPagination();
+    
+    // Remonter automatiquement la vue au début de la liste des camions
+    document.getElementById('truck-pagination-controls').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// Fonction 3 (Bonus) : Tout réduire pour y voir plus clair
+function collapseAllTrucks() {
+    document.querySelectorAll('.truck-card .accordion-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    document.querySelectorAll('.truck-card .chevron').forEach(chevron => {
+        chevron.classList.remove('rotated');
+    });
 }
 
 // ========================================== //
@@ -539,6 +615,8 @@ function clearForm() {
     currentRemarkCharCode = 65; 
 
     calculateTotals();
+    currentTruckPage = 1;
+    updateTruckPagination();
     isClearingForm = false; 
 }
 

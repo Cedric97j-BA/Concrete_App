@@ -432,6 +432,20 @@
         <!-- SECTION : GRILLE DES CAMIONS (Dynamique) -->
         <div class="form-section">
             <h3>Registre des Camions</h3>
+
+            <!-- CONTRÔLES DE PAGINATION -->
+            <div id="truck-pagination-controls" style="display: none; justify-content: space-between; align-items: center; background: #e2e8f0; padding: 10px; border-radius: 6px; margin-bottom: 15px;">
+                <button type="button" onclick="changeTruckPage(-1)" id="btn-prev-page" style="padding: 8px 15px; background: #94a3b8; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">◀ Précédent</button>
+                
+                <span style="font-weight: bold; color: #334155; font-size: 1.1rem;">Page <span id="current-page-display">1</span> de <span id="total-pages-display">1</span></span>
+                
+                <button type="button" onclick="changeTruckPage(1)" id="btn-next-page" style="padding: 8px 15px; background: #0284c7; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">Suivant ▶</button>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
+                <button type="button" onclick="collapseAllTrucks()" style="background: #475569; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">Tout réduire (Fermer les accordéons)</button>
+            </div>
+
             <div id="trucks-container">
                 <!-- Les camions s'ajouteront ici -->
             </div>
