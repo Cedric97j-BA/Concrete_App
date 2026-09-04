@@ -334,6 +334,11 @@ button[onclick^="add"]:hover {
         margin-bottom: 10px !important;
         flex-wrap: nowrap !important;
     }
+
+    /* Protection absolue de l'accordéon sur mobile */
+    .accordion-content { display: none !important; }
+    .accordion-content.active { display: block !important; }
+
     .truck-card .input-group {
         flex: 1 1 0% !important;
         min-width: 0 !important;
@@ -558,4 +563,9 @@ body.dark-mode [style*="background"] {
     background: #1e293b !important;
     color: #f8fafc !important;
     border-color: #334155 !important;
+}
+
+body.dark-mode header img {
+    filter: invert(1);
+    mix-blend-mode: screen;
 }
