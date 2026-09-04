@@ -1,4 +1,4 @@
-const APP_VERSION = 'v1.1.0.7a';
+const APP_VERSION = 'v1.1.0.7b';
 
 // ========================================== //
 // 1. NAVIGATION ET INITIALISATION            //
@@ -566,42 +566,34 @@ async function exportToPDF() {
         const blob = new Blob([pdfBytes], { type: 'application/pdf' });
         const fileName = `Compactage_${noProjetVal}_${rawDateVal}_${initialsVal}.pdf`;
 
-        // Logique de partage iOS/Android
-        // CORRECTIF ANDROID : Gestion plus robuste du partage et du téléchargement
+        // LOGIQUE SÉPARÉE : APPLE VS ANDROID/PC
         const isMacTouch = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
-        const isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || isMacTouch;
+        const isApple = /iPhone|iPad|iPod/i.test(navigator.userAgent) || isMacTouch;
         
         let attemptedShare = false;
         try {
-            // Utiliser le menu de partage UNIQUEMENT sur mobile/tablette
-            if (isMobileDevice && navigator.share && navigator.canShare) {
+            // UNIQUEMENT POUR APPLE : On ouvre le menu de partage
+            if (isApple && navigator.share && navigator.canShare) {
                 const file = new File([blob], fileName, { type: 'application/pdf' });
                 if (navigator.canShare({ files: [file] })) {
                     attemptedShare = true;
-                    await navigator.share({
-                        files: [file]
-                    });
+                    await navigator.share({ files: [file] });
                 }
             }
         } catch (err) {
             console.log("Partage annulé ou échoué:", err);
-            // Si Android fait planter le partage, on force le téléchargement direct
-            if (err.name !== 'AbortError') {
-                attemptedShare = false;
-            }
+            if (err.name !== 'AbortError') attemptedShare = false;
         }
 
-        // TÉLÉCHARGEMENT DIRECT (Amélioré pour Android avec ObjectURL)
+        // POUR ANDROID ET PC : On sauvegarde directement le fichier en local
         if (!attemptedShare) {
             const url = window.URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
             link.download = fileName;
             document.body.appendChild(link);
-            link.click();
+            link.click(); // Force le téléchargement direct dans le dossier de la tablette
             document.body.removeChild(link);
-            
-            // Nettoyage de la mémoire après 100ms
             setTimeout(() => window.URL.revokeObjectURL(url), 100);
         }
         
