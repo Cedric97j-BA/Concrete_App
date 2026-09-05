@@ -33,7 +33,7 @@
         <div style="display: flex; flex-direction: column; gap: 5px;">
             <h1 style="margin: 0; font-size: 1.5rem; letter-spacing: 0.5px;">Bétonnage et Échantillonnage</h1>
             <div>
-                <span id="app-version" style="font-size: 0.95rem; font-weight: bold; background: #73968c; padding: 3px 10px; border-radius: 12px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);">v1.1.0.4</span>
+                <span id="app-version" style="font-size: 0.95rem; font-weight: bold; background: #73968c; padding: 3px 10px; border-radius: 12px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);">v1.1.0.7c</span>
             </div>
         </div>
 
@@ -429,6 +429,39 @@
             <div class="input-group"><label>Localisation du prélèvement</label><input type="text" id="f2-loc-prelevement" placeholder="Ex : Entre axe A et B"></div>
         </div>
 
+        <!-- SECTION : Équipements utilisés -->
+        <div class="form-section">
+            <h3>Équipements (No de série)</h3>
+            <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center;">
+                
+                <div style="display: flex; align-items: center; gap: 5px;">
+                    <label style="margin: 0;">Thermomètre</label>
+                    <input type="text" id="f2-equip-thermo" style="width: 100px;">
+                </div>
+                
+                <div style="display: flex; align-items: center; gap: 5px;">
+                    <label style="margin: 0;">Airmètre</label>
+                    <input type="text" id="f2-equip-airmetre" style="width: 100px;">
+                </div>
+                
+                <div style="display: flex; align-items: center; gap: 5px;">
+                    <label style="margin: 0;">Cône d'affaissement</label>
+                    <input type="text" id="f2-equip-cone" style="width: 100px;">
+                </div>
+                
+                <div style="display: flex; align-items: center; gap: 5px;">
+                    <label style="margin: 0;">Bourroir (16 mm)</label>
+                    <input type="text" id="f2-equip-bourroir16" style="width: 100px;">
+                </div>
+                
+                <div style="display: flex; align-items: center; gap: 5px;">
+                    <label style="margin: 0;">Bourroir (10 mm)</label>
+                    <input type="text" id="f2-equip-bourroir10" style="width: 100px;">
+                </div>
+
+            </div>
+        </div>
+
         <!-- SECTION : GRILLE DES CAMIONS (Dynamique) -->
         <div class="form-section">
             <h3>Registre des Camions</h3>
@@ -443,7 +476,7 @@
             </div>
 
             <div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
-                <button type="button" onclick="collapseAllTrucks()" style="background: #475569; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">Tout réduire (Fermer les accordéons)</button>
+                <button type="button" onclick="collapseAllTrucks()" style="background: #475569; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">Tout réduire</button>
             </div>
 
             <div id="trucks-container">
@@ -460,15 +493,14 @@
             <div class="input-group"><label>Total vérifié</label><input type="number" id="f2-total-verifie" readonly style="background: #f3f4f6; width: 100px; display: inline-block;"> (m³)</div>
         </div>
 
-        <!-- SECTION : Équipements utilisés -->
-        <div class="form-section">
+        <!--<div class="form-section">
             <h3>Équipements (Numéros de série)</h3>
             <div class="input-group"><label>Thermomètre </label><input type="text" id="f2-equip-thermo" style="width: 100px; display: inline-block;"></div>
             <div class="input-group"><label>Airmètre </label><input type="text" id="f2-equip-airmetre" style="width: 100px; display: inline-block;"></div>
             <div class="input-group"><label>Cône d'affaissement </label><input type="text" id="f2-equip-cone" style="width: 100px; display: inline-block;"></div>
             <div class="input-group"><label>Bourroir (16 mm) </label><input type="text" id="f2-equip-bourroir16" style="width: 100px; display: inline-block;"></div>
             <div class="input-group"><label>Bourroir (10 mm) </label><input type="text" id="f2-equip-bourroir10" style="width: 100px; display: inline-block;"></div>
-        </div>
+        </div>-->
 
         <!-- SECTION : Remarques Générales Formulaire 2 -->
         <div class="form-section">
@@ -571,7 +603,7 @@
                         </div>
 
                         <!-- Système de remarques Multiples -->
-                        <div class="input-group" style="margin-top: 10px;">
+                        <!--<div class="input-group" style="margin-top: 10px;">
                             <label>Remarques attachées</label>
                             <div style="display: flex; gap: 5px;">
                                 <input type="text" class="truck-remarques-list" readonly placeholder="Aucune" style="flex: 1; background: #f3f4f6; font-weight: bold; color: var(--primary);">
@@ -579,7 +611,18 @@
                                 <button type="button" onclick="clearTruckRemarks(this)" style="background: #ef4444; color: white; border: none; border-radius: 4px; padding: 0 10px; font-weight: bold; cursor: pointer;">Effacer</button>
                             </div>
                             <div class="truck-remarks-preview" style="margin-top: 8px; font-size: 0.85rem; color: #475569; line-height: 1.4;"></div>
+                        </div>-->
+                    </div>
+
+                    <!-- Système de remarques Multiples -->
+                    <div class="input-group" style="margin-top: 10px;">
+                        <label>Remarques attachées</label>
+                        <div style="display: flex; gap: 5px;">
+                            <input type="text" class="truck-remarques-list" readonly placeholder="Aucune" style="flex: 1; background: #f3f4f6; font-weight: bold; color: var(--primary);">
+                            <button type="button" onclick="createNewRemark(this)" style="background: #0284c7; color: white; border: none; border-radius: 4px; padding: 0 10px; font-weight: bold; cursor: pointer;">+ Ajouter</button>
+                            <button type="button" onclick="clearTruckRemarks(this)" style="background: #ef4444; color: white; border: none; border-radius: 4px; padding: 0 10px; font-weight: bold; cursor: pointer;">Effacer</button>
                         </div>
+                        <div class="truck-remarks-preview" style="margin-top: 8px; font-size: 0.85rem; color: #475569; line-height: 1.4;"></div>
                     </div>
                 </div>
             </div>
@@ -699,396 +742,413 @@
 
     <!-- TEMPLATE INVISIBLE POUR LES FICHES D'ÉCHANTILLONS (FORM 3) -->
     <template id="sample-template">
-        <div class="sample-card" style="border: 2px solid #16a34a; border-radius: 8px; padding: 15px; margin-bottom: 20px; background: #f0fdf4;">
-            <div style="font-weight: bold; font-size: 1.2rem; margin-bottom: 15px; color: #16a34a;">
-                Échantillon n° <span class="sample-number-display"></span> 
-                <span style="font-size: 0.9rem; color: gray;">(Lié au Camion #<span class="sample-truck-linked"></span>)</span>
-            </div>
-
-            <!-- SPÉCIFICATIONS DES MOULES -->
-            <div class="form-section" style="background: white;">
-                <h3>Spécifications des moules</h3>
-                <div style="display: flex; gap: 20px; flex-wrap: wrap;">
-                    <div class="checkbox-group">
-                        <label style="font-weight:bold;">Moules</label>
-                        <label><input type="checkbox" class="sample-moule-cpv"> CPV</label>
-                        <label><input type="checkbox" class="sample-moule-carton"> Carton</label>
-                        <label><input type="checkbox" class="sample-moule-acier"> Acier</label>
-                    </div>
-                    <div class="checkbox-group">
-                        <label style="font-weight:bold;">Dimensions (mm)</label>
-                        <label><input type="checkbox" class="sample-dim-100"> 100 x 200</label>
-                        <label><input type="checkbox" class="sample-dim-150"> 150 x 300</label>
-                        <label><input type="checkbox" class="sample-dim-poutre"> Poutre</label>
-                        <label><input type="checkbox" class="sample-dim-cube"> Cube</label>
-                    </div>
-                    <div class="checkbox-group">
-                        <label style="font-weight:bold;">Méthode / Cure</label>
-                        <label><input type="checkbox" class="sample-meth-csa"> CSA-A23.2-9C</label>
-                        <label><input type="checkbox" class="sample-meth-chantier"> Mûris en conditions de chantier</label>
-                        <label><input type="checkbox" class="sample-meth-labo"> Moulés au laboratoire</label>
-                    </div>
+        <div class="sample-card" style="border: 2px solid #16a34a; border-radius: 8px; margin-bottom: 20px; background: #f0fdf4; overflow: hidden;">
+            
+            <!-- EN-TÊTE ACCORDÉON (CLIQUABLE) -->
+            <div class="accordion-header" onclick="toggleAccordion(this)" style="background-color: #dcfce7; padding: 15px;">
+                <div style="font-weight: bold; font-size: 1.2rem; color: #16a34a;">
+                    Échantillon n° <span class="sample-number-display"></span> 
+                    <span style="font-size: 0.9rem; color: #475569; font-weight: normal;">(Lié au Camion #<span class="sample-truck-linked"></span>)</span>
                 </div>
+                <span class="chevron" style="color: #16a34a;">▼</span>
             </div>
+            
+            <!-- DÉBUT DU CONTENU CACHABLE -->
+            <div class="accordion-content active" style="padding: 15px;">
 
-            <!-- CONDITIONS INITIALES DE CURE ET D'ENTREPOSAGE -->
-            <div class="form-section" style="background: white;">
-                <h3>Conditions initiales de cure et d'entreposage (CSA-A23.2-3C)</h3>
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                    <div>
-                        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 5px; font-size: 0.85rem; font-weight: bold; text-align: center; margin-bottom: 5px;">
-                            <div style="text-align: left;">Étape</div><div>Date</div><div>Heure</div><div>Par</div>
+                <!-- SPÉCIFICATIONS DES MOULES -->
+                <div class="form-section" style="background: white;">
+                    <h3>Spécifications des moules</h3>
+                    <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                        <div class="checkbox-group">
+                            <label style="font-weight:bold;">Moules</label>
+                            <label><input type="checkbox" class="sample-moule-cpv"> CPV</label>
+                            <label><input type="checkbox" class="sample-moule-carton"> Carton</label>
+                            <label><input type="checkbox" class="sample-moule-acier"> Acier</label>
                         </div>
-                        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 5px; margin-bottom: 5px;">
-                            <label>Prélèvement</label>
-                            <input type="date" class="sample-prelev-date" style="padding:2px;">
-                            <input type="time" class="sample-prelev-time" style="padding:2px;">
-                            <input type="text" class="sample-prelev-tech" style="padding:2px;">
+                        <div class="checkbox-group">
+                            <label style="font-weight:bold;">Dimensions (mm)</label>
+                            <label><input type="checkbox" class="sample-dim-100"> 100 x 200</label>
+                            <label><input type="checkbox" class="sample-dim-150"> 150 x 300</label>
+                            <label><input type="checkbox" class="sample-dim-poutre"> Poutre</label>
+                            <label><input type="checkbox" class="sample-dim-cube"> Cube</label>
                         </div>
-                        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 5px; margin-bottom: 5px;">
-                            <label>Récupération</label>
-                            <input type="date" class="sample-recup-date" style="padding:2px;">
-                            <input type="time" class="sample-recup-time" style="padding:2px;">
-                            <input type="text" class="sample-recup-tech" style="padding:2px;">
-                        </div>
-                        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 5px;">
-                            <label>Chambre humide</label>
-                            <input type="date" class="sample-lab-date" style="padding:2px;">
-                            <input type="time" class="sample-lab-time" style="padding:2px;">
-                            <input type="text" class="sample-lab-tech" style="padding:2px;">
-                        </div>
-                    </div>
-
-                    <div>
-                        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 5px; margin-bottom: 5px; align-items: center;">
-                            <label>Début d'entreposage</label>
-                            <div><input type="number" class="sample-temp-init" step="0.1" style="width:100%;"> °C</div>
-                            <div style="text-align:center; font-size:0.85rem;">min. (°C)</div>
-                            <div style="text-align:center; font-size:0.85rem;">max. (°C)</div>
-                        </div>
-                        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 5px; margin-bottom: 5px; align-items: center;">
-                            <label>Fin d'entreposage</label>
-                            <div><input type="number" class="sample-temp-recup" step="0.1" style="width:100%;"> °C</div>
-                            <div><input type="number" class="sample-temp-min" step="0.1" style="width:100%;"></div>
-                            <div><input type="number" class="sample-temp-max" step="0.1" style="width:100%;"></div>
-                        </div>
-                        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 5px; align-items: center;">
-                            <label>Pendant le transport</label>
-                            <div><input type="number" class="sample-temp-transp" step="0.1" style="width:100%;"> °C</div>
-                        </div>
-                        <div style="margin-top: 10px; display: flex; align-items: center; gap: 10px;">
-                            <label style="white-space: nowrap;">Thermomètre min/max n°</label>
-                            <input type="text" class="sample-thermo-num" style="flex:1;">
+                        <div class="checkbox-group">
+                            <label style="font-weight:bold;">Méthode / Cure</label>
+                            <label><input type="checkbox" class="sample-meth-csa"> CSA-A23.2-9C</label>
+                            <label><input type="checkbox" class="sample-meth-chantier"> Mûris en conditions de chantier</label>
+                            <label><input type="checkbox" class="sample-meth-labo"> Moulés au laboratoire</label>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- PROTECTION ET MÛRISSEMENT -->
-            <div class="form-section" style="background: white;">
-                <h3>Protection et mûrissement des éprouvettes au chantier</h3>
-                <div class="grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                    <div>
-                        <h4 style="margin: 0 0 10px 0; border-bottom: 1px solid #ccc;">Intérieur</h4>
-                        <div style="display: flex; gap: 20px;">
-                            <div class="checkbox-group">
-                                <label><input type="checkbox" class="sample-cure-int-roulotte"> Roulotte</label>
-                                <label><input type="checkbox" class="sample-cure-int-local"> Local</label>
-                                <label><input type="checkbox" class="sample-cure-int-abri"> Abri temporaire</label>
-                            </div>
-                            <div class="checkbox-group">
-                                <label><input type="checkbox" class="sample-cure-int-chauffe"> Chauffé (e)</label>
-                                <label><input type="checkbox" class="sample-cure-int-nonchauffe"> Non chauffé (e)</label>
-                                <div style="margin-top: 5px;"></div>
-                                <label><input type="checkbox" class="sample-cure-int-clim"> Climatisé (e)</label>
-                                <label><input type="checkbox" class="sample-cure-int-nonclim"> Non climatisé (e)</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div>
-                        <h4 style="margin: 0 0 10px 0; border-bottom: 1px solid #ccc;">Extérieur</h4>
-                        <div style="display: flex; gap: 20px;">
-                            <div class="checkbox-group">
-                                <label><input type="checkbox" class="sample-cure-ext-ombre"> À l'ombre</label>
-                                <label><input type="checkbox" class="sample-cure-ext-soleil"> Au soleil</label>
-                                <div style="margin-top: 5px;"></div>
-                                <label><input type="checkbox" class="sample-cure-ext-prot"> Protégées contre l'évaporation</label>
-                                <label><input type="checkbox" class="sample-cure-ext-nonprot"> Non protégées contre l'évaporation</label>
-                            </div>
-                            <div class="checkbox-group">
-                                <label><input type="checkbox" class="sample-cure-ext-boite-iso"> Boîte de cure isolée</label>
-                                <label><input type="checkbox" class="sample-cure-ext-boite-noniso"> Boîte de cure non isolée</label>
-                                <label><input type="checkbox" class="sample-cure-ext-boite-chauff"> Boîte de cure chauffée</label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- OBSERVATIONS -->
-            <div class="form-section" style="background: white;">
-                <h3>Observations</h3>
-                <div class="grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                    <div class="checkbox-group">
-                        <h4 style="margin: 0 0 10px 0; border-bottom: 1px solid #ccc;">À la récupération</h4>
-                        <label><input type="checkbox" class="sample-obs-recup-finition"> Mauvaise finition</label>
-                        <label><input type="checkbox" class="sample-obs-recup-deplaces"> Cylindres déplacés</label>
-                        <label><input type="checkbox" class="sample-obs-recup-endom"> Cylindres possiblement endommagés</label>
-                        <label><input type="checkbox" class="sample-obs-recup-niveau"> Cylindres pas de niveau</label>
-                    </div>
-                    <div class="checkbox-group">
-                        <h4 style="margin: 0 0 10px 0; border-bottom: 1px solid #ccc;">À l'échantillonnage</h4>
-                        <label><input type="checkbox" class="sample-obs-ech-autre"> Échantillonnage par autre partie</label>
-                        <label><input type="checkbox" class="sample-obs-ech-conjoint"> Échantillonnage conjoint</label>
-                        <div style="display: flex; gap: 10px; margin-left: 20px;">
-                            <label><input type="checkbox" class="sample-obs-ech-fournisseur"> Fournisseur</label>
-                            <label><input type="checkbox" class="sample-obs-ech-entrepreneur"> Entrepreneur</label>
-                        </div>
-                        <label><input type="checkbox" class="sample-obs-ech-meme"> Échantillonnage même camion qu'Englobe</label>
-                        <label><input type="checkbox" class="sample-obs-ech-cond"> Conditions de cure des cylindres de l'autre partie</label>
-                    </div>
-                </div>
-            </div>
-
-            <!-- MASSE DES CYLINDRES (Optionnel, non mappé) -->
-            <div class="form-section" style="background: white; display: none;"></div>
-
-            <!-- CROQUIS ET REMARQUES GLOBALES (Échantillon) -->
-            <div class="form-section" style="background: white;">
-                <h3>Croquis de localisation et remarques</h3>
-                <textarea class="sample-croquis-remarques" rows="4" style="width: 100%;"></textarea>
-            </div>
-
-            <!-- TÉMOINS (CACHÉ PAR DÉFAUT) -->
-            <div class="form-section" style="background: white; border-top: 2px dashed #0284c7; padding-top: 15px;">
-                <label style="font-weight: bold; color: #0284c7; font-size: 1.1rem; cursor: pointer;">
-                    <input type="checkbox" class="sample-temoin-check" onchange="toggleTemoinSection(this)"> Activer la fiche TÉMOIN
-                </label>
-                
-                <div class="temoin-container" style="display: none; margin-top: 15px; border: 1px solid #0284c7; padding: 15px; background: #f8fafc; border-radius: 4px;">
-                    <h2 style="text-align: center; letter-spacing: 2px; margin-bottom: 20px;">TÉMOIN</h2>
+                <!-- CONDITIONS INITIALES DE CURE ET D'ENTREPOSAGE -->
+                <div class="form-section" style="background: white;">
+                    <h3>Conditions initiales de cure et d'entreposage (CSA-A23.2-3C)</h3>
                     
-                    <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #cbd5e1;">
-                        <div class="checkbox-group" style="flex: 1; display: flex; gap: 10px;">
-                            <label style="font-weight:bold;">Moules:</label>
-                            <label><input type="checkbox" class="temoin-moule-cpv"> CPV</label>
-                            <label><input type="checkbox" class="temoin-moule-carton"> Carton</label>
-                            <label><input type="checkbox" class="temoin-moule-acier"> Acier</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div>
+                            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 5px; font-size: 0.85rem; font-weight: bold; text-align: center; margin-bottom: 5px;">
+                                <div style="text-align: left;">Étape</div><div>Date</div><div>Heure</div><div>Par</div>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 5px; margin-bottom: 5px;">
+                                <label>Prélèvement</label>
+                                <input type="date" class="sample-prelev-date" style="padding: 2px; min-width: 140px; max-width: 100%;">
+                                <input type="time" class="sample-prelev-time" style="padding: 2px; min-width: 140px; max-width: 100%;">
+                                <input type="text" class="sample-prelev-tech" style="padding: 2px; min-width: 140px; max-width: 100%;">
+                            </div>
+                            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 5px; margin-bottom: 5px;">
+                                <label>Récupération</label>
+                                <input type="date" class="sample-recup-date" style="padding: 2px; min-width: 140px; max-width: 100%;">
+                                <input type="time" class="sample-recup-time" style="padding: 2px; min-width: 140px; max-width: 100%;">
+                                <input type="text" class="sample-recup-tech" style="padding: 2px; min-width: 140px; max-width: 100%;">
+                            </div>
+                            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 5px;">
+                                <label>Chambre humide</label>
+                                <input type="date" class="sample-lab-date" style="padding: 2px; min-width: 140px; max-width: 100%;">
+                                <input type="time" class="sample-lab-time" style="padding: 2px; min-width: 140px; max-width: 100%;">
+                                <input type="text" class="sample-lab-tech" style="padding: 2px; min-width: 140px; max-width: 100%;">
+                            </div>
                         </div>
-                        <div class="checkbox-group" style="flex: 2; display: flex; gap: 10px;">
-                            <label style="font-weight:bold;">Dimensions (mm):</label>
-                            <label><input type="checkbox" class="temoin-dim-100"> 100 x 200</label>
-                            <label><input type="checkbox" class="temoin-dim-150"> 150 x 300</label>
-                            <label><input type="checkbox" class="temoin-dim-poutre"> Poutre</label>
-                            <label><input type="checkbox" class="temoin-dim-cube"> Cube</label>
+
+                        <div>
+                            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 5px; margin-bottom: 5px; align-items: center;">
+                                <label>Début d'entreposage</label>
+                                <div><input type="number" class="sample-temp-init" step="0.1" style="width:100%;"> °C</div>
+                                <div style="text-align:center; font-size:0.85rem;">min. (°C)</div>
+                                <div style="text-align:center; font-size:0.85rem;">max. (°C)</div>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 5px; margin-bottom: 5px; align-items: center;">
+                                <label>Fin d'entreposage</label>
+                                <div><input type="number" class="sample-temp-recup" step="0.1" style="width:100%;"> °C</div>
+                                <div><input type="number" class="sample-temp-min" step="0.1" style="width:100%;"></div>
+                                <div><input type="number" class="sample-temp-max" step="0.1" style="width:100%;"></div>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 5px; align-items: center;">
+                                <label>Pendant le transport</label>
+                                <div><input type="number" class="sample-temp-transp" step="0.1" style="width:100%;"> °C</div>
+                            </div>
+                            <div style="margin-top: 10px; display: flex; align-items: center; gap: 10px;">
+                                <label style="white-space: nowrap;">Thermomètre min/max n°</label>
+                                <input type="text" class="sample-thermo-num" style="flex:1;">
+                            </div>
                         </div>
                     </div>
+                </div>
 
-                    <div style="margin-bottom: 15px;">
-                        <h4 style="text-align: center; background: #e2e8f0; padding: 5px; margin: 0 0 10px 0;">Conditions initiales de cure et d'entreposage</h4>
-                        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                            <label style="font-weight:bold; width: 100px; ">Prélèvement</label>
-                            <div style="flex: 1; display: flex; gap: 5px;"><label>date</label><input type="date" class="temoin-prelev-date" style="flex:1;"></div>
-                            <div style="flex: 1; display: flex; gap: 5px;"><label>heure</label><input type="time" class="temoin-prelev-time" style="flex:1;"></div>
-                            <div style="flex: 1; display: flex; gap: 5px;"><label>par</label><input type="text" class="temoin-prelev-tech" style="flex:1;"></div>
-                        </div>
-
-                        <!-- ACCORDION ROWS POUR MOBILE ET BUREAU -->
-                        <div style="display: flex; flex-direction: column; gap: 8px;">
-                            <!-- Ligne a -->
-                            <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
-                                <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne a</summary>
-                                <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                                    <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-a-num"></div>
-                                    <div class="input-group"><label>N° éch.</label><input type="text" value="a" readonly style="background:#f3f4f6; text-align:center;"></div>
-                                    <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-a-bris"></div>
-                                    <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-a-temp-debut" step="0.1"></div>
-                                    <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-a-temp-fin" step="0.1"></div>
-                                    <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-a-recup-date"></div>
-                                    <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-a-recup-heure"></div>
-                                    <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-a-recup-par"></div>
+                <!-- PROTECTION ET MÛRISSEMENT -->
+                <div class="form-section" style="background: white;">
+                    <h3>Protection et mûrissement des éprouvettes au chantier</h3>
+                    <div class="grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div>
+                            <h4 style="margin: 0 0 10px 0; border-bottom: 1px solid #ccc;">Intérieur</h4>
+                            <div style="display: flex; gap: 20px;">
+                                <div class="checkbox-group">
+                                    <label><input type="checkbox" class="sample-cure-int-roulotte"> Roulotte</label>
+                                    <label><input type="checkbox" class="sample-cure-int-local"> Local</label>
+                                    <label><input type="checkbox" class="sample-cure-int-abri"> Abri temporaire</label>
                                 </div>
-                            </details>
-                            <!-- Ligne b -->
-                            <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
-                                <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne b</summary>
-                                <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                                    <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-b-num"></div>
-                                    <div class="input-group"><label>N° éch.</label><input type="text" value="b" readonly style="background:#f3f4f6; text-align:center;"></div>
-                                    <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-b-bris"></div>
-                                    <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-b-temp-debut" step="0.1"></div>
-                                    <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-b-temp-fin" step="0.1"></div>
-                                    <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-b-recup-date"></div>
-                                    <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-b-recup-heure"></div>
-                                    <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-b-recup-par"></div>
-                                </div>
-                            </details>
-                            <!-- Ligne c -->
-                            <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
-                                <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne c</summary>
-                                <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                                    <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-c-num"></div>
-                                    <div class="input-group"><label>N° éch.</label><input type="text" value="c" readonly style="background:#f3f4f6; text-align:center;"></div>
-                                    <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-c-bris"></div>
-                                    <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-c-temp-debut" step="0.1"></div>
-                                    <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-c-temp-fin" step="0.1"></div>
-                                    <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-c-recup-date"></div>
-                                    <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-c-recup-heure"></div>
-                                    <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-c-recup-par"></div>
-                                </div>
-                            </details>
-                            <!-- Ligne d -->
-                            <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
-                                <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne d</summary>
-                                <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                                    <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-d-num"></div>
-                                    <div class="input-group"><label>N° éch.</label><input type="text" value="d" readonly style="background:#f3f4f6; text-align:center;"></div>
-                                    <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-d-bris"></div>
-                                    <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-d-temp-debut" step="0.1"></div>
-                                    <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-d-temp-fin" step="0.1"></div>
-                                    <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-d-recup-date"></div>
-                                    <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-d-recup-heure"></div>
-                                    <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-d-recup-par"></div>
-                                </div>
-                            </details>
-                            <!-- Ligne e -->
-                            <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
-                                <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne e</summary>
-                                <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                                    <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-e-num"></div>
-                                    <div class="input-group"><label>N° éch.</label><input type="text" value="e" readonly style="background:#f3f4f6; text-align:center;"></div>
-                                    <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-e-bris"></div>
-                                    <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-e-temp-debut" step="0.1"></div>
-                                    <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-e-temp-fin" step="0.1"></div>
-                                    <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-e-recup-date"></div>
-                                    <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-e-recup-heure"></div>
-                                    <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-e-recup-par"></div>
-                                </div>
-                            </details>
-                            <!-- Ligne f -->
-                            <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
-                                <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne f</summary>
-                                <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                                    <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-f-num"></div>
-                                    <div class="input-group"><label>N° éch.</label><input type="text" value="f" readonly style="background:#f3f4f6; text-align:center;"></div>
-                                    <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-f-bris"></div>
-                                    <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-f-temp-debut" step="0.1"></div>
-                                    <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-f-temp-fin" step="0.1"></div>
-                                    <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-f-recup-date"></div>
-                                    <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-f-recup-heure"></div>
-                                    <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-f-recup-par"></div>
-                                </div>
-                            </details>
-                            <!-- Ligne g -->
-                            <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
-                                <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne g</summary>
-                                <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                                    <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-g-num"></div>
-                                    <div class="input-group"><label>N° éch.</label><input type="text" value="g" readonly style="background:#f3f4f6; text-align:center;"></div>
-                                    <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-g-bris"></div>
-                                    <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-g-temp-debut" step="0.1"></div>
-                                    <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-g-temp-fin" step="0.1"></div>
-                                    <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-g-recup-date"></div>
-                                    <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-g-recup-heure"></div>
-                                    <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-g-recup-par"></div>
-                                </div>
-                            </details>
-                            <!-- Ligne h -->
-                            <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
-                                <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne h</summary>
-                                <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                                    <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-h-num"></div>
-                                    <div class="input-group"><label>N° éch.</label><input type="text" value="h" readonly style="background:#f3f4f6; text-align:center;"></div>
-                                    <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-h-bris"></div>
-                                    <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-h-temp-debut" step="0.1"></div>
-                                    <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-h-temp-fin" step="0.1"></div>
-                                    <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-h-recup-date"></div>
-                                    <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-h-recup-heure"></div>
-                                    <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-h-recup-par"></div>
-                                </div>
-                            </details>
-                            <!-- Ligne i -->
-                            <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
-                                <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne i</summary>
-                                <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                                    <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-i-num"></div>
-                                    <div class="input-group"><label>N° éch.</label><input type="text" value="i" readonly style="background:#f3f4f6; text-align:center;"></div>
-                                    <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-i-bris"></div>
-                                    <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-i-temp-debut" step="0.1"></div>
-                                    <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-i-temp-fin" step="0.1"></div>
-                                    <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-i-recup-date"></div>
-                                    <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-i-recup-heure"></div>
-                                    <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-i-recup-par"></div>
-                                </div>
-                            </details>
-                        </div>
-                    </div>
-
-                    <div style="margin-bottom: 15px;">
-                        <h4 style="text-align: center; background: #e2e8f0; padding: 5px; margin: 0 0 10px 0;">Protection et mûrissement des éprouvettes au chantier</h4>
-                        <div style="text-align: center; font-weight: bold; margin-bottom: 5px;">Extérieur</div>
-                        <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
-                            <div class="checkbox-group">
-                                <label><input type="checkbox" class="temoin-cure-prot"> Protégées contre l'évaporation</label>
-                                <label><input type="checkbox" class="temoin-cure-nonprot"> Non protégées contre l'évaporation</label>
-                                <label><input type="checkbox" class="temoin-cure-meme"> même condition que l'ouvrage</label>
-                                <div style="margin-top: 5px; display: flex; align-items: center; gap: 5px;">
-                                    <label>Thermocouple n°</label>
-                                    <input type="text" class="temoin-thermo-num" style="width: 100px;">
+                                <div class="checkbox-group">
+                                    <label><input type="checkbox" class="sample-cure-int-chauffe"> Chauffé (e)</label>
+                                    <label><input type="checkbox" class="sample-cure-int-nonchauffe"> Non chauffé (e)</label>
+                                    <div style="margin-top: 5px;"></div>
+                                    <label><input type="checkbox" class="sample-cure-int-clim"> Climatisé (e)</label>
+                                    <label><input type="checkbox" class="sample-cure-int-nonclim"> Non climatisé (e)</label>
                                 </div>
                             </div>
-                            <div class="checkbox-group">
-                                <label><input type="checkbox" class="temoin-cure-ombre"> À l'ombre</label>
-                                <label><input type="checkbox" class="temoin-cure-soleil"> Au soleil</label>
-                                <div style="display: flex; gap: 10px; align-items: center; margin-top: 5px;">
-                                    <label><input type="checkbox" class="temoin-cure-abris"> Abris</label>
-                                    <label><input type="checkbox" class="temoin-cure-chauffe"> chauffé</label>
-                                    <label><input type="checkbox" class="temoin-cure-nonchauffe"> non chauffé</label>
+                        </div>
+                        <div>
+                            <h4 style="margin: 0 0 10px 0; border-bottom: 1px solid #ccc;">Extérieur</h4>
+                            <div style="display: flex; gap: 20px;">
+                                <div class="checkbox-group">
+                                    <label><input type="checkbox" class="sample-cure-ext-ombre"> À l'ombre</label>
+                                    <label><input type="checkbox" class="sample-cure-ext-soleil"> Au soleil</label>
+                                    <div style="margin-top: 5px;"></div>
+                                    <label><input type="checkbox" class="sample-cure-ext-prot"> Protégées contre l'évaporation</label>
+                                    <label><input type="checkbox" class="sample-cure-ext-nonprot"> Non protégées contre l'évaporation</label>
+                                </div>
+                                <div class="checkbox-group">
+                                    <label><input type="checkbox" class="sample-cure-ext-boite-iso"> Boîte de cure isolée</label>
+                                    <label><input type="checkbox" class="sample-cure-ext-boite-noniso"> Boîte de cure non isolée</label>
+                                    <label><input type="checkbox" class="sample-cure-ext-boite-chauff"> Boîte de cure chauffée</label>
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <div style="margin-bottom: 15px;">
-                        <h4 style="text-align: center; background: #e2e8f0; padding: 5px; margin: 0 0 10px 0;">Observations</h4>
-                        <div class="grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                            <div class="checkbox-group">
-                                <div style="text-align: center; font-weight: bold; margin-bottom: 5px; border-bottom: 1px solid #ccc;">À la récupération</div>
-                                <label><input type="checkbox" class="temoin-obs-finition"> Mauvaise finition</label>
-                                <label><input type="checkbox" class="temoin-obs-deplaces"> Cylindres déplacés</label>
-                                <label><input type="checkbox" class="temoin-obs-endom"> Cylindres possiblement endommagés</label>
-                                <label><input type="checkbox" class="temoin-obs-niveau"> Cylindres pas de niveau</label>
+                <!-- OBSERVATIONS -->
+                <div class="form-section" style="background: white;">
+                    <h3>Observations</h3>
+                    <div class="grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="checkbox-group">
+                            <h4 style="margin: 0 0 10px 0; border-bottom: 1px solid #ccc;">À la récupération</h4>
+                            <label><input type="checkbox" class="sample-obs-recup-finition"> Mauvaise finition</label>
+                            <label><input type="checkbox" class="sample-obs-recup-deplaces"> Cylindres déplacés</label>
+                            <label><input type="checkbox" class="sample-obs-recup-endom"> Cylindres possiblement endommagés</label>
+                            <label><input type="checkbox" class="sample-obs-recup-niveau"> Cylindres pas de niveau</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <h4 style="margin: 0 0 10px 0; border-bottom: 1px solid #ccc;">À l'échantillonnage</h4>
+                            <label><input type="checkbox" class="sample-obs-ech-autre"> Échantillonnage par autre partie</label>
+                            <label><input type="checkbox" class="sample-obs-ech-conjoint"> Échantillonnage conjoint</label>
+                            <div style="display: flex; gap: 10px; margin-left: 20px;">
+                                <label><input type="checkbox" class="sample-obs-ech-fournisseur"> Fournisseur</label>
+                                <label><input type="checkbox" class="sample-obs-ech-entrepreneur"> Entrepreneur</label>
                             </div>
-                            <div class="checkbox-group">
-                                <div style="text-align: center; font-weight: bold; margin-bottom: 5px; border-bottom: 1px solid #ccc;">À l'échantillonnage</div>
-                                <label><input type="checkbox" class="temoin-obs-autre"> Échantillonnage par autre partie</label>
-                                <label><input type="checkbox" class="temoin-obs-conjoint"> Échantillonnage conjoint</label>
-                                <div style="display: flex; gap: 10px; margin-left: 20px;">
-                                    <label><input type="checkbox" class="temoin-obs-fournisseur"> Fournisseur</label>
-                                    <label><input type="checkbox" class="temoin-obs-entrepreneur"> Entrepreneur</label>
-                                </div>
-                                <label><input type="checkbox" class="temoin-obs-meme"> Échantillonnage même camion qu'Englobe</label>
-                                <label><input type="checkbox" class="temoin-obs-cond"> Conditions de cure des cylindres de l'autre partie</label>
-                            </div>
+                            <label><input type="checkbox" class="sample-obs-ech-meme"> Échantillonnage même camion qu'Englobe</label>
+                            <label><input type="checkbox" class="sample-obs-ech-cond"> Conditions de cure des cylindres de l'autre partie</label>
                         </div>
                     </div>
+                </div>
 
-                    <div>
-                        <h4 style="text-align: center; background: #e2e8f0; padding: 5px; margin: 0 0 10px 0;">Croquis de localisation et remarques</h4>
-                        <textarea class="temoin-croquis" rows="4" style="width: 100%; border: 1px solid #ccc; border-radius: 4px; padding: 5px;"></textarea>
-                    </div>
+                <!-- MASSE DES CYLINDRES (Optionnel, non mappé) -->
+                <div class="form-section" style="background: white; display: none;"></div>
+
+                <!-- CROQUIS ET REMARQUES GLOBALES (Échantillon) -->
+                <div class="form-section" style="background: white;">
+                    <h3>Croquis de localisation et remarques</h3>
+                    <textarea class="sample-croquis-remarques" rows="4" style="width: 100%;"></textarea>
+                </div>
+
+                <!-- TÉMOINS (CACHÉ PAR DÉFAUT) -->
+                <div class="form-section" style="background: white; border-top: 2px dashed #0284c7; padding-top: 15px;">
+                    <label style="font-weight: bold; color: #0284c7; font-size: 1.1rem; cursor: pointer;">
+                        <input type="checkbox" class="sample-temoin-check" onchange="toggleTemoinSection(this)"> Activer la fiche TÉMOIN
+                    </label>
+                    
+                    <div class="temoin-container" style="display: none; margin-top: 15px; border: 1px solid #0284c7; padding: 15px; background: #f8fafc; border-radius: 4px;">
+                        <h2 style="text-align: center; letter-spacing: 2px; margin-bottom: 20px;">TÉMOIN</h2>
+                        
+                        <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #cbd5e1;">
+                            <div class="checkbox-group" style="flex: 1; display: flex; gap: 10px;">
+                                <label style="font-weight:bold;">Moules:</label>
+                                <label><input type="checkbox" class="temoin-moule-cpv"> CPV</label>
+                                <label><input type="checkbox" class="temoin-moule-carton"> Carton</label>
+                                <label><input type="checkbox" class="temoin-moule-acier"> Acier</label>
+                            </div>
+                            <div class="checkbox-group" style="flex: 2; display: flex; gap: 10px;">
+                                <label style="font-weight:bold;">Dimensions (mm):</label>
+                                <label><input type="checkbox" class="temoin-dim-100"> 100 x 200</label>
+                                <label><input type="checkbox" class="temoin-dim-150"> 150 x 300</label>
+                                <label><input type="checkbox" class="temoin-dim-poutre"> Poutre</label>
+                                <label><input type="checkbox" class="temoin-dim-cube"> Cube</label>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 15px;">
+                            <h4 style="text-align: center; background: #e2e8f0; padding: 5px; margin: 0 0 10px 0;">Conditions initiales de cure et d'entreposage</h4>
+                            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                                <label style="font-weight:bold; width: 100px; ">Prélèvement</label>
+                                <div style="flex: 1; display: flex; gap: 5px;"><label>date</label><input type="date" class="temoin-prelev-date" style="flex:1;"></div>
+                                <div style="flex: 1; display: flex; gap: 5px;"><label>heure</label><input type="time" class="temoin-prelev-time" style="flex:1;"></div>
+                                <div style="flex: 1; display: flex; gap: 5px;"><label>par</label><input type="text" class="temoin-prelev-tech" style="flex:1;"></div>
+                            </div>
+
+                            <!-- ACCORDION ROWS POUR MOBILE ET BUREAU -->
+                            <div style="display: flex; flex-direction: column; gap: 8px;">
+                                <!-- Ligne a -->
+                                <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
+                                    <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne a</summary>
+                                    <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                        <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-a-num"></div>
+                                        <div class="input-group"><label>N° éch.</label><input type="text" value="a" readonly style="background:#f3f4f6; text-align:center;"></div>
+                                        <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-a-bris"></div>
+                                        <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-a-temp-debut" step="0.1"></div>
+                                        <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-a-temp-fin" step="0.1"></div>
+                                        <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-a-recup-date"></div>
+                                        <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-a-recup-heure"></div>
+                                        <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-a-recup-par"></div>
+                                    </div>
+                                </details>
+                                <!-- Ligne b -->
+                                <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
+                                    <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne b</summary>
+                                    <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                        <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-b-num"></div>
+                                        <div class="input-group"><label>N° éch.</label><input type="text" value="b" readonly style="background:#f3f4f6; text-align:center;"></div>
+                                        <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-b-bris"></div>
+                                        <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-b-temp-debut" step="0.1"></div>
+                                        <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-b-temp-fin" step="0.1"></div>
+                                        <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-b-recup-date"></div>
+                                        <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-b-recup-heure"></div>
+                                        <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-b-recup-par"></div>
+                                    </div>
+                                </details>
+                                <!-- Ligne c -->
+                                <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
+                                    <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne c</summary>
+                                    <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                        <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-c-num"></div>
+                                        <div class="input-group"><label>N° éch.</label><input type="text" value="c" readonly style="background:#f3f4f6; text-align:center;"></div>
+                                        <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-c-bris"></div>
+                                        <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-c-temp-debut" step="0.1"></div>
+                                        <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-c-temp-fin" step="0.1"></div>
+                                        <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-c-recup-date"></div>
+                                        <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-c-recup-heure"></div>
+                                        <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-c-recup-par"></div>
+                                    </div>
+                                </details>
+                                <!-- Ligne d -->
+                                <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
+                                    <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne d</summary>
+                                    <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                        <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-d-num"></div>
+                                        <div class="input-group"><label>N° éch.</label><input type="text" value="d" readonly style="background:#f3f4f6; text-align:center;"></div>
+                                        <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-d-bris"></div>
+                                        <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-d-temp-debut" step="0.1"></div>
+                                        <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-d-temp-fin" step="0.1"></div>
+                                        <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-d-recup-date"></div>
+                                        <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-d-recup-heure"></div>
+                                        <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-d-recup-par"></div>
+                                    </div>
+                                </details>
+                                <!-- Ligne e -->
+                                <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
+                                    <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne e</summary>
+                                    <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                        <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-e-num"></div>
+                                        <div class="input-group"><label>N° éch.</label><input type="text" value="e" readonly style="background:#f3f4f6; text-align:center;"></div>
+                                        <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-e-bris"></div>
+                                        <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-e-temp-debut" step="0.1"></div>
+                                        <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-e-temp-fin" step="0.1"></div>
+                                        <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-e-recup-date"></div>
+                                        <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-e-recup-heure"></div>
+                                        <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-e-recup-par"></div>
+                                    </div>
+                                </details>
+                                <!-- Ligne f -->
+                                <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
+                                    <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne f</summary>
+                                    <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                        <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-f-num"></div>
+                                        <div class="input-group"><label>N° éch.</label><input type="text" value="f" readonly style="background:#f3f4f6; text-align:center;"></div>
+                                        <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-f-bris"></div>
+                                        <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-f-temp-debut" step="0.1"></div>
+                                        <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-f-temp-fin" step="0.1"></div>
+                                        <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-f-recup-date"></div>
+                                        <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-f-recup-heure"></div>
+                                        <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-f-recup-par"></div>
+                                    </div>
+                                </details>
+                                <!-- Ligne g -->
+                                <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
+                                    <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne g</summary>
+                                    <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                        <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-g-num"></div>
+                                        <div class="input-group"><label>N° éch.</label><input type="text" value="g" readonly style="background:#f3f4f6; text-align:center;"></div>
+                                        <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-g-bris"></div>
+                                        <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-g-temp-debut" step="0.1"></div>
+                                        <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-g-temp-fin" step="0.1"></div>
+                                        <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-g-recup-date"></div>
+                                        <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-g-recup-heure"></div>
+                                        <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-g-recup-par"></div>
+                                    </div>
+                                </details>
+                                <!-- Ligne h -->
+                                <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
+                                    <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne h</summary>
+                                    <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                        <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-h-num"></div>
+                                        <div class="input-group"><label>N° éch.</label><input type="text" value="h" readonly style="background:#f3f4f6; text-align:center;"></div>
+                                        <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-h-bris"></div>
+                                        <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-h-temp-debut" step="0.1"></div>
+                                        <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-h-temp-fin" step="0.1"></div>
+                                        <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-h-recup-date"></div>
+                                        <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-h-recup-heure"></div>
+                                        <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-h-recup-par"></div>
+                                    </div>
+                                </details>
+                                <!-- Ligne i -->
+                                <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
+                                    <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne i</summary>
+                                    <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                        <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-i-num"></div>
+                                        <div class="input-group"><label>N° éch.</label><input type="text" value="i" readonly style="background:#f3f4f6; text-align:center;"></div>
+                                        <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-i-bris"></div>
+                                        <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-i-temp-debut" step="0.1"></div>
+                                        <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-i-temp-fin" step="0.1"></div>
+                                        <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-i-recup-date"></div>
+                                        <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-i-recup-heure"></div>
+                                        <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-i-recup-par"></div>
+                                    </div>
+                                </details>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 15px;">
+                            <h4 style="text-align: center; background: #e2e8f0; padding: 5px; margin: 0 0 10px 0;">Protection et mûrissement des éprouvettes au chantier</h4>
+                            <div style="text-align: center; font-weight: bold; margin-bottom: 5px;">Extérieur</div>
+                            <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
+                                <div class="checkbox-group">
+                                    <label><input type="checkbox" class="temoin-cure-prot"> Protégées contre l'évaporation</label>
+                                    <label><input type="checkbox" class="temoin-cure-nonprot"> Non protégées contre l'évaporation</label>
+                                    <label><input type="checkbox" class="temoin-cure-meme"> même condition que l'ouvrage</label>
+                                    <div style="margin-top: 5px; display: flex; align-items: center; gap: 5px;">
+                                        <label>Thermocouple n°</label>
+                                        <input type="text" class="temoin-thermo-num" style="width: 100px;">
+                                    </div>
+                                </div>
+                                <div class="checkbox-group">
+                                    <label><input type="checkbox" class="temoin-cure-ombre"> À l'ombre</label>
+                                    <label><input type="checkbox" class="temoin-cure-soleil"> Au soleil</label>
+                                    <div style="display: flex; gap: 10px; align-items: center; margin-top: 5px;">
+                                        <label><input type="checkbox" class="temoin-cure-abris"> Abris</label>
+                                        <label><input type="checkbox" class="temoin-cure-chauffe"> chauffé</label>
+                                        <label><input type="checkbox" class="temoin-cure-nonchauffe"> non chauffé</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 15px;">
+                            <h4 style="text-align: center; background: #e2e8f0; padding: 5px; margin: 0 0 10px 0;">Observations</h4>
+                            <div class="grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                                <div class="checkbox-group">
+                                    <div style="text-align: center; font-weight: bold; margin-bottom: 5px; border-bottom: 1px solid #ccc;">À la récupération</div>
+                                    <label><input type="checkbox" class="temoin-obs-finition"> Mauvaise finition</label>
+                                    <label><input type="checkbox" class="temoin-obs-deplaces"> Cylindres déplacés</label>
+                                    <label><input type="checkbox" class="temoin-obs-endom"> Cylindres possiblement endommagés</label>
+                                    <label><input type="checkbox" class="temoin-obs-niveau"> Cylindres pas de niveau</label>
+                                </div>
+                                <div class="checkbox-group">
+                                    <div style="text-align: center; font-weight: bold; margin-bottom: 5px; border-bottom: 1px solid #ccc;">À l'échantillonnage</div>
+                                    <label><input type="checkbox" class="temoin-obs-autre"> Échantillonnage par autre partie</label>
+                                    <label><input type="checkbox" class="temoin-obs-conjoint"> Échantillonnage conjoint</label>
+                                    <div style="display: flex; gap: 10px; margin-left: 20px;">
+                                        <label><input type="checkbox" class="temoin-obs-fournisseur"> Fournisseur</label>
+                                        <label><input type="checkbox" class="temoin-obs-entrepreneur"> Entrepreneur</label>
+                                    </div>
+                                    <label><input type="checkbox" class="temoin-obs-meme"> Échantillonnage même camion qu'Englobe</label>
+                                    <label><input type="checkbox" class="temoin-obs-cond"> Conditions de cure des cylindres de l'autre partie</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 style="text-align: center; background: #e2e8f0; padding: 5px; margin: 0 0 10px 0;">Croquis de localisation et remarques</h4>
+                            <textarea class="temoin-croquis" rows="4" style="width: 100%; border: 1px solid #ccc; border-radius: 4px; padding: 5px;"></textarea>
+                        </div>
+                    </div> 
                 </div> 
             </div> 
         </div> 
     </template>
 
     <!-- TEMPLATE INVISIBLE POUR FICHE TÉMOIN SEULE -->
-    <template id="temoin-only-template">
-        <div class="sample-card temoin-only-card" style="border: 2px solid #8b5cf6; border-radius: 8px; padding: 15px; margin-bottom: 20px; background: #faf5ff;">
-            <div style="font-weight: bold; font-size: 1.2rem; margin-bottom: 15px; color: #8b5cf6; text-align: center; letter-spacing: 2px;">
+<template id="temoin-only-template">
+    <div class="sample-card temoin-only-card" style="border: 2px solid #8b5cf6; border-radius: 8px; margin-bottom: 20px; background: #faf5ff; overflow: hidden;">
+        
+        <!-- EN-TÊTE ACCORDÉON (CLIQUABLE) -->
+        <div class="accordion-header" onclick="toggleAccordion(this)" style="background-color: #f3e8ff; padding: 15px;">
+            <div style="font-weight: bold; font-size: 1.2rem; color: #8b5cf6; letter-spacing: 2px;">
                 Fiche TÉMOIN Indépendante n° <span class="temoin-number-display"></span>
             </div>
+            <span class="chevron" style="color: #8b5cf6;">▼</span>
+        </div>
+        
+        <!-- DÉBUT DU CONTENU CACHABLE -->
+        <div class="accordion-content active" style="padding: 15px;">
 
             <div style="background: white; border: 1px solid #8b5cf6; padding: 15px; border-radius: 4px;">
                 <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #cbd5e1;">
