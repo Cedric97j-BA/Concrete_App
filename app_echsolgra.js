@@ -1,4 +1,4 @@
-const APP_VERSION = 'v1.0.0.1';
+const APP_VERSION = 'v1.0.0.2';
 
 // ========================================== //
 // 1. INITIALISATION ET INTERFACE GLOBALE     //
