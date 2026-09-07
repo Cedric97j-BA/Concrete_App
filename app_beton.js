@@ -1,4 +1,4 @@
-const APP_VERSION = 'v1.1.0.7c';
+const APP_VERSION = 'v1.1.0.7f';
 
 // ========================================== //
 // 1. NAVIGATION ET INTERFACE GLOBALE         //
@@ -891,6 +891,41 @@ function saveReport(isDuplicate = false) {
     const dropdown = document.getElementById('saved-reports-dropdown');
     if (dropdown) dropdown.value = saveKey;
     showToast(isDuplicate ? "Copie sauvegardée avec succès sous : " + baseName : "Rapport mis à jour : " + baseName, "success");
+}
+
+function deleteTruckCard(btn, event) {
+    event.stopPropagation(); // Empêche l'accordéon de s'ouvrir/fermer quand on clique sur le X
+    if (confirm("Voulez-vous vraiment supprimer ce camion ?")) {
+        const card = btn.closest('.truck-card');
+        card.remove();
+        renumberTrucks();
+        calculateTotals();
+        updateTruckPagination();
+        syncForm3UI();
+    }
+}
+
+function renumberTrucks() {
+    const trucks = document.querySelectorAll('.truck-card');
+    trucks.forEach((card, index) => {
+        const newNum = index + 1;
+        const numDisplay = card.querySelector('.truck-number-display');
+        const oldNum = numDisplay.textContent;
+        
+        // 1. Mise à jour visuelle du camion
+        numDisplay.textContent = newNum;
+        
+        // 2. Mise à jour de la liaison avec le Formulaire 3
+        const linkedSamples = document.querySelectorAll(`.sample-card[data-linked-truck="${oldNum}"]`);
+        linkedSamples.forEach(sample => {
+            sample.dataset.linkedTruck = newNum;
+            const displayEl = sample.querySelector('.sample-truck-linked');
+            if (displayEl) displayEl.textContent = newNum;
+        });
+    });
+    
+    // 3. Réinitialise le compteur global pour le prochain ajout
+    truckCount = trucks.length; 
 }
 
 let deleteArmed = false;
