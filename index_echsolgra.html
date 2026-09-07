@@ -30,7 +30,7 @@
         <div style="display: flex; flex-direction: column; gap: 5px;">
             <h1 style="margin: 0; font-size: 1.5rem; letter-spacing: 0.5px;">Échantillonnage - Sols et granulats</h1>
             <div>
-                <span id="app-version" style="font-size: 0.95rem; font-weight: bold; background: #73968c; padding: 3px 10px; border-radius: 12px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);">v1.0.0.0</span>
+                <span id="app-version" style="font-size: 0.95rem; font-weight: bold; background: #73968c; padding: 3px 10px; border-radius: 12px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);">v1.0.0.1</span>
             </div>
         </div>
 
@@ -163,7 +163,7 @@
                 <div class="input-group" style="border-top: 1px dashed #ccc; padding-top: 10px;">
                     <div style="display: flex; gap: 10px; align-items: center;">
                         <label style="margin:0; white-space: nowrap;"><input type="checkbox" id="ep-autre"> <strong>Autre :</strong></label>
-                        <input type="text" id="ep-autre-txt" style="flex: 1;">
+                        <input type="text" id="ep-autre-text" style="flex: 1;">
                     </div>
                 </div>
             </div>
@@ -239,16 +239,16 @@
                 <h4 style="background: #e2e8f0; margin: 0; padding: 8px; text-align: center; border-bottom: 1px solid #cbd5e1;">Calibre / Code de produit</h4>
                 <div class="checkbox-group" style="padding: 10px; font-size: 0.9rem;">
                     <div style="display: grid; grid-template-columns: auto 1fr; gap: 5px; align-items: center; margin-bottom: 2px;">
-                        <label style="margin:0;"><input type="checkbox" id="calib-mg-20"> MG 20</label><input type="text" id="calib-mg-20-txt" style="padding: 2px;">
-                        <label style="margin:0;"><input type="checkbox" id="calib-mg-20b"> MG 20b</label><input type="text" id="calib-mg-20b-txt" style="padding: 2px;">
-                        <label style="margin:0;"><input type="checkbox" id="calib-mg-56"> MG 56</label><input type="text" id="calib-mg-56-txt" style="padding: 2px;">
-                        <label style="margin:0;"><input type="checkbox" id="calib-mg-112"> MG 112</label><input type="text" id="calib-mg-112-txt" style="padding: 2px;">
+                        <label style="margin:0;"><input type="checkbox" id="calib-mg-20"> MG 20</label><input type="text" id="calib-mg-20-text" style="padding: 2px;">
+                        <label style="margin:0;"><input type="checkbox" id="calib-mg-20b"> MG 20b</label><input type="text" id="calib-mg-20b-text" style="padding: 2px;">
+                        <label style="margin:0;"><input type="checkbox" id="calib-mg-56"> MG 56</label><input type="text" id="calib-mg-56-text" style="padding: 2px;">
+                        <label style="margin:0;"><input type="checkbox" id="calib-mg-112"> MG 112</label><input type="text" id="calib-mg-112-text" style="padding: 2px;">
                         
                         <div style="grid-column: span 2; height: 5px;"></div>
                         
-                        <label style="margin:0;"><input type="checkbox" id="calib-cg-20"> CG 20</label><input type="text" id="calib-cg-20-txt" style="padding: 2px;">
-                        <label style="margin:0;"><input type="checkbox" id="calib-cg-14"> CG 14</label><input type="text" id="calib-cg-14-txt" style="padding: 2px;">
-                        <label style="margin:0;"><input type="checkbox" id="calib-cg-14b"> CG 14b</label><input type="text" id="calib-cg-14b-txt" style="padding: 2px;">
+                        <label style="margin:0;"><input type="checkbox" id="calib-cg-20"> CG 20</label><input type="text" id="calib-cg-20-text" style="padding: 2px;">
+                        <label style="margin:0;"><input type="checkbox" id="calib-cg-14"> CG 14</label><input type="text" id="calib-cg-14-text" style="padding: 2px;">
+                        <label style="margin:0;"><input type="checkbox" id="calib-cg-14b"> CG 14b</label><input type="text" id="calib-cg-14b-text" style="padding: 2px;">
                         
                         <label style="margin:0; grid-column: span 2;"><input type="checkbox" id="calib-classb"> Classe « B »</label>
                         
@@ -302,7 +302,7 @@
                     <label><input type="checkbox" id="cons-mois"> À jeter (1 mois)</label>
                     <div style="display: flex; align-items: center; gap: 5px;">
                         <label style="margin:0;"><input type="checkbox" id="cons-a"> À conserver</label>
-                        <input type="text" id="cons-mois-txt" style="width: 50px;">
+                        <input type="text" id="cons-mois-text" style="width: 50px;">
                         <span>Mois</span>
                     </div>
                 </div>
@@ -327,13 +327,13 @@
                     <label><input type="checkbox" id="ech-conj-fourn"> Fournisseur</label>
                     <div style="display: flex; align-items: center; gap: 5px;">
                         <label style="margin:0;"><input type="checkbox" id="ech-conj-autre"> Autre</label>
-                        <input type="text" id="ech-conj-autre-txt" style="width: 150px;">
+                        <input type="text" id="ech-conj-autre-text" style="width: 150px;">
                     </div>
                 </div>
-                <div style="display: flex; gap: 10px; align-items: center; margin-top: 5px;">
+                <!--<div style="display: flex; gap: 10px; align-items: center; margin-top: 5px;">
                     <label style="margin:0; font-size: 0.85rem;">Noms:</label>
                     <input type="text" id="pers-txt" style="flex: 1;">
-                </div>
+                </div>-->
             </div>
         </div>
     </section>
@@ -358,14 +358,14 @@
                 <strong style="font-size: 1.1rem;">LC 21-010</strong>
                 <div style="display: flex; align-items: center; gap: 5px;">
                     <label style="margin:0;"><input type="checkbox" id="metho-autre"> Autre :</label>
-                    <input type="text" id="metho-autre-txt" style="width: 200px;">
+                    <input type="text" id="metho-autre-text" style="width: 200px;">
                 </div>
             </div>
         </div>
 
         <div style="display: flex; justify-content: flex-end; gap: 15px; border-top: 2px solid #ccc; padding-top: 15px;">
             <div class="input-group" style="width: 250px;">
-                <label>Vérifié par (Nom)</label>
+                <label>Vérifié par</label>
                 <input type="text" id="sig-prep-nom">
             </div>
             <div class="input-group" style="width: 160px;">
