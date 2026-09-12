@@ -306,8 +306,18 @@ function loadReport() {
     const selectedKey = document.getElementById('saved-reports-dropdown').value;
     if (!selectedKey) return showToast("Sélectionnez un rapport d'abord.", "info");
 
-    const reportData = JSON.parse(localStorage.getItem(selectedKey));
-    if (!reportData) return;
+    let reportData;
+    try {
+        reportData = JSON.parse(localStorage.getItem(selectedKey));
+    } catch (error) {
+        console.error("Rapport de compactage invalide", error);
+        showToast("Ce rapport est invalide ou provient d'une ancienne version.", "error");
+        return;
+    }
+    if (!reportData || typeof reportData !== 'object' || !reportData.static) {
+        showToast("Ce rapport est invalide ou provient d'une ancienne version.", "error");
+        return;
+    }
 
     clearForm();
 

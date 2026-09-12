@@ -446,7 +446,18 @@ function loadReport() {
     if (!reportDataStr) return;
 
     clearForm();
-    const reportData = JSON.parse(reportDataStr);
+    let reportData;
+    try {
+        reportData = JSON.parse(reportDataStr);
+    } catch (error) {
+        console.error("Rapport de planche invalide", error);
+        showToast("Ce rapport est invalide ou provient d'une ancienne version.", "error");
+        return;
+    }
+    if (!reportData || typeof reportData !== 'object' || !reportData.static) {
+        showToast("Ce rapport est invalide ou provient d'une ancienne version.", "error");
+        return;
+    }
 
     if (reportData.static) {
         for (const [id, value] of Object.entries(reportData.static)) {

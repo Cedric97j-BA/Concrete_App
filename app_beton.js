@@ -1,4 +1,4 @@
-const APP_VERSION = 'v1.1.0.7f';
+const APP_VERSION = 'v1.1.0.7h';
 
 // ========================================== //
 // 1. NAVIGATION ET INTERFACE GLOBALE         //
@@ -143,6 +143,32 @@ function updateTruckHeader(inputElement) {
     }
 }
 
+function updateTruckColor(card) {
+    const isRefused = card.querySelector('.truck-refuse') && card.querySelector('.truck-refuse').checked;
+    const isSampled = card.querySelector('.truck-sample-check') && card.querySelector('.truck-sample-check').checked;
+    
+    const air1 = card.querySelector('.truck-air1') ? card.querySelector('.truck-air1').value : '';
+    const air2 = card.querySelector('.truck-air2') ? card.querySelector('.truck-air2').value : '';
+    const slump1 = card.querySelector('.truck-slump1') ? card.querySelector('.truck-slump1').value : '';
+    const slump2 = card.querySelector('.truck-slump2') ? card.querySelector('.truck-slump2').value : '';
+    
+    const hasTest = air1 !== '' || air2 !== '' || slump1 !== '' || slump2 !== '';
+
+    if (isRefused) {
+        card.style.borderColor = '#dc2626'; // Rouge
+        card.style.backgroundColor = '#fef2f2';
+    } else if (isSampled) {
+        card.style.borderColor = '#0284c7'; // Bleu
+        card.style.backgroundColor = '#f0f9ff';
+    } else if (hasTest) {
+        card.style.borderColor = '#16a34a'; // Vert
+        card.style.backgroundColor = '#f0fdf4';
+    } else {
+        card.style.borderColor = '#94a3b8'; // Gris (Défaut)
+        card.style.backgroundColor = '#f8fafc'; 
+    }
+}
+
 function toggleSampleFields(checkbox) {
     const card = checkbox.closest('.truck-card');
     const fields = card.querySelector('.truck-sample-fields');
@@ -169,16 +195,18 @@ function toggleSampleFields(checkbox) {
         const linkedCard = container.querySelector(`.sample-card[data-linked-truck="${truckLineNum}"]`);
         
         if (linkedCard) {
-            if (isClearingForm) return; 
-
-            if (confirm(`Voulez-vous supprimer la fiche d'échantillon associée à la Ligne #${truckLineNum} ?`)) {
+            if (isClearingForm) {
+                // If we are clearing form, don't confirm, just continue logic
+            } else if (confirm(`Voulez-vous supprimer la fiche d'échantillon associée à la Ligne #${truckLineNum} ?`)) {
                 linkedCard.remove();
             } else {
                 checkbox.checked = true; 
                 fields.style.display = 'block';
+                return; // User cancelled
             }
         }
     }
+    updateTruckColor(card);
 }
 
 function toggleRefuse(checkbox) {
@@ -186,9 +214,6 @@ function toggleRefuse(checkbox) {
     const remarkInput = card.querySelector('.truck-remarques-list');
 
     if (checkbox.checked) {
-        card.style.borderColor = '#dc2626'; 
-        card.style.backgroundColor = '#fef2f2';
-        
         if (remarkInput) {
             let current = remarkInput.value.split(',').map(s=>s.trim()).filter(s=>s!=="");
             if (!current.includes("N/C")) current.unshift("N/C"); 
@@ -196,14 +221,12 @@ function toggleRefuse(checkbox) {
             remarkInput.value = current.join(',');
         }
     } else {
-        card.style.borderColor = '#0284c7'; 
-        card.style.backgroundColor = '#f8fafc'; 
-        
         if (remarkInput) {
             let current = remarkInput.value.split(',').map(s=>s.trim()).filter(s=>s!=="N/C" && s!=="");
             remarkInput.value = current.join(',');
         }
     }
+    updateTruckColor(card);
     updateAllTruckPreviews();
     calculateTotals();
 }
@@ -673,7 +696,18 @@ function loadReport() {
     if (!reportDataStr) return;
 
     clearForm();
-    const reportData = JSON.parse(reportDataStr);
+    let reportData;
+    try {
+        reportData = JSON.parse(reportDataStr);
+    } catch (error) {
+        console.error("Rapport béton invalide", error);
+        showToast("Ce rapport est invalide ou provient d'une ancienne version.", "error");
+        return;
+    }
+    if (!reportData || typeof reportData !== 'object' || !reportData.static) {
+        showToast("Ce rapport est invalide ou provient d'une ancienne version.", "error");
+        return;
+    }
 
     if (reportData.static) {
         for (const [id, value] of Object.entries(reportData.static)) {
@@ -740,6 +774,7 @@ function loadReport() {
                 let rawVal = truckInfo.remarquesList || truckInfo.remarqueSelect || '';
                 rmInput.value = rawVal.split(',').map(s => s.trim()).filter(s => s !== "").join(',');
             }
+            updateTruckColor(card);
         });
         calculateTotals();
     }
@@ -1372,3 +1407,9 @@ async function exportToPDF() {
         }
     }
 }
+document.addEventListener('input', function(e) {
+    if (e.target.matches('.truck-air1, .truck-air2, .truck-slump1, .truck-slump2')) {
+        const card = e.target.closest('.truck-card');
+        if (card) updateTruckColor(card);
+    }
+});
