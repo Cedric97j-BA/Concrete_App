@@ -1,14 +1,9 @@
-const APP_VERSION = 'v1.1.0.7c';
-
 // ========================================== //
 // 1. NAVIGATION ET INITIALISATION            //
 // ========================================== //
 
 
 document.addEventListener('DOMContentLoaded', () => {
-    const versionEl = document.getElementById('app-version');
-    if (versionEl) versionEl.textContent = APP_VERSION;
-
     if (document.getElementById('essais-container').children.length === 0) {
         addEssai();
     }
@@ -207,6 +202,16 @@ function calculateCompacite() {
 // ========================================== //
 
 let currentActiveReportKey = null;
+
+function updateLastSavedStatus(timestamp = Date.now()) {
+    const status = document.getElementById('last-saved-status');
+    if (status) {
+        const date = new Date(timestamp);
+        const dateText = date.toLocaleDateString('fr-CA');
+        const timeText = date.toLocaleTimeString('fr-CA', { hour: '2-digit', minute: '2-digit', hour12: false }).replace(':', 'H');
+        status.textContent = `Dernière sauvegarde : ${dateText} - ${timeText}`;
+    }
+}
 /*
 function updateDropdown() {
     const dropdown = document.getElementById('saved-reports-dropdown');
@@ -318,6 +323,7 @@ function loadReport() {
         showToast("Ce rapport est invalide ou provient d'une ancienne version.", "error");
         return;
     }
+    updateLastSavedStatus(reportData.timestamp);
 
     clearForm();
 
@@ -363,31 +369,22 @@ function loadReport() {
 
 function saveReport(isDuplicate = false) {
     let saveKey = currentActiveReportKey;
-    let baseName = "";
 
-    // On récupère le nom existant s'il y en a un
-    if (saveKey) {
-        try {
-            const oldData = JSON.parse(localStorage.getItem(saveKey));
-            if (oldData && oldData.displayName) baseName = oldData.displayName;
-        } catch(e) {}
-    }
+    // 1. On recalcule TOUJOURS le nom de base avec les champs actuels
+    const noProjet = document.getElementById('global-no-projet').value.trim() || 'SANS-NUMERO';
+    const rawDate = document.getElementById('global-date').value || new Date().toISOString().split('T')[0];
+    const techName = document.getElementById('sig-englobe-nom')?.value || '';
+    const techInitials = techName.split(' ').filter(n => n).map(n => n[0].toUpperCase()).join('') || 'TECH';
+    
+    let baseName = `compactage_${rawDate}_${noProjet}_${techInitials}`;
 
-    // Demande un nom SEULEMENT si c'est un nouveau rapport ou une duplication
+    // 2. Demande un nom SEULEMENT si c'est un nouveau rapport ou une copie
     if (!saveKey || isDuplicate) {
-        const noProjet = document.getElementById('global-no-projet').value.trim() || 'SANS-NUMERO';
-        const rawDate = document.getElementById('global-date').value || new Date().toISOString().split('T')[0];
-        const techName = document.getElementById('sig-englobe-nom')?.value || '';
-        const techInitials = techName.split(' ').filter(n => n).map(n => n[0].toUpperCase()).join('') || 'TECH';
-        
-        const defaultBaseName = `compactage_${rawDate}_${noProjet}_${techInitials}`;
         const promptMsg = isDuplicate ? "Nom pour la COPIE du rapport :" : "Nom de sauvegarde du rapport :";
-        const promptDefault = (isDuplicate && baseName) ? `${baseName}_copie` : defaultBaseName;
-
-        let userPromptName = prompt(promptMsg, promptDefault);
+        let userPromptName = prompt(promptMsg, baseName);
         if (!userPromptName) return; 
         
-        baseName = userPromptName.trim() || defaultBaseName;
+        baseName = userPromptName.trim() || baseName;
         if (!baseName.startsWith('compactage_')) baseName = `compactage_${baseName}`;
 
         // Création de l'identifiant unique invisible
@@ -423,13 +420,14 @@ function saveReport(isDuplicate = false) {
 
     localStorage.setItem(saveKey, JSON.stringify(reportData));
     currentActiveReportKey = saveKey; 
+    updateLastSavedStatus(reportData.timestamp);
     
     updateDropdown();
     
     const dropdown = document.getElementById('saved-reports-dropdown');
     if (dropdown) dropdown.value = saveKey;
     
-    showToast(isDuplicate ? "Copie sauvegardée avec succès sous : " + baseName : "Rapport mis à jour : " + baseName, "success");
+    showToast(isDuplicate ? "Copie sauvegardée avec succès." : "Rapport sauvegardé avec succès.", "success");
 }
 
 function deleteReport() {

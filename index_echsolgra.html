@@ -27,11 +27,10 @@
         <div style="display: flex; flex-direction: column; gap: 5px;">
             <h1 style="margin: 0; font-size: 1.5rem; letter-spacing: 0.5px;">Échantillonnage - Sols et granulats</h1>
             <div>
-                <span id="app-version" style="font-size: 0.95rem; font-weight: bold; background: #73968c; padding: 3px 10px; border-radius: 12px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);">v1.0.0.2</span>
             </div>
         </div>
 
-        <a href="index.html" style="margin-left: auto; background: #1e293b; color: white; text-decoration: none; padding: 10px 15px; border-radius: 6px; font-weight: bold; font-size: 0.9rem; display: flex; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+        <a class="home-button" href="index.html" style="margin-left: auto; background: #1e293b; color: white; text-decoration: none; padding: 10px 15px; border-radius: 6px; font-weight: bold; font-size: 0.9rem; display: flex; align-items: center; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);">
             🏠 Accueil
         </a>
     </header>
@@ -55,7 +54,8 @@
 
         <div style="width: 100%; margin-top: 5px;">
             <button type="button" onclick="exportToPDF()" style="background: #8b5cf6; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%;">📄 Exporter en PDF</button>
-        </div> 
+        </div>
+        <div id="last-saved-status" style="width: 100%; color: #475569; font-size: 0.85rem;">Dernière sauvegarde : aucune</div>
     </section>
 
     <!-- === INFORMATIONS GÉNÉRALES === -->

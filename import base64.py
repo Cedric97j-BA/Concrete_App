@@ -13,6 +13,9 @@ files_to_convert = {
     "TEMPLATE_COMPACTION": os.path.join(BASE_DIR, "templates", "template_compaction.pdf"),
     "TEMPLATE_PLANCHE": os.path.join(BASE_DIR, "templates", "template_planche.pdf"),
     "TEMPLATE_ECHSOLGRA": os.path.join(BASE_DIR, "templates", "template_echsolgra.pdf"),
+    "TEMPLATE_JOURNAL_F1": os.path.join(BASE_DIR, "templates", "template_journal_f1.pdf"),
+    "TEMPLATE_JOURNAL_F2": os.path.join(BASE_DIR, "templates", "template_journal_f2.pdf"),
+    "TEMPLATE_JOURNAL_F3": os.path.join(BASE_DIR, "templates", "template_journal_f3.pdf"),
     "TAHOMA_FONT": os.path.join(BASE_DIR, "fonts", "tahoma.ttf") 
 }
 

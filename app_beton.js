@@ -1,15 +1,8 @@
-const APP_VERSION = 'v1.1.0.7h';
-
 // ========================================== //
 // 1. NAVIGATION ET INTERFACE GLOBALE         //
 // ========================================== //
 
 document.addEventListener('DOMContentLoaded', () => {
-    const versionEl = document.getElementById('app-version');
-    if (versionEl) {
-        versionEl.textContent = APP_VERSION;
-    }
-    
     const logoEl = document.getElementById('main-logo');
     if (logoEl && typeof LOGO_BASE64 !== 'undefined') {
         logoEl.src = LOGO_BASE64;
@@ -128,7 +121,7 @@ function toggleAccordion(headerElement) {
     content.classList.toggle('active');
     chevron.classList.toggle('rotated');
 }
-
+/*
 // Fonction pour afficher le numéro de camion et de bordereau dans l'en-tête
 function updateTruckHeader(inputElement) {
     const card = inputElement.closest('.truck-card');
@@ -140,6 +133,28 @@ function updateTruckHeader(inputElement) {
     
     if (summary) {
         summary.textContent = `| Camion: ${truckId} | Bordereau: ${bordereau}`;
+    }
+} */
+
+// Fonction pour afficher le numéro, bordereau et échantillon dans l'en-tête
+function updateTruckHeader(element) {
+    const card = element.closest('.truck-card');
+    if (!card) return;
+    
+    const truckId = card.querySelector('.truck-id').value || '---';
+    const bordereau = card.querySelector('.truck-bordereau').value || '---';
+    const summary = card.querySelector('.truck-header-summary');
+    
+    // Vérifier l'échantillon
+    const isSampled = card.querySelector('.truck-sample-check').checked;
+    const sampleNum = card.querySelector('.truck-sample-num').value || '---';
+    
+    if (summary) {
+        let texte = `| Camion: ${truckId} | Bordereau: ${bordereau}`;
+        if (isSampled) {
+            texte += ` | Éch: ${sampleNum}`;
+        }
+        summary.textContent = texte;
     }
 }
 
@@ -154,18 +169,14 @@ function updateTruckColor(card) {
     
     const hasTest = air1 !== '' || air2 !== '' || slump1 !== '' || slump2 !== '';
 
+    card.classList.remove('truck-status-refused', 'truck-status-sampled', 'truck-status-tested');
+
     if (isRefused) {
-        card.style.borderColor = '#dc2626'; // Rouge
-        card.style.backgroundColor = '#fef2f2';
+        card.classList.add('truck-status-refused');
     } else if (isSampled) {
-        card.style.borderColor = '#0284c7'; // Bleu
-        card.style.backgroundColor = '#f0f9ff';
+        card.classList.add('truck-status-sampled');
     } else if (hasTest) {
-        card.style.borderColor = '#16a34a'; // Vert
-        card.style.backgroundColor = '#f0fdf4';
-    } else {
-        card.style.borderColor = '#94a3b8'; // Gris (Défaut)
-        card.style.backgroundColor = '#f8fafc'; 
+        card.classList.add('truck-status-tested');
     }
 }
 
@@ -207,6 +218,7 @@ function toggleSampleFields(checkbox) {
         }
     }
     updateTruckColor(card);
+    updateTruckHeader(checkbox);
 }
 
 function toggleRefuse(checkbox) {
@@ -308,6 +320,7 @@ function collapseAllTrucks() {
 // 3. MOTEUR MATHÉMATIQUE ET LIVE SYNC        //
 // ========================================== //
 
+/*
 ['input', 'change'].forEach(eventType => {
     document.addEventListener(eventType, function(e) {
         if (e.target.classList.contains('truck-volume')) {
@@ -320,6 +333,27 @@ function collapseAllTrucks() {
             e.target.id === 'f1-tech-name' || 
             e.target.id === 'global-date') {
             syncForm3UI();
+        }
+    });
+}); */
+
+['input', 'change'].forEach(eventType => {
+    document.addEventListener(eventType, function(e) {
+        if (e.target.classList.contains('truck-volume')) {
+            calculateTotals();
+        }
+        
+        if (e.target.classList.contains('truck-sample-num') || 
+            e.target.classList.contains('truck-sample-time') || 
+            e.target.id === 'f2-tech-name' || 
+            e.target.id === 'f1-tech-name' || 
+            e.target.id === 'global-date') {
+            syncForm3UI();
+        }
+
+        // NOUVEAU: Si on tape dans le champ Numéro d'échantillon, on force la mise à jour de l'en-tête
+        if (e.target.classList.contains('truck-sample-num')) {
+            updateTruckHeader(e.target);
         }
     });
 });
@@ -396,6 +430,19 @@ function getRemarksDict() {
     return dict;
 }
 
+function updateRemarkLetterState() {
+    const dictKeys = Object.keys(getRemarksDict());
+    const assignedKeys = Array.from(document.querySelectorAll('.truck-remarques-list'))
+        .flatMap(input => input.value.split(','))
+        .map(value => value.trim())
+        .filter(value => /^[A-Z]$/.test(value));
+    const allKeys = [...dictKeys, ...assignedKeys];
+    const maxCode = allKeys.length > 0
+        ? Math.max(...allKeys.map(letter => letter.charCodeAt(0)))
+        : 64;
+    currentRemarkCharCode = Math.min(maxCode + 1, 91);
+}
+
 function rebuildGlobalRemarks(dict) {
     let lines = [];
     Object.keys(dict).sort().forEach(k => {
@@ -468,12 +515,11 @@ function createNewRemark(btn) {
             return;
         }
     } else {
-        // CALCUL DYNAMIQUE : Repart à 'A' si la boîte est vide, sinon prend la lettre suivante
-        let nextCharCode = 65; 
-        let keys = Object.keys(dict);
-        if (keys.length > 0) {
-            let maxCode = Math.max(...keys.map(k => k.charCodeAt(0)));
-            nextCharCode = maxCode + 1;
+        updateRemarkLetterState();
+        let nextCharCode = currentRemarkCharCode;
+        if (nextCharCode >= 91) {
+            showToast("Toutes les lettres de remarque disponibles sont utilisées.", "info");
+            return;
         }
         letterToAdd = String.fromCharCode(nextCharCode);
         
@@ -560,6 +606,16 @@ function addTemoinOnly() {
 // ========================================== //
 
 let currentActiveReportKey = null;
+
+function updateLastSavedStatus(timestamp = Date.now()) {
+    const status = document.getElementById('last-saved-status');
+    if (status) {
+        const date = new Date(timestamp);
+        const dateText = date.toLocaleDateString('fr-CA');
+        const timeText = date.toLocaleTimeString('fr-CA', { hour: '2-digit', minute: '2-digit', hour12: false }).replace(':', 'H');
+        status.textContent = `Dernière sauvegarde : ${dateText} - ${timeText}`;
+    }
+}
 
 function updateDropdown() {
     const dropdown = document.getElementById('saved-reports-dropdown');
@@ -708,6 +764,7 @@ function loadReport() {
         showToast("Ce rapport est invalide ou provient d'une ancienne version.", "error");
         return;
     }
+    updateLastSavedStatus(reportData.timestamp);
 
     if (reportData.static) {
         for (const [id, value] of Object.entries(reportData.static)) {
@@ -776,6 +833,7 @@ function loadReport() {
             }
             updateTruckColor(card);
         });
+        updateRemarkLetterState();
         calculateTotals();
     }
 
@@ -833,31 +891,23 @@ function scrollToSection(sectionId) {
 
 function saveReport(isDuplicate = false) {
     let saveKey = currentActiveReportKey;
-    let baseName = "";
 
-    // On récupère le nom existant s'il y en a un
-    if (saveKey) {
-        try {
-            const oldData = JSON.parse(localStorage.getItem(saveKey));
-            if (oldData && oldData.displayName) baseName = oldData.displayName;
-        } catch(e) {}
-    }
+    // 1. On recalcule TOUJOURS le nom de base avec les champs actuels
+    const noProjet = document.getElementById('global-no-projet').value.trim() || 'SANS-NUMERO';
+    const rawDate = document.getElementById('global-date').value || new Date().toISOString().split('T')[0];
+    const resistance = document.getElementById('f2-spec-resistance')?.value.trim() || 'Mix';
+    const techName = document.getElementById('f2-tech-name')?.value || document.getElementById('f1-tech-name')?.value || '';
+    const techInitials = techName.split(' ').filter(n => n).map(n => n[0].toUpperCase()).join('') || 'TECH';
+    
+    let baseName = `englobe_${rawDate}_${noProjet}_${resistance}_${techInitials}`;
 
+    // 2. Demande un nom SEULEMENT si c'est un nouveau rapport ou une copie
     if (!saveKey || isDuplicate) {
-        const noProjet = document.getElementById('global-no-projet').value.trim() || 'SANS-NUMERO';
-        const rawDate = document.getElementById('global-date').value || new Date().toISOString().split('T')[0];
-        const resistance = document.getElementById('f2-spec-resistance')?.value.trim() || 'Mix';
-        const techName = document.getElementById('f2-tech-name')?.value || document.getElementById('f1-tech-name')?.value || '';
-        const techInitials = techName.split(' ').filter(n => n).map(n => n[0].toUpperCase()).join('') || 'TECH';
-        
-        const defaultBaseName = `englobe_${rawDate}_${noProjet}_${resistance}_${techInitials}`;
         const promptMsg = isDuplicate ? "Nom pour la COPIE du rapport :" : "Nom de sauvegarde du rapport (modifiable) :";
-        const promptDefault = (isDuplicate && baseName) ? `${baseName}_copie` : defaultBaseName;
-
-        let userPromptName = prompt(promptMsg, promptDefault);
+        let userPromptName = prompt(promptMsg, baseName);
         if (userPromptName === null) return; 
         
-        baseName = userPromptName.trim() || defaultBaseName;
+        baseName = userPromptName.trim() || baseName;
         if (!baseName.startsWith('englobe_')) baseName = `englobe_${baseName}`;
         
         // Création de l'identifiant unique invisible
@@ -920,12 +970,13 @@ function saveReport(isDuplicate = false) {
 
     localStorage.setItem(saveKey, JSON.stringify(reportData));
     currentActiveReportKey = saveKey; 
+    updateLastSavedStatus(reportData.timestamp);
     
     updateDropdown();
     
     const dropdown = document.getElementById('saved-reports-dropdown');
     if (dropdown) dropdown.value = saveKey;
-    showToast(isDuplicate ? "Copie sauvegardée avec succès sous : " + baseName : "Rapport mis à jour : " + baseName, "success");
+    showToast(isDuplicate ? "Copie sauvegardée avec succès." : "Rapport sauvegardé avec succès.", "success");
 }
 
 function deleteTruckCard(btn, event) {

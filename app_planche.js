@@ -1,15 +1,8 @@
-const APP_VERSION = 'v1.1.0.7c';
-
 // ========================================== //
 // 1. NAVIGATION ET INITIALISATION            //
 // ========================================== //
 
 document.addEventListener('DOMContentLoaded', () => {
-    const versionEl = document.getElementById('app-version');
-    if (versionEl) {
-        versionEl.textContent = APP_VERSION;
-    }
-    
     const logoEl = document.getElementById('main-logo');
     if (logoEl && typeof LOGO_BASE64 !== 'undefined') {
         logoEl.src = LOGO_BASE64;
@@ -297,6 +290,16 @@ function drawChart(data) {
 // ========================================== //
 
 let currentActiveReportKey = null;
+
+function updateLastSavedStatus(timestamp = Date.now()) {
+    const status = document.getElementById('last-saved-status');
+    if (status) {
+        const date = new Date(timestamp);
+        const dateText = date.toLocaleDateString('fr-CA');
+        const timeText = date.toLocaleTimeString('fr-CA', { hour: '2-digit', minute: '2-digit', hour12: false }).replace(':', 'H');
+        status.textContent = `Dernière sauvegarde : ${dateText} - ${timeText}`;
+    }
+}
 /*
 function updateDropdown() {
     const dropdown = document.getElementById('saved-reports-dropdown');
@@ -458,6 +461,7 @@ function loadReport() {
         showToast("Ce rapport est invalide ou provient d'une ancienne version.", "error");
         return;
     }
+    updateLastSavedStatus(reportData.timestamp);
 
     if (reportData.static) {
         for (const [id, value] of Object.entries(reportData.static)) {
@@ -513,35 +517,24 @@ function scrollToSection(sectionId) {
 
 function saveReport(isDuplicate = false) {
     let saveKey = currentActiveReportKey;
-    let baseName = "";
 
-    // On récupère le nom existant s'il y en a un
-    if (saveKey) {
-        try {
-            const oldData = JSON.parse(localStorage.getItem(saveKey));
-            if (oldData && oldData.displayName) baseName = oldData.displayName;
-        } catch(e) {}
-    }
+    // 1. On recalcule TOUJOURS le nom de base avec les champs actuels
+    const noProjet = document.getElementById('global-no-projet').value.trim() || 'SANS-NUMERO';
+    const rawDate = document.getElementById('global-date').value || new Date().toISOString().split('T')[0];
+    const calibre = document.getElementById('info-calibre')?.value.trim() || 'Calibre';
+    const techName = document.getElementById('sig-prep-nom')?.value || '';
+    const techInitials = techName.split(' ').filter(n => n).map(n => n[0].toUpperCase()).join('') || 'TECH';
+    
+    let baseName = `planche_${rawDate}_${noProjet}_${calibre}_${techInitials}`;
 
-    // Demande un nom SEULEMENT si c'est un nouveau rapport ou une duplication
+    // 2. Demande un nom SEULEMENT si c'est un nouveau rapport ou une copie
     if (!saveKey || isDuplicate) {
-        const noProjet = document.getElementById('global-no-projet').value.trim() || 'SANS-NUMERO';
-        const rawDate = document.getElementById('global-date').value || new Date().toISOString().split('T')[0];
-        const calibre = document.getElementById('info-calibre')?.value.trim() || 'Calibre';
-        const techName = document.getElementById('sig-prep-nom')?.value || '';
-        const techInitials = techName.split(' ').filter(n => n).map(n => n[0].toUpperCase()).join('') || 'TECH';
-        
-        const defaultBaseName = `planche_${rawDate}_${noProjet}_${calibre}_${techInitials}`;
         const promptMsg = isDuplicate ? "Nom pour la COPIE du rapport :" : "Nom de sauvegarde du rapport (modifiable) :";
-        const promptDefault = (isDuplicate && baseName) ? `${baseName}_copie` : defaultBaseName;
-
-        let userPromptName = prompt(promptMsg, promptDefault);
+        let userPromptName = prompt(promptMsg, baseName);
         if (userPromptName === null) return; 
         
-        baseName = userPromptName.trim() || defaultBaseName;
-        if (!baseName.startsWith('planche_')) {
-            baseName = `planche_${baseName}`;
-        }
+        baseName = userPromptName.trim() || baseName;
+        if (!baseName.startsWith('planche_')) baseName = `planche_${baseName}`;
 
         // Création de l'identifiant unique invisible
         saveKey = 'ID_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
@@ -578,13 +571,14 @@ function saveReport(isDuplicate = false) {
 
     localStorage.setItem(saveKey, JSON.stringify(reportData));
     currentActiveReportKey = saveKey; 
+    updateLastSavedStatus(reportData.timestamp);
     
     updateDropdown();
     
     const dropdown = document.getElementById('saved-reports-dropdown');
     if (dropdown) dropdown.value = saveKey;
     
-    showToast(isDuplicate ? "Copie sauvegardée avec succès sous : " + baseName : "Planche mise à jour : " + baseName);
+    showToast(isDuplicate ? "Copie sauvegardée avec succès." : "Rapport sauvegardé avec succès.", "success");
 }
 
 let deleteArmed = false;

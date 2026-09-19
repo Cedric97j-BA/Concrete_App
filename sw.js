@@ -1,24 +1,26 @@
-const CACHE_NAME = 'hub-inspection-v1.1.0.8';
+const CACHE_NAME = 'hub-inspection-v1.2.0.0c'; 
 
-// These files are required for the application to start and work offline.
 const APP_ASSETS = [
     './',
     './index.html',
     './index_beton.html',
     './index_compaction.html',
     './index_echsolgra.html',
+    './index_journal.html',
     './index_planche.html',
+    './changelog.html',
     './styles.css',
-    './app.js',
     './app_beton.js',
     './app_compaction.js',
     './app_echsolgra.js',
+    './app_journal.js',
     './app_planche.js',
     './pdf_templates.js',
     './logo.png',
     './logo_beton.png',
     './logo_compaction.png',
     './logo_echsolgra.png',
+    './logo_journal.png',
     './logo_planche.png',
     './fonts/tahoma.ttf'
 ];
@@ -31,13 +33,19 @@ const EXTERNAL_ASSETS = [
 
 self.addEventListener('install', (event) => {
     event.waitUntil(
-        caches.open(CACHE_NAME)
-            .then((cache) => cache.addAll(APP_ASSETS))
-            .then((cache) => Promise.all(
-                EXTERNAL_ASSETS.map((asset) => fetch(asset, { mode: 'no-cors' })
-                    .then((response) => cache.put(asset, response)))
-            ))
-            .then(() => self.skipWaiting())
+        caches.open(CACHE_NAME).then((cache) => {
+            const internalPromise = cache.addAll(APP_ASSETS);
+            
+            const externalPromise = Promise.all(
+                EXTERNAL_ASSETS.map((asset) => {
+                    return fetch(asset, { mode: 'no-cors' }).then((response) => {
+                        return cache.put(asset, response);
+                    });
+                })
+            );
+
+            return Promise.all([internalPromise, externalPromise]);
+        }).then(() => self.skipWaiting())
     );
 });
 
@@ -57,7 +65,6 @@ self.addEventListener('message', (event) => {
     }
 });
 
-// Keep newly requested resources available offline as well.
 self.addEventListener('fetch', (event) => {
     if (event.request.method !== 'GET') return;
 

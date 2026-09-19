@@ -1,15 +1,8 @@
-const APP_VERSION = 'v1.0.0.3';
-
 // ========================================== //
 // 1. INITIALISATION ET INTERFACE GLOBALE     //
 // ========================================== //
 
 document.addEventListener('DOMContentLoaded', () => {
-    const versionEl = document.getElementById('app-version');
-    if (versionEl) {
-        versionEl.textContent = APP_VERSION;
-    }
-    
     const logoEl = document.getElementById('main-logo');
     if (logoEl && typeof LOGO_BASE64 !== 'undefined') {
         logoEl.src = LOGO_BASE64;
@@ -51,6 +44,16 @@ function showToast(message, type = 'success') {
 
 let currentActiveReportKey = null;
 let isClearingForm = false; 
+
+function updateLastSavedStatus(timestamp = Date.now()) {
+    const status = document.getElementById('last-saved-status');
+    if (status) {
+        const date = new Date(timestamp);
+        const dateText = date.toLocaleDateString('fr-CA');
+        const timeText = date.toLocaleTimeString('fr-CA', { hour: '2-digit', minute: '2-digit', hour12: false }).replace(':', 'H');
+        status.textContent = `Dernière sauvegarde : ${dateText} - ${timeText}`;
+    }
+}
 
 function updateDropdown() {
     const dropdown = document.getElementById('saved-reports-dropdown');
@@ -140,32 +143,26 @@ function newReportPrompt() {
 
 function saveReport(isDuplicate = false) {
     let saveKey = currentActiveReportKey;
-    let baseName = "";
 
-    if (saveKey) {
-        try {
-            const oldData = JSON.parse(localStorage.getItem(saveKey));
-            if (oldData && oldData.displayName) baseName = oldData.displayName;
-        } catch(e) {}
-    }
+    // 1. On recalcule TOUJOURS le nom de base avec les champs actuels
+    const noProjet = document.getElementById('global-no-projet').value.trim() || 'SANS-NUMERO';
+    const rawDate = document.getElementById('global-date').value || new Date().toISOString().split('T')[0];
+    const techName = document.getElementById('sig-prep-nom')?.value || '';
+    const techInitials = techName.split(' ').filter(n => n).map(n => n[0].toUpperCase()).join('') || 'TECH';
+    const sampleNo = document.getElementById('ech-no')?.value.trim() || 'Ech';
+    
+    let baseName = `echsolgra_${rawDate}_${noProjet}_${sampleNo}_${techInitials}`;
 
+    // 2. Demande un nom SEULEMENT si c'est un nouveau rapport ou une copie
     if (!saveKey || isDuplicate) {
-        const noProjet = document.getElementById('global-no-projet').value.trim() || 'SANS-NUMERO';
-        const rawDate = document.getElementById('global-date').value || new Date().toISOString().split('T')[0];
-        const techName = document.getElementById('sig-prep-nom')?.value || '';
-        const techInitials = techName.split(' ').filter(n => n).map(n => n[0].toUpperCase()).join('') || 'TECH';
-        const sampleNo = document.getElementById('ech-no')?.value.trim() || 'Ech';
-        
-        const defaultBaseName = `echsolgra_${rawDate}_${noProjet}_${sampleNo}_${techInitials}`;
         const promptMsg = isDuplicate ? "Nom pour la COPIE du rapport :" : "Nom de sauvegarde du rapport (modifiable) :";
-        const promptDefault = (isDuplicate && baseName) ? `${baseName}_copie` : defaultBaseName;
-
-        let userPromptName = prompt(promptMsg, promptDefault);
+        let userPromptName = prompt(promptMsg, baseName);
         if (userPromptName === null) return; 
         
-        baseName = userPromptName.trim() || defaultBaseName;
+        baseName = userPromptName.trim() || baseName;
         if (!baseName.startsWith('echsolgra_')) baseName = `echsolgra_${baseName}`;
         
+        // Création de l'identifiant unique invisible
         saveKey = 'echsolgra_ID_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     }
 
@@ -183,6 +180,7 @@ function saveReport(isDuplicate = false) {
 
     localStorage.setItem(saveKey, JSON.stringify(reportData));
     currentActiveReportKey = saveKey; 
+    updateLastSavedStatus(reportData.timestamp);
     
     updateDropdown();
     const dropdown = document.getElementById('saved-reports-dropdown');
@@ -216,6 +214,7 @@ function loadReport() {
         showToast("Ce rapport est invalide ou provient d'une ancienne version.", "error");
         return;
     }
+    updateLastSavedStatus(reportData.timestamp);
 
     if (reportData.static) {
         for (const [id, value] of Object.entries(reportData.static)) {

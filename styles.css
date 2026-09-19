@@ -125,6 +125,10 @@ h4 {
 /* INPUTS ET CONTRÔLES                       */
 /* ========================================= */
 .input-group {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end; /* Force l'input à rester aligné vers le bas */
+    height: 100%; /* Permet d'utiliser tout l'espace disponible de la grille */
     margin-bottom: 15px;
 }
 
@@ -208,6 +212,21 @@ input[type="checkbox"] {
     background: #f8fafc; /* Gris très clair / Slate 50 */
     transition: background-color 0.3s, border-color 0.3s;
 }
+.truck-card.truck-status-refused {
+    border-color: #dc2626 !important;
+    background-color: #fecaca !important;
+}
+.truck-card.truck-status-sampled {
+    border-color: #16a34a !important;
+    background-color: #bbf7d0 !important;
+}
+.truck-card.truck-status-tested {
+    border-color: #0284c7 !important;
+    background-color: #bae6fd !important;
+}
+.truck-card > .accordion-header {
+    background-color: #e2e8f0 !important;
+}
 .truck-card .input-group {
     margin-bottom: 0; 
 }
@@ -260,7 +279,7 @@ input[type="checkbox"] {
     color: #0284c7;
 }
 .chevron.rotated {
-    transform: rotate(180deg);
+    transform: rotate(-90deg);
 }
 
 /* ========================================= */
@@ -352,6 +371,18 @@ button[onclick^="add"]:hover {
         font-size: 0.8rem !important;
         line-height: 1.15 !important;
         margin-bottom: 4px !important;
+    }
+    .truck-remarks-controls {
+        flex-wrap: wrap !important;
+    }
+    .truck-remarks-controls .truck-remarques-list {
+        flex: 1 1 100% !important;
+        min-width: 100% !important;
+        width: 100% !important;
+    }
+    .truck-remarks-controls button {
+        flex: 1 1 auto !important;
+        min-height: 42px !important;
     }
     .truck-card > div:has(input[type="checkbox"]) {
         align-items: center !important;
@@ -508,6 +539,25 @@ body.dark-mode .truck-card {
     background-color: #172554; /* Very dark blue */
     border-color: #1e3a8a;
 }
+body.dark-mode .truck-card.truck-status-refused {
+    border-color: #f87171 !important;
+    background-color: #450a0a !important;
+}
+body.dark-mode .truck-card.truck-status-sampled {
+    border-color: #4ade80 !important;
+    background-color: #052e16 !important;
+}
+body.dark-mode .truck-card.truck-status-tested {
+    border-color: #38bdf8 !important;
+    background-color: #082f49 !important;
+}
+body.dark-mode .truck-card > .accordion-header {
+    background-color: #334155 !important;
+}
+body.dark-mode .home-button {
+    border: 1px solid #94a3b8 !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.35) !important;
+}
 body.dark-mode .sample-card {
     background-color: #064e3b; /* Very dark green */
     border-color: #047857;
@@ -525,6 +575,30 @@ body.dark-mode .sample-card h3 { background-color: #047857; color: white; }
 body.dark-mode .temoin-only-card h3, 
 body.dark-mode .temoin-only-card h4 { background-color: #6b21a8; color: white; }
 body.dark-mode .accordion-header { background-color: #1e3a8a; border-bottom-color: #172554; }
+body.dark-mode .truck-header-summary,
+body.dark-mode .form-instructions,
+body.dark-mode .truck-legend,
+body.dark-mode .page-numbering {
+    color: #f8fafc !important;
+}
+body.dark-mode .truck-legend span {
+    color: #7dd3fc !important;
+}
+body.dark-mode .truck-legend span:nth-of-type(2) {
+    color: #86efac !important;
+}
+body.dark-mode .truck-legend span:nth-of-type(3) {
+    color: #fca5a5 !important;
+}
+body.dark-mode #truck-pagination-controls {
+    background-color: #334155 !important;
+}
+body.dark-mode #save-manager button,
+body.dark-mode #truck-pagination-controls button,
+body.dark-mode .collapse-trucks-button {
+    border: 1px solid #94a3b8 !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
 
 /* 4. Navigation Tabs */
 body.dark-mode .tab-btn { background-color: #334155; color: #cbd5e1; border-color: #475569; }
@@ -552,6 +626,10 @@ body.dark-mode .app-desc,
 body.dark-mode .accordion-header {
     color: #cbd5e1;
 }
+body.dark-mode #save-manager label,
+body.dark-mode #last-saved-status {
+    color: #e2e8f0 !important;
+}
 body.dark-mode .app-title,
 body.dark-mode .chevron {
     color: #f8fafc;
@@ -568,4 +646,43 @@ body.dark-mode [style*="background"] {
 body.dark-mode header img {
     filter: invert(1);
     mix-blend-mode: screen;
+}
+
+/* ========================================== */
+/* OVERRIDES MODE SOMBRE : JOURNAL DE CHANTIER*/
+/* ========================================== */
+body.dark-mode .task-card {
+    background-color: #1e293b !important;
+    border-color: #0f766e !important;
+}
+body.dark-mode .task-header {
+    background-color: #115e59 !important;
+    border-bottom-color: #0f766e !important;
+}
+body.dark-mode .task-header span {
+    color: #ccfbf1 !important;
+}
+body.dark-mode .task-duration {
+    background-color: #475569 !important;
+    color: #f8fafc !important;
+}
+
+/* --- BORDURES VISIBLES POUR LES BOUTONS DU JOURNAL (MODE NUIT) --- */
+body.dark-mode button[onclick="addTask()"],
+body.dark-mode button[onclick^="removeTask"],
+body.dark-mode button[onclick^="clearImage"] {
+    border: 1px solid #94a3b8 !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.35) !important;
+}
+
+/* --- CORRECTION DES INPUTS HEURE POUR TOUS LES APPAREILS APPLE (iPAD inclus) --- */
+input[type="time"], input[type="date"] {
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    min-height: 44px !important;
+    box-sizing: border-box !important;
+}
+input[type="time"]::-webkit-clear-button,
+input[type="time"]::-webkit-inner-spin-button {
+    display: none !important;
 }

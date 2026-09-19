@@ -32,42 +32,49 @@
 
     <div class="dashboard-grid">
         
+        <!-- APPLICATION : JOURNAL -->
+        <a href="index_journal.html" class="app-card">
+            <img src="logo_journal.png" alt="Béton" class="app-icon-img">
+            <h3 class="app-title">Journal de chantier</h3>
+            <p class="app-desc">Suivi journalier des travaux et interventions</p>
+        </a>
+        
         <!-- APPLICATION : BÉTON -->
         <a href="index_beton.html" class="app-card">
             <img src="logo_beton.png" alt="Béton" class="app-icon-img">
-            <h3 class="app-title">Rapport de Béton</h3>
+            <h3 class="app-title">Rapport de béton</h3>
             <p class="app-desc">Inspection et essais sur béton frais</p>
         </a>
 
         <!-- APPLICATION : PLANCHE DE RÉFÉRENCE -->
         <a href="index_planche.html" class="app-card">
             <img src="logo_planche.png" alt="Planche" class="app-icon-img">
-            <h3 class="app-title">Planche de Référence</h3>
+            <h3 class="app-title">Planche de référence</h3>
             <p class="app-desc">Établissement de la densité cible</p>
         </a>
 
         <!-- APPLICATION : COMPACTAGE -->
         <a href="index_compaction.html" class="app-card">
             <img src="logo_compaction.png" alt="Compactage" class="app-icon-img">
-            <h3 class="app-title">Rapport de Compactage</h3>
+            <h3 class="app-title">Rapport de compactage</h3>
             <p class="app-desc">Essais in situ au nucléodensimètre</p>
         </a>
   
         <!-- APPLICATION : ECHANTILLONAGE SOLS ET GRANULATS -->
         <a href="index_echsolgra.html" class="app-card">
             <img src="logo_echsolgra.png" alt="Échantillonage" class="app-icon-img">
-            <h3 class="app-title">Échantillonage Sols et Granulats</h3>
+            <h3 class="app-title">Échantillonage sols et granulats</h3>
             <p class="app-desc">Collecte et analyse des échantillons</p>
         </a>
 
         
 
-        <!-- PLACEHOLDER : NOUVELLE APPLICATION -->
+        <!-- PLACEHOLDER : NOUVELLE APPLICATION --> <!--
         <a href="javascript:void(0)" class="app-card new-app-card" style="cursor: default;">
             <div class="app-icon-img" style="display:flex; justify-content:center; align-items:center; font-size: 3rem; color: #94a3b8;">➕</div>
             <h3 class="app-title" style="color: #64748b;">Nouveau Formulaire</h3>
             <p class="app-desc">Emplacement pour une future application</p>
-        </a>
+        </a> -->
 
     </div>
 </div>
@@ -77,10 +84,22 @@
 </button>
 
 <div>
-    <span id="app-version" style="position: fixed; bottom: 15px; right: 15px; z-index: 9999; font-size: 0.95rem; font-weight: bold; padding: 3px 10px; border-radius: 12px; ">v1.1.0.7e</span>
+    <span id="app-version" style="position: fixed; bottom: 15px; right: 15px; z-index: 9999; font-size: 0.95rem; font-weight: bold; padding: 3px 10px; border-radius: 12px; ">v1.2.0.0c</span>
+</div>
+
+<div style="text-align: center; margin: 12px auto 24px;">
+    <button id="diagnostics-toggle" type="button" onclick="toggleDiagnostics()" style="background: #64748b; color: white; padding: 8px 14px; border-radius: 6px; border: none; cursor: pointer;">
+        Afficher l'état hors ligne et les diagnostics
+    </button>
+    <div id="diagnostics-panel" hidden style="max-width: 620px; margin: 12px auto 0; padding: 12px; text-align: left; background: #f1f5f9; color: #334155; border-radius: 6px; font-size: 0.9rem; white-space: pre-line;"></div>
+    <button onclick="window.location.href='changelog.html'" style="margin-top: 10px; font-size: 0.9em; padding: 8px 15px; opacity: 0.8;">
+    🕒 Historique des mises à jour
+    </button>
 </div>
  
 <script>
+    const APP_VERSION = 'v1.2.0.0c';
+
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('./sw.js')
@@ -88,61 +107,159 @@
         });
     }
 
-    async function forceAppUpdate() {
-        if (!navigator.onLine) {
-            alert("Vous devez être connecté à Internet (Wi-Fi ou LTE) pour mettre à jour.");
+    async function toggleDiagnostics() {
+        const panel = document.getElementById('diagnostics-panel');
+        const button = document.getElementById('diagnostics-toggle');
+        if (!panel || !button) return;
+
+        if (!panel.hidden) {
+            panel.hidden = true;
+            button.textContent = "Afficher l'état hors ligne et les diagnostics";
             return;
         }
 
-        if (confirm("L'application va télécharger la dernière version. Continuer ?")) {
-            const button = document.querySelector('button[onclick="forceAppUpdate()"]');
-            if (button) {
-                button.disabled = true;
-                button.textContent = "Téléchargement...";
+        panel.hidden = false;
+        button.textContent = "Masquer l'état hors ligne et les diagnostics";
+        panel.textContent = "Vérification de l'état de l'application...";
+
+        const lines = [
+            `Version de l'application : ${APP_VERSION}`,
+            `Connexion réseau : ${navigator.onLine ? "En ligne" : "Hors ligne"}`,
+            `Service Worker : ${'serviceWorker' in navigator ? "Disponible" : "Non disponible"}`
+        ];
+
+        if ('serviceWorker' in navigator) {
+            const registration = await navigator.serviceWorker.getRegistration();
+            lines.push(`Service Worker actif : ${registration && registration.active ? registration.active.state : "Non actif"}`);
+            lines.push(`Page contrôlée : ${navigator.serviceWorker.controller ? "Oui" : "Non"}`);
+        }
+
+        if ('caches' in window) {
+            const cacheNames = await caches.keys();
+            lines.push(`Caches disponibles : ${cacheNames.length ? cacheNames.join(", ") : "Aucun"}`);
+            const appCacheName = cacheNames.find((name) => name.startsWith('hub-inspection-'));
+            if (appCacheName) {
+                const appCache = await caches.open(appCacheName);
+                lines.push(`Fichiers en cache : ${(await appCache.keys()).length}`);
+            } else {
+                lines.push("Fichiers en cache : Aucun cache de l'application");
             }
+        }
 
-            try {
-                if (!('serviceWorker' in navigator)) {
-                    throw new Error("Service Worker non disponible");
+        const reportPrefixes = [
+            ["Rapports béton", ["englobe_"]],
+            ["Rapports compactage", ["compactage_"]],
+            ["Rapports planche", ["planche_"]],
+            ["Rapports échantillonnage", ["echsolgra_"]]
+        ];
+        reportPrefixes.forEach(([label, prefixes]) => {
+            let count = 0;
+            for (let i = 0; i < localStorage.length; i += 1) {
+                const key = localStorage.key(i);
+                if (!key) continue;
+                if (prefixes.some((prefix) => key.startsWith(prefix))) {
+                    count += 1;
+                    continue;
                 }
-
-                const registration = await navigator.serviceWorker.ready;
-                await registration.update();
-
-                if (registration.waiting) {
-                    registration.waiting.postMessage({ type: 'SKIP_WAITING' });
-                }
-
-                await new Promise((resolve, reject) => {
-                    const timeout = setTimeout(() => {
-                        reject(new Error("Délai de mise à jour dépassé"));
-                    }, 30000);
-
-                    const finish = () => {
-                        clearTimeout(timeout);
-                        resolve();
-                    };
-
-                    if (!registration.installing && !registration.waiting) {
-                        finish();
-                    } else if (navigator.serviceWorker.controller) {
-                        navigator.serviceWorker.addEventListener('controllerchange', finish, { once: true });
-                    } else {
-                        finish();
+                if (key.startsWith("ID_")) {
+                    try {
+                        const report = JSON.parse(localStorage.getItem(key));
+                        if (report && typeof report.displayName === "string" &&
+                            prefixes.some((prefix) => report.displayName.startsWith(prefix))) count += 1;
+                    } catch (error) {
+                        console.warn("Rapport ignoré dans le diagnostic", key, error);
                     }
-                });
+                }
+            }
+            lines.push(`${label} : ${count}`);
+        });
 
-                window.location.reload();
-            } catch (error) {
-                console.error("Échec de la mise à jour", error);
+        if (navigator.storage && navigator.storage.estimate) {
+            const estimate = await navigator.storage.estimate();
+            const usedMb = ((estimate.usage || 0) / 1024 / 1024).toFixed(2);
+            const quotaMb = estimate.quota ? (estimate.quota / 1024 / 1024).toFixed(0) : "?";
+            lines.push(`Stockage local utilisé : ${usedMb} Mo / ${quotaMb} Mo`);
+            if (estimate.quota && estimate.usage / estimate.quota >= 0.8) {
+                lines.push("AVERTISSEMENT : le stockage local dépasse 80 % de la capacité estimée.");
+            }
+        }
+
+        panel.textContent = lines.join("\n");
+    }
+
+    async function forceAppUpdate() {
+    if (!navigator.onLine) {
+        alert("Vous devez être connecté à Internet (Wi-Fi ou LTE) pour mettre à jour.");
+        return;
+    }
+
+    if (!confirm("L'application va rechercher et installer la dernière version. Continuer ?")) {
+        return;
+    }
+
+    const button = document.querySelector('button[onclick="forceAppUpdate()"]');
+    if (button) {
+        button.disabled = true;
+        button.textContent = "Recherche de mise à jour...";
+    }
+
+    try {
+        if (!('serviceWorker' in navigator)) {
+            throw new Error("Service Worker non disponible");
+        }
+
+        // 1. CORRECTION ANDROID : On force le re-téléchargement du sw.js en contournant le cache HTTP
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        for (let reg of registrations) {
+            await reg.update(); // Force la vérification serveur en ignorant le cache local
+        }
+
+        const registration = await navigator.serviceWorker.ready;
+        let updateFound = false;
+
+        registration.addEventListener('updatefound', () => {
+            updateFound = true;
+            if (button) button.textContent = "Téléchargement...";
+            const newWorker = registration.installing;
+            
+            newWorker.addEventListener('statechange', () => {
+                if (newWorker.state === 'installed') {
+                    newWorker.postMessage({ type: 'SKIP_WAITING' });
+                }
+                if (newWorker.state === 'activated') {
+                    sessionStorage.setItem('updateResult', `Mise à jour terminée. Version active : ${APP_VERSION}`);
+                    window.location.reload();
+                }
+            });
+        }, { once: true });
+
+        // Petit délai pour laisser le temps au navigateur de déclencher 'updatefound' si un nouveau sw.js est trouvé
+        setTimeout(() => {
+            if (!updateFound && !registration.waiting) {
+                showToast(`L'application est déjà à jour (${APP_VERSION}).`, "info");
                 if (button) {
                     button.disabled = false;
                     button.textContent = "Mettre à jour l'application";
                 }
-                showToast("La mise à jour a échoué. Réessayez avec une connexion stable.", "error");
+            } else if (registration.waiting && !updateFound) {
+                if (button) button.textContent = "Installation...";
+                registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+                navigator.serviceWorker.addEventListener('controllerchange', () => {
+                    sessionStorage.setItem('updateResult', `Mise à jour terminée. Version active : ${APP_VERSION}`);
+                    window.location.reload();
+                }, { once: true });
             }
+        }, 1500);
+
+    } catch (error) {
+        console.error("Échec de la mise à jour", error);
+        if (button) {
+            button.disabled = false;
+            button.textContent = "Mettre à jour l'application";
         }
+        showToast("La mise à jour a échoué. Réessayez avec une connexion stable.", "error");
     }
+}
 
     // 1. IL FAUT LA FONCTION TOAST ICI AUSSI POUR LE HUB
     function showToast(message, type = 'success') {
@@ -160,6 +277,11 @@
     document.addEventListener('DOMContentLoaded', () => {
         if (localStorage.getItem('darkMode') === 'enabled') {
             document.body.classList.add('dark-mode');
+        }
+        const updateResult = sessionStorage.getItem('updateResult');
+        if (updateResult) {
+            sessionStorage.removeItem('updateResult');
+            showToast(updateResult, "success");
         }
     });
 
