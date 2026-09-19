@@ -560,6 +560,9 @@ async function exportToPDF() {
                 console.warn("Erreur d'apparence PDF", e);
             }
 
+            // FIX: Dynamic Field Renaming
+            form.getFields().forEach(f => { try { f.acroField.setPartialName(f.getName() + '_pg' + p); } catch(e){} });
+
             const copiedPages = await mergedPdf.copyPages(subDoc, subDoc.getPageIndices());
             copiedPages.forEach(page => mergedPdf.addPage(page));
         }
@@ -620,3 +623,177 @@ async function exportToPDF() {
         }
     }
 }
+/*
+async function exportToPDF() {
+    try {
+        const btn = document.querySelector('button[onclick="exportToPDF()"]');
+        const originalText = btn ? btn.textContent : "📄 Exporter en PDF";
+        if (btn) {
+            btn.textContent = "⏳ Génération en cours...";
+            btn.disabled = true;
+        }
+
+        const mergedPdf = await PDFLib.PDFDocument.create();
+        
+        // 1. Initialisation de Fontkit pour Foxit/Chrome/Preview
+        mergedPdf.registerFontkit(fontkit);
+        
+        const getBuffer = (base64) => {
+            const str = window.atob(base64);
+            const bytes = new Uint8Array(str.length);
+            for (let i = 0; i < str.length; i++) bytes[i] = str.charCodeAt(i);
+            return bytes.buffer;
+        };
+
+        // Chargement de la police (Assurez-vous que TAHOMA_FONT est dans pdf_templates.js)
+        const fontBytes = new Uint8Array(getBuffer(TAHOMA_FONT));
+        await mergedPdf.embedFont(fontBytes);
+
+        const allEssais = Array.from(document.querySelectorAll('.essai-card'));
+        const maxPerPage = 8;
+        const nbPages = Math.max(1, Math.ceil(allEssais.length / maxPerPage));
+
+        for (let p = 0; p < nbPages; p++) {
+            const subDoc = await PDFLib.PDFDocument.load(getBuffer(TEMPLATE_COMPACTION));
+            
+            // On enregistre Fontkit dans le sous-document
+            subDoc.registerFontkit(fontkit);
+            const subFont = await subDoc.embedFont(fontBytes);
+            const form = subDoc.getForm();
+
+            // Mappage des champs statiques
+            form.getFields().forEach(field => {
+                const pdfName = field.getName();
+                
+                if (pdfName.startsWith('essai-row-') || pdfName.startsWith('page-')) return; 
+                
+                const el = document.getElementById(pdfName);
+                if (el) {
+                    let val = el.type === 'checkbox' ? el.checked : el.value;
+                    
+                    if (val !== null && val !== undefined && val !== '') {
+                        try {
+                            if (el.type === 'checkbox') {
+                                val ? field.check() : field.uncheck();
+                            } else {
+                                let finalStr = val.toString();
+                                const lowerName = pdfName.toLowerCase();
+                                const isProjectNumber = lowerName.includes('projet') || lowerName.includes('no-') || lowerName.includes('numero');
+                                
+                                if (!isProjectNumber) {
+                                    finalStr = finalStr.replace(/(\d)\.(\d)/g, '$1,$2'); 
+                                }
+                                field.setText(finalStr);
+                            }
+                        } catch (e) {
+                            console.warn(`Impossible de remplir le champ ${pdfName}`, e);
+                        }
+                    }
+                }
+            });
+
+            // Mappage Invisible des Cases Maîtresses MG / CG
+            try {
+                if (document.querySelector('.auto-mg-sous:checked')) form.getCheckBox('sous-cal-mg').check();
+                if (document.querySelector('.auto-cg-sous:checked')) form.getCheckBox('sous-cal-cg').check();
+                if (document.querySelector('.auto-mg-rem:checked')) form.getCheckBox('rem-cal-mg').check();
+                if (document.querySelector('.auto-cg-rem:checked')) form.getCheckBox('rem-cal-cg').check();
+            } catch (e) {}
+
+            // Numérotation des pages
+            try { form.getTextField('page-actuelle').setText((p + 1).toString()); } catch(e) {}
+            try { form.getTextField('page-totale').setText(nbPages.toString()); } catch(e) {}
+
+            // Mappage de la grille (8 essais maximum par page)
+            const chunk = allEssais.slice(p * maxPerPage, (p + 1) * maxPerPage);
+            
+            chunk.forEach((card, index) => {
+                const row = index + 1; 
+                
+                const trySetGrid = (cls, pdfFieldSuffix) => {
+                    const el = card.querySelector(cls);
+                    if (el && el.value) {
+                        let finalVal = el.value.toString().replace(/(\d)\.(\d)/g, '$1,$2');
+                        try { form.getTextField(`essai-row-${pdfFieldSuffix}_${row}`).setText(finalVal); } catch(e) {}
+                    }
+                };
+
+                trySetGrid('.essai-secteur', 'secteur');
+                trySetGrid('.essai-no', 'no');
+                trySetGrid('.essai-elevation', 'elevation');
+                trySetGrid('.essai-part', 'part-5mm');
+                trySetGrid('.essai-eau', 'teneur-eau');
+                trySetGrid('.essai-mv-seche', 'mv-seche');
+                trySetGrid('.essai-mv-max-corr', 'mv-max-corr');
+                trySetGrid('.essai-compacite', 'compacite');
+                trySetGrid('.essai-rem', 'rem');
+            });
+
+            // === LE FIX FOXIT EST ICI ===
+            try {
+                form.updateFieldAppearances(subFont);
+                if (form.acroForm) form.acroForm.dict.set(PDFLib.PDFName.of('NeedAppearances'), PDFLib.PDFBool.False);
+            } catch (e) {
+                console.warn("Erreur d'apparence PDF", e);
+            }
+
+            const copiedPages = await mergedPdf.copyPages(subDoc, subDoc.getPageIndices());
+            copiedPages.forEach(page => mergedPdf.addPage(page));
+        }
+
+        // Nettoyage et création du nom de fichier final
+        const noProjetVal = document.getElementById('global-no-projet').value.trim() || 'SANS-NUMERO';
+        const rawDateVal = document.getElementById('global-date').value || new Date().toISOString().split('T')[0];
+        const techNameVal = document.getElementById('sig-englobe-nom')?.value || '';
+        const initialsVal = techNameVal.split(' ').filter(n => n).map(n => n[0].toUpperCase()).join('') || 'TECH';
+
+        const pdfBytes = await mergedPdf.save();
+        const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+        const fileName = `Compactage_${noProjetVal}_${rawDateVal}_${initialsVal}.pdf`;
+
+        // LOGIQUE SÉPARÉE : APPLE VS ANDROID/PC
+        const isMacTouch = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+        const isApple = /iPhone|iPad|iPod/i.test(navigator.userAgent) || isMacTouch;
+        
+        let attemptedShare = false;
+        try {
+            // UNIQUEMENT POUR APPLE : On ouvre le menu de partage
+            if (isApple && navigator.share && navigator.canShare) {
+                const file = new File([blob], fileName, { type: 'application/pdf' });
+                if (navigator.canShare({ files: [file] })) {
+                    attemptedShare = true;
+                    await navigator.share({ files: [file] });
+                }
+            }
+        } catch (err) {
+            console.log("Partage annulé ou échoué:", err);
+            if (err.name !== 'AbortError') attemptedShare = false;
+        }
+
+        // POUR ANDROID ET PC : On sauvegarde directement le fichier en local
+        if (!attemptedShare) {
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click(); // Force le téléchargement direct dans le dossier de la tablette
+            document.body.removeChild(link);
+            setTimeout(() => window.URL.revokeObjectURL(url), 100);
+        }
+        
+        if (btn) {
+            btn.textContent = originalText;
+            btn.disabled = false;
+        }
+
+    } catch (error) {
+        console.error("Erreur lors de l'export PDF :", error);
+        showToast("Erreur lors de l'export PDF. Vérifiez la console.", "error");
+        const btn = document.querySelector('button[onclick="exportToPDF()"]');
+        if (btn) {
+            btn.textContent = "📄 Exporter en PDF";
+            btn.disabled = false;
+        }
+    }
+} */

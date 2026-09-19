@@ -625,6 +625,228 @@ async function exportToPDF() {
             formF1.updateFieldAppearances(fontF1);
         } catch(e) {}
 
+        // FIX: Dynamic field renaming for Foxit/PDF-XChange compatibility
+        formF1.getFields().forEach(f => { try { f.acroField.setPartialName(f.getName() + '_pg' + currentPage); } catch(e){} });
+
+        const f1Pages = await mergedPdf.copyPages(f1Doc, [0]);
+        mergedPdf.addPage(f1Pages[0]);
+        currentPage++;
+
+        // =====================================
+        // TRAITEMENT DE F2
+        // =====================================
+        if (needsF2) {
+            const f2Doc = await PDFLib.PDFDocument.load(getBuffer(TEMPLATE_JOURNAL_F2));
+            const formF2 = f2Doc.getForm();
+            fillGlobalFields(formF2);
+            
+            for (let i = 15; i < 46; i++) {
+                if (printableRows[i]) {
+                    try { formF2.getTextField(`heure_deb_${i+1}`).setText(printableRows[i].deb || ""); } catch(e){}
+                    try { formF2.getTextField(`heure_fin_${i+1}`).setText(printableRows[i].fin || ""); } catch(e){}
+                    try { formF2.getTextField(`text_box_${i+1}`).setText(printableRows[i].text || ""); } catch(e){}
+                }
+            }
+            
+            try { formF2.getTextField('f2-page-number').setText(currentPage.toString()); } catch(e){}
+            
+            try {
+                const fontF2 = await f2Doc.embedFont(PDFLib.StandardFonts.Helvetica);
+                formF2.updateFieldAppearances(fontF2);
+            } catch(e) {}
+
+            // FIX: Dynamic field renaming
+            formF2.getFields().forEach(f => { try { f.acroField.setPartialName(f.getName() + '_pg' + currentPage); } catch(e){} });
+
+            const f2Pages = await mergedPdf.copyPages(f2Doc, [0]);
+            mergedPdf.addPage(f2Pages[0]);
+            currentPage++;
+        }
+
+        // =====================================
+        // TRAITEMENT DE F3 (Photos)
+        // =====================================
+        if (needsF3) {
+            const injectPhotosToDoc = async (imgA, imgB, textA, textB, pageNum) => {
+                const f3Doc = await PDFLib.PDFDocument.load(getBuffer(TEMPLATE_JOURNAL_F3));
+                const formF3 = f3Doc.getForm();
+                const f3PagesArr = f3Doc.getPages();
+                
+                fillGlobalFields(formF3);
+                
+                try { formF3.getTextField('f3-page-number').setText(pageNum.toString()); } catch(e){}
+                try { formF3.getTextField('desc-text-01').setText(document.getElementById(textA)?.value || ""); } catch(e){}
+                try { formF3.getTextField('desc-text-02').setText(document.getElementById(textB)?.value || ""); } catch(e){}
+
+                try {
+                    const fontF3 = await f3Doc.embedFont(PDFLib.StandardFonts.Helvetica);
+                    formF3.updateFieldAppearances(fontF3);
+                } catch(e) {}
+
+                const drawImg = async (inputId, pdfFieldId) => {
+                    const hiddenInput = document.getElementById(inputId);
+                    if (hiddenInput && hiddenInput.value) {
+                        try {
+                            const field = formF3.getField(pdfFieldId);
+                            const widget = field.acroField.getWidgets()[0];
+                            const rect = widget.getRectangle();
+                            
+                            const widgetPageRef = widget.dict.get(PDFLib.PDFName.of('P'));
+                            let targetPage = f3PagesArr.find(p => p.ref === widgetPageRef) || f3PagesArr[0];
+
+                            const base64String = hiddenInput.value.split(',')[1];
+                            const pdfImage = await f3Doc.embedJpg(base64String);
+
+                            const scaled = pdfImage.scaleToFit(rect.width, rect.height);
+                            const centerX = rect.x + (rect.width - scaled.width) / 2;
+                            const centerY = rect.y + (rect.height - scaled.height) / 2;
+
+                            targetPage.drawImage(pdfImage, { x: centerX, y: centerY, width: scaled.width, height: scaled.height });
+                        } catch (e) {}
+                    }
+                };
+
+                await drawImg(imgA, 'desc-img-01');
+                await drawImg(imgB, 'desc-img-02');
+
+                // FIX: Dynamic field renaming
+                formF3.getFields().forEach(f => { try { f.acroField.setPartialName(f.getName() + '_pg' + pageNum); } catch(e){} });
+
+                const copiedPages = await mergedPdf.copyPages(f3Doc, [0]);
+                mergedPdf.addPage(copiedPages[0]);
+            };
+
+            if (hasImg1or2) {
+                await injectPhotosToDoc('desc-img-01-base64', 'desc-img-02-base64', 'desc-text-01', 'desc-text-02', currentPage);
+                currentPage++;
+            }
+            
+            if (hasImg3or4) {
+                await injectPhotosToDoc('desc-img-03-base64', 'desc-img-04-base64', 'desc-text-03', 'desc-text-04', currentPage);
+                currentPage++;
+            }
+        }
+
+        // =====================================
+        // SAUVEGARDE FINALE
+        // =====================================
+        const noProjet = document.getElementById('global-no-projet').value.trim() || 'SANS-NUMERO';
+        const rawDate = document.getElementById('global-date').value || new Date().toISOString().split('T')[0];
+        const techName = document.getElementById('sig-prep-nom')?.value || '';
+        const techInitials = techName.split(' ').filter(n => n).map(n => n[0].toUpperCase()).join('') || 'TECH';
+
+        const pdfBytes = await mergedPdf.save();
+        const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+        const fileName = `Journal_${rawDate}_${noProjet}_${techInitials}.pdf`;
+
+        const isMacTouch = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+        const isApple = /iPhone|iPad|iPod/i.test(navigator.userAgent) || isMacTouch;
+        
+        let attemptedShare = false;
+        try {
+            if (isApple && navigator.share && navigator.canShare) {
+                const file = new File([blob], fileName, { type: 'application/pdf' });
+                if (navigator.canShare({ files: [file] })) {
+                    attemptedShare = true;
+                    await navigator.share({ files: [file] });
+                }
+            }
+        } catch (err) {
+            if (err.name !== 'AbortError') attemptedShare = false;
+        }
+
+        if (!attemptedShare) {
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            setTimeout(() => window.URL.revokeObjectURL(url), 100);
+        }
+        
+        if (btn) { btn.textContent = originalText; btn.disabled = false; }
+    } catch (error) {
+        console.error("Erreur lors de l'export PDF :", error);
+        showToast("Erreur lors de l'export PDF. Vérifiez la console.", "error");
+        const btn = document.querySelector('button[onclick="exportToPDF()"]');
+        if (btn) { btn.textContent = "📄 Exporter en PDF"; btn.disabled = false; }
+    }
+}
+
+/*
+async function exportToPDF() {
+    if (typeof TEMPLATE_JOURNAL_F1 === 'undefined' || typeof TEMPLATE_JOURNAL_F2 === 'undefined' || typeof TEMPLATE_JOURNAL_F3 === 'undefined') {
+        showToast("Erreur: Les modèles F1, F2 ou F3 sont introuvables.", "error");
+        return;
+    }
+
+    try {
+        const btn = document.querySelector('button[onclick="exportToPDF()"]');
+        const originalText = btn ? btn.textContent : "📄 Exporter en PDF";
+        if (btn) { btn.textContent = "⏳ Génération en cours..."; btn.disabled = true; }
+
+        const getBuffer = (base64) => {
+            const str = window.atob(base64);
+            const bytes = new Uint8Array(str.length);
+            for (let i = 0; i < str.length; i++) bytes[i] = str.charCodeAt(i);
+            return bytes.buffer;
+        };
+        
+        const printableRows = typeof buildPrintableRows === 'function' ? buildPrintableRows() : [];
+        
+        const needsF2 = printableRows.length > 15;
+        const hasImg1or2 = document.getElementById('desc-img-01-base64')?.value || document.getElementById('desc-img-02-base64')?.value;
+        const hasImg3or4 = document.getElementById('desc-img-03-base64')?.value || document.getElementById('desc-img-04-base64')?.value;
+        const needsF3 = hasImg1or2 || hasImg3or4;
+        
+        let totalPages = 1; 
+        if (needsF2) totalPages++;
+        if (needsF3) {
+            if (hasImg1or2) totalPages++;
+            if (hasImg3or4) totalPages++; 
+        }
+
+        const mergedPdf = await PDFLib.PDFDocument.create();
+        let currentPage = 1;
+
+        const fillGlobalFields = (form) => {
+            const allInputs = document.querySelectorAll('input[id], textarea[id], select[id]');
+            allInputs.forEach(el => {
+                const name = el.id;
+                try {
+                    if (el.type === 'checkbox') {
+                        el.checked ? form.getCheckBox(name).check() : form.getCheckBox(name).uncheck();
+                    } else if (el.type !== 'file' && (el.type !== 'hidden' || el.id === 'total-heures')) {
+                        form.getTextField(name).setText(el.value || "");
+                    }
+                } catch (e) {} 
+            });
+        };
+
+        // =====================================
+        // TRAITEMENT DE F1
+        // =====================================
+        const f1Doc = await PDFLib.PDFDocument.load(getBuffer(TEMPLATE_JOURNAL_F1));
+        const formF1 = f1Doc.getForm();
+        fillGlobalFields(formF1);
+        
+        for (let i = 0; i < 15; i++) {
+            if (printableRows[i]) {
+                try { formF1.getTextField(`heure_deb_${i+1}`).setText(printableRows[i].deb || ""); } catch(e){}
+                try { formF1.getTextField(`heure_fin_${i+1}`).setText(printableRows[i].fin || ""); } catch(e){}
+                try { formF1.getTextField(`text_box_${i+1}`).setText(printableRows[i].text || ""); } catch(e){}
+            }
+        }
+        
+        try { formF1.getTextField('f1-page-number').setText(currentPage.toString()); } catch(e){}
+        
+        try {
+            const fontF1 = await f1Doc.embedFont(PDFLib.StandardFonts.Helvetica);
+            formF1.updateFieldAppearances(fontF1);
+        } catch(e) {}
+
         const f1Pages = await mergedPdf.copyPages(f1Doc, [0]);
         mergedPdf.addPage(f1Pages[0]);
         currentPage++;
@@ -768,229 +990,4 @@ async function exportToPDF() {
     }
 }
 
-/*
-// ========================================== //
-// 5. MOTEUR D'EXPORT PDF (Phase 4 : Final)   //
-// ========================================== //
-async function exportToPDF() {
-    if (typeof TEMPLATE_JOURNAL_F1 === 'undefined' || typeof TEMPLATE_JOURNAL_F2 === 'undefined' || typeof TEMPLATE_JOURNAL_F3 === 'undefined') {
-        showToast("Erreur: Les modèles F1, F2 ou F3 sont introuvables.", "error");
-        return;
-    }
-
-    try {
-        const btn = document.querySelector('button[onclick="exportToPDF()"]');
-        const originalText = btn ? btn.textContent : "📄 Exporter en PDF";
-        if (btn) { btn.textContent = "⏳ Génération en cours..."; btn.disabled = true; }
-
-        const getBuffer = (base64) => {
-            const str = window.atob(base64);
-            const bytes = new Uint8Array(str.length);
-            for (let i = 0; i < str.length; i++) bytes[i] = str.charCodeAt(i);
-            return bytes.buffer;
-        };
-        
-        const printableRows = typeof buildPrintableRows === 'function' ? buildPrintableRows() : [];
-        
-        const needsF2 = printableRows.length > 15;
-        const hasImg1or2 = document.getElementById('desc-img-01-base64')?.value || document.getElementById('desc-img-02-base64')?.value;
-        const hasImg3or4 = document.getElementById('desc-img-03-base64')?.value || document.getElementById('desc-img-04-base64')?.value;
-        const needsF3 = hasImg1or2 || hasImg3or4;
-        
-        let totalPages = 1; 
-        if (needsF2) totalPages++;
-        if (needsF3) {
-            if (hasImg1or2) totalPages++;
-            if (hasImg3or4) totalPages++; 
-        }
-
-        const mergedPdf = await PDFLib.PDFDocument.create();
-        let currentPage = 1;
-
-        const fillGlobalFields = (form) => {
-            const allInputs = document.querySelectorAll('input[id], textarea[id], select[id]');
-            allInputs.forEach(el => {
-                const name = el.id;
-                try {
-                    if (el.type === 'checkbox') {
-                        el.checked ? form.getCheckBox(name).check() : form.getCheckBox(name).uncheck();
-                    } else if (el.type !== 'file' && (el.type !== 'hidden' || el.id === 'total-heures')) {
-                        form.getTextField(name).setText(el.value || "");
-                    }
-                } catch (e) {} 
-            });
-        };
-
-        // =====================================
-        // TRAITEMENT DE F1
-        // =====================================
-        const f1Doc = await PDFLib.PDFDocument.load(getBuffer(TEMPLATE_JOURNAL_F1));
-        const formF1 = f1Doc.getForm();
-        fillGlobalFields(formF1);
-        
-        for (let i = 0; i < 15; i++) {
-            if (printableRows[i]) {
-                try { formF1.getTextField(`heure_deb_${i+1}`).setText(printableRows[i].deb || ""); } catch(e){}
-                try { formF1.getTextField(`heure_fin_${i+1}`).setText(printableRows[i].fin || ""); } catch(e){}
-                try { formF1.getTextField(`text_box_${i+1}`).setText(printableRows[i].text || ""); } catch(e){}
-            }
-        }
-        
-        // Méthode standard, propre et directe pour la page F1
-        try { formF1.getTextField('f1-page-number').setText(currentPage.toString()); } catch(e){}
-        
-        // CORRECTIF ANDROID : Forcer le dessin des polices pour F1
-        try {
-            const fontF1 = await f1Doc.embedFont(PDFLib.StandardFonts.Helvetica);
-            formF1.updateFieldAppearances(fontF1);
-        } catch(e) {}
-
-        const f1Pages = await mergedPdf.copyPages(f1Doc, [0]);
-        mergedPdf.addPage(f1Pages[0]);
-        currentPage++;
-
-        // =====================================
-        // TRAITEMENT DE F2
-        // =====================================
-        if (needsF2) {
-            const f2Doc = await PDFLib.PDFDocument.load(getBuffer(TEMPLATE_JOURNAL_F2));
-            const formF2 = f2Doc.getForm();
-            fillGlobalFields(formF2);
-            
-            for (let i = 15; i < 46; i++) {
-                if (printableRows[i]) {
-                    try { formF2.getTextField(`heure_deb_${i+1}`).setText(printableRows[i].deb || ""); } catch(e){}
-                    try { formF2.getTextField(`heure_fin_${i+1}`).setText(printableRows[i].fin || ""); } catch(e){}
-                    try { formF2.getTextField(`text_box_${i+1}`).setText(printableRows[i].text || ""); } catch(e){}
-                }
-            }
-            
-            // Méthode standard pour F2
-            try { formF2.getTextField('f2-page-number').setText(currentPage.toString()); } catch(e){}
-            
-            // CORRECTIF ANDROID : Forcer le dessin des polices pour F2
-            try {
-                const fontF2 = await f2Doc.embedFont(PDFLib.StandardFonts.Helvetica);
-                formF2.updateFieldAppearances(fontF2);
-            } catch(e) {}
-
-            const f2Pages = await mergedPdf.copyPages(f2Doc, [0]);
-            mergedPdf.addPage(f2Pages[0]);
-            currentPage++;
-        }
-
-        // =====================================
-        // TRAITEMENT DE F3 (Photos)
-        // =====================================
-        if (needsF3) {
-            const injectPhotosToDoc = async (imgA, imgB, textA, textB, pageNum) => {
-                const f3Doc = await PDFLib.PDFDocument.load(getBuffer(TEMPLATE_JOURNAL_F3));
-                const formF3 = f3Doc.getForm();
-                const f3PagesArr = f3Doc.getPages();
-                
-                fillGlobalFields(formF3);
-                
-                // Méthode standard pour F3
-                try { formF3.getTextField('f3-page-number').setText(pageNum.toString()); } catch(e){}
-
-                try { formF3.getTextField('desc-text-01').setText(document.getElementById(textA)?.value || ""); } catch(e){}
-                try { formF3.getTextField('desc-text-02').setText(document.getElementById(textB)?.value || ""); } catch(e){}
-
-                const drawImg = async (inputId, pdfFieldId) => {
-                    const hiddenInput = document.getElementById(inputId);
-                    if (hiddenInput && hiddenInput.value) {
-                        try {
-                            const field = formF3.getField(pdfFieldId);
-                            const widget = field.acroField.getWidgets()[0];
-                            const rect = widget.getRectangle();
-                            
-                            const widgetPageRef = widget.dict.get(PDFLib.PDFName.of('P'));
-                            let targetPage = f3PagesArr.find(p => p.ref === widgetPageRef) || f3PagesArr[0];
-
-                            // CORRECTIF FOXIT : Retirer le champ pour enlever la bordure
-                            formF3.removeField(pdfFieldId);
-
-                            const base64String = hiddenInput.value.split(',')[1];
-                            const pdfImage = await f3Doc.embedJpg(base64String);
-
-                            const scaled = pdfImage.scaleToFit(rect.width, rect.height);
-                            const centerX = rect.x + (rect.width - scaled.width) / 2;
-                            const centerY = rect.y + (rect.height - scaled.height) / 2;
-
-                            targetPage.drawImage(pdfImage, { x: centerX, y: centerY, width: scaled.width, height: scaled.height });
-                        } catch (e) {}
-                    }
-                };
-
-                // CORRECTIF ANDROID : On applique les apparences de texte AVANT de dessiner les images
-                try {
-                    const fontF3 = await f3Doc.embedFont(PDFLib.StandardFonts.Helvetica);
-                    formF3.updateFieldAppearances(fontF3);
-                } catch(e) {}
-
-                // On dessine les images par-dessus pour qu'elles restent visibles sur tous les appareils
-                await drawImg(imgA, 'desc-img-01');
-                await drawImg(imgB, 'desc-img-02');
-
-                const copiedPages = await mergedPdf.copyPages(f3Doc, [0]);
-                mergedPdf.addPage(copiedPages[0]);
-            };
-
-            if (hasImg1or2) {
-                await injectPhotosToDoc('desc-img-01-base64', 'desc-img-02-base64', 'desc-text-01', 'desc-text-02', currentPage);
-                currentPage++;
-            }
-            
-            if (hasImg3or4) {
-                await injectPhotosToDoc('desc-img-03-base64', 'desc-img-04-base64', 'desc-text-03', 'desc-text-04', currentPage);
-                currentPage++;
-            }
-        }
-
-        // =====================================
-        // SAUVEGARDE FINALE
-        // =====================================
-        const noProjet = document.getElementById('global-no-projet').value.trim() || 'SANS-NUMERO';
-        const rawDate = document.getElementById('global-date').value || new Date().toISOString().split('T')[0];
-        const techName = document.getElementById('sig-prep-nom')?.value || '';
-        const techInitials = techName.split(' ').filter(n => n).map(n => n[0].toUpperCase()).join('') || 'TECH';
-
-        const pdfBytes = await mergedPdf.save();
-        const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-        const fileName = `Journal_${rawDate}_${noProjet}_${techInitials}.pdf`;
-
-        const isMacTouch = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
-        const isApple = /iPhone|iPad|iPod/i.test(navigator.userAgent) || isMacTouch;
-        
-        let attemptedShare = false;
-        try {
-            if (isApple && navigator.share && navigator.canShare) {
-                const file = new File([blob], fileName, { type: 'application/pdf' });
-                if (navigator.canShare({ files: [file] })) {
-                    attemptedShare = true;
-                    await navigator.share({ files: [file] });
-                }
-            }
-        } catch (err) {
-            if (err.name !== 'AbortError') attemptedShare = false;
-        }
-
-        if (!attemptedShare) {
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = fileName;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            setTimeout(() => window.URL.revokeObjectURL(url), 100);
-        }
-        
-        if (btn) { btn.textContent = originalText; btn.disabled = false; }
-    } catch (error) {
-        console.error("Erreur lors de l'export PDF :", error);
-        showToast("Erreur lors de l'export PDF. Vérifiez la console.", "error");
-        const btn = document.querySelector('button[onclick="exportToPDF()"]');
-        if (btn) { btn.textContent = "📄 Exporter en PDF"; btn.disabled = false; }
-    }
-}*/
+*/

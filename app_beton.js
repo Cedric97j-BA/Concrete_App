@@ -312,9 +312,10 @@ function collapseAllTrucks() {
         content.classList.remove('active');
     });
     document.querySelectorAll('.truck-card .chevron').forEach(chevron => {
-        chevron.classList.remove('rotated');
+        chevron.classList.add('rotated');
     });
 }
+
 
 // ========================================== //
 // 3. MOTEUR MATHÉMATIQUE ET LIVE SYNC        //
@@ -879,6 +880,8 @@ function loadReport() {
     currentActiveReportKey = selectedKey; 
     dropdown.value = selectedKey;
     updateAllTruckPreviews();
+    collapseAllTrucks();
+
     showToast("Rapport chargé avec succès.", "success");
 }
 
@@ -889,6 +892,125 @@ function scrollToSection(sectionId) {
     }
 }
 
+function saveReport(isDuplicate = false) {
+    let saveKey = currentActiveReportKey;
+
+    // 1. On calcule le nom de base par défaut
+    const noProjet = document.getElementById('global-no-projet').value.trim() || 'SANS-NUMERO';
+    const rawDate = document.getElementById('global-date').value || new Date().toISOString().split('T')[0];
+    const resistance = document.getElementById('f2-spec-resistance')?.value.trim() || 'Mix';
+    const techName = document.getElementById('f2-tech-name')?.value || document.getElementById('f1-tech-name')?.value || '';
+    const techInitials = techName.split(' ').filter(n => n).map(n => n[0].toUpperCase()).join('') || 'TECH';
+    
+    let baseName = `englobe_${rawDate}_${noProjet}_${resistance}_${techInitials}`;
+
+    // 2. Demande un nom SEULEMENT si c'est un nouveau rapport ou une copie
+    if (!saveKey || isDuplicate) {
+        if (isDuplicate) baseName += "_copie"; // Ajoute le tag copie par défaut
+        const promptMsg = isDuplicate ? "Nom pour la COPIE du rapport :" : "Nom de sauvegarde du rapport (modifiable) :";
+        let userPromptName = prompt(promptMsg, baseName);
+        if (userPromptName === null) return; 
+        
+        baseName = userPromptName.trim() || baseName;
+        if (!baseName.startsWith('englobe_')) baseName = `englobe_${baseName}`;
+        
+        // Création de l'identifiant unique invisible
+        saveKey = 'ID_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    } else {
+        // 3. C'EST UNE MISE À JOUR : On récupère l'ancien nom pour ne pas l'écraser !
+        const existingDataStr = localStorage.getItem(saveKey);
+        if (existingDataStr) {
+            try {
+                const existingData = JSON.parse(existingDataStr);
+                if (existingData.displayName) {
+                    baseName = existingData.displayName;
+                }
+            } catch(e) {}
+        }
+    }
+
+    // Outil pour réparer les zéros manquants (".5" devient "0.5")
+    const fixZero = (v) => {
+        if (!v) return "";
+        let str = v.toString();
+        if (str.startsWith('.')) return '0' + str;
+        if (str.startsWith('-.')) return '-0.' + str.substring(2);
+        return str;
+    };
+
+    const staticData = {};
+    document.querySelectorAll('input[id], select[id], textarea[id]').forEach(el => {
+        if (el.id === 'saved-reports-dropdown') return;
+        if (el.type === 'checkbox') {
+            staticData[el.id] = el.checked;
+        } else {
+            staticData[el.id] = el.type === 'number' ? fixZero(el.value) : el.value;
+        }
+    });
+
+    const trucksData = [];
+    document.querySelectorAll('.truck-card').forEach(card => {
+        trucksData.push({
+            id: card.querySelector('.truck-id').value,
+            bordereau: card.querySelector('.truck-bordereau').value,
+            volume: fixZero(card.querySelector('.truck-volume').value),
+            timeMix: card.querySelector('.truck-time-mix').value,
+            timeStart: card.querySelector('.truck-time-start').value,
+            timeEnd: card.querySelector('.truck-time-end').value,
+            water: fixZero(card.querySelector('.truck-water').value),
+            plast: fixZero(card.querySelector('.truck-plast').value),
+            air1: fixZero(card.querySelector('.truck-air1').value),
+            air2: fixZero(card.querySelector('.truck-air2').value),
+            temp: fixZero(card.querySelector('.truck-temp').value),
+            slump1: fixZero(card.querySelector('.truck-slump1').value),
+            slump1Sp: card.querySelector('.truck-slump1-sp').checked,
+            slump2: fixZero(card.querySelector('.truck-slump2').value),
+            slump2Sp: card.querySelector('.truck-slump2-sp').checked,
+            refuse: card.querySelector('.truck-refuse').checked,
+            sampleCheck: card.querySelector('.truck-sample-check').checked,
+            sampleNum: card.querySelector('.truck-sample-num').value,
+            sampleTime: card.querySelector('.truck-sample-time').value,
+            remarquesList: card.querySelector('.truck-remarques-list')?.value || ''
+        });
+    });
+
+    const samplesData = [];
+    document.querySelectorAll('.sample-card').forEach(card => {
+        const data = { 
+            isStandaloneTemoin: card.classList.contains('temoin-only-card'),
+            linkedTruck: card.dataset.linkedTruck || null 
+        };
+        
+        card.querySelectorAll('input, textarea, select').forEach(input => {
+            const cls = Array.from(input.classList).find(c => c.startsWith('sample-') || c.startsWith('temoin-'));
+            if (cls) {
+                if (input.type === 'checkbox') data[cls] = input.checked;
+                else data[cls] = input.type === 'number' ? fixZero(input.value) : input.value;
+            }
+        });
+        samplesData.push(data);
+    });
+
+    const reportData = {
+        displayName: baseName, // Le nom préservé est sauvegardé
+        static: staticData,
+        trucks: trucksData,
+        samples: samplesData,
+        timestamp: new Date().getTime()
+    };
+
+    localStorage.setItem(saveKey, JSON.stringify(reportData));
+    currentActiveReportKey = saveKey; 
+    updateLastSavedStatus(reportData.timestamp);
+    
+    updateDropdown();
+    
+    const dropdown = document.getElementById('saved-reports-dropdown');
+    if (dropdown) dropdown.value = saveKey;
+    showToast(isDuplicate ? "Copie sauvegardée avec succès." : "Rapport sauvegardé avec succès.", "success");
+}
+
+/*
 function saveReport(isDuplicate = false) {
     let saveKey = currentActiveReportKey;
 
@@ -979,6 +1101,7 @@ function saveReport(isDuplicate = false) {
     showToast(isDuplicate ? "Copie sauvegardée avec succès." : "Rapport sauvegardé avec succès.", "success");
 }
 
+*/
 function deleteTruckCard(btn, event) {
     event.stopPropagation(); // Empêche l'accordéon de s'ouvrir/fermer quand on clique sur le X
     if (confirm("Voulez-vous vraiment supprimer ce camion ?")) {
@@ -1060,6 +1183,12 @@ function deleteReport() {
     updateDropdown(); 
 }
 
+document.addEventListener('input', function(e) {
+    if (e.target.matches('.truck-air1, .truck-air2, .truck-slump1, .truck-slump2')) {
+        const card = e.target.closest('.truck-card');
+        if (card) updateTruckColor(card);
+    }
+});
 
 // === MOTEUR D'EXPORT MULTI-TEMPLATE (OFFLINE BASE64) === //
 async function exportToPDF() {
@@ -1070,6 +1199,15 @@ async function exportToPDF() {
             btn.textContent = "⏳ Génération en cours...";
             btn.disabled = true;
         }
+
+        // Utilitaire pour la conversion en format francophone sécuritaire
+        const formatNum = (val) => {
+            if (!val) return "";
+            let str = val.toString();
+            if (str.startsWith('.')) str = '0' + str;
+            if (str.startsWith('-.')) str = '-0.' + str.substring(2);
+            return str.replace('.', ',');
+        };
 
         let compiledRemarks = [];
         for (let i = 1; i <= 8; i++) {
@@ -1128,6 +1266,8 @@ async function exportToPDF() {
             if (formF1.acroForm) formF1.acroForm.dict.set(PDFLib.PDFName.of('NeedAppearances'), PDFLib.PDFBool.False);
         } catch (e) {}
 
+        formF1.getFields().forEach(f => { try { f.acroField.setPartialName(f.getName() + '_F1'); } catch(e){} });
+
         const copiedPagesF1 = await mergedPdf.copyPages(subDocF1, subDocF1.getPageIndices());
         copiedPagesF1.forEach(page => mergedPdf.addPage(page));
 
@@ -1164,8 +1304,15 @@ async function exportToPDF() {
                 const el = document.getElementById(name);
                 if (el) {
                     try {
-                        if (el.type === 'checkbox') el.checked ? formF2.getCheckBox(name).check() : formF2.getCheckBox(name).uncheck();
-                        else formF2.getTextField(name).setText(el.value || "");
+                        if (el.type === 'checkbox') {
+                            el.checked ? formF2.getCheckBox(name).check() : formF2.getCheckBox(name).uncheck();
+                        } else {
+                            let val = el.value || "";
+                            if (['f2-total-coulee', 'f2-total-refuse', 'f2-total-verifie'].includes(name)) {
+                                val = formatNum(val);
+                            }
+                            formF2.getTextField(name).setText(val);
+                        }
                     } catch (e) {}
                 }
             });
@@ -1181,8 +1328,15 @@ async function exportToPDF() {
                     const el = card.querySelector(cls);
                     if (!el) return;
                     try {
-                        if (isCheck) el.checked ? formF2.getCheckBox(pdfName).check() : formF2.getCheckBox(pdfName).uncheck();
-                        else if (el.value) formF2.getTextField(pdfName).setText(el.value);
+                        if (isCheck) {
+                            el.checked ? formF2.getCheckBox(pdfName).check() : formF2.getCheckBox(pdfName).uncheck();
+                        } else if (el.value) {
+                            let val = el.value;
+                            if (['.truck-water', '.truck-plast', '.truck-air1', '.truck-air2', '.truck-temp'].includes(cls)) {
+                                val = formatNum(val);
+                            }
+                            formF2.getTextField(pdfName).setText(val);
+                        }
                     } catch (e) {}
                 };
 
@@ -1190,12 +1344,14 @@ async function exportToPDF() {
                 const volInput = card.querySelector('.truck-volume');
                 
                 if (volInput && volInput.value) {
-                    const vol = parseFloat(volInput.value);
+                    let volStr = volInput.value;
+                    if (volStr.startsWith('.')) volStr = '0' + volStr;
+                    const vol = parseFloat(volStr) || 0;
                     if (!isRefused) {
                         volumeCumuleF2 += vol;
                     }
-                    try { formF2.getTextField(`truck-${row}-vol-un`).setText(vol.toString()); } catch(e) {}
-                    try { formF2.getTextField(`truck-${row}-vol-cum`).setText(isRefused ? "" : volumeCumuleF2.toFixed(1)); } catch(e) {}
+                    try { formF2.getTextField(`truck-${row}-vol-un`).setText(formatNum(volStr)); } catch(e) {}
+                    try { formF2.getTextField(`truck-${row}-vol-cum`).setText(isRefused ? "" : formatNum(volumeCumuleF2.toFixed(1))); } catch(e) {}
                 }
 
                 trySetF2('.truck-id', `truck-${row}-id`);
@@ -1247,6 +1403,8 @@ async function exportToPDF() {
                 formF2.updateFieldAppearances(subFont);
                 if (formF2.acroForm) formF2.acroForm.dict.set(PDFLib.PDFName.of('NeedAppearances'), PDFLib.PDFBool.False);
             } catch (e) {}
+
+            formF2.getFields().forEach(f => { try { f.acroField.setPartialName(f.getName() + '_F2_pg' + p); } catch(e){} });
 
             const copiedPagesF2 = await mergedPdf.copyPages(subDocF2, subDocF2.getPageIndices());
             copiedPagesF2.forEach(page => mergedPdf.addPage(page));
@@ -1330,6 +1488,8 @@ async function exportToPDF() {
                 if (form.acroForm) form.acroForm.dict.set(PDFLib.PDFName.of('NeedAppearances'), PDFLib.PDFBool.False);
             } catch (e) {}
 
+            form.getFields().forEach(f => { try { f.acroField.setPartialName(f.getName() + '_F3_s' + num); } catch(e){} });
+
             const copiedPages = await mergedPdf.copyPages(subDoc, subDoc.getPageIndices());
             copiedPages.forEach(page => mergedPdf.addPage(page));
         }
@@ -1398,6 +1558,8 @@ async function exportToPDF() {
                 if (form.acroForm) form.acroForm.dict.set(PDFLib.PDFName.of('NeedAppearances'), PDFLib.PDFBool.False);
             } catch (e) {}
 
+            form.getFields().forEach(f => { try { f.acroField.setPartialName(f.getName() + '_F4_t' + num); } catch(e){} });
+
             const copiedPages = await mergedPdf.copyPages(subDoc, subDoc.getPageIndices());
             copiedPages.forEach(page => mergedPdf.addPage(page));
         }
@@ -1412,13 +1574,11 @@ async function exportToPDF() {
         const blob = new Blob([pdfBytes], { type: 'application/pdf' });
         const fileName = `Rapport_${rawDateVal}_${noProjetVal}_${resistanceVal}_${initialsVal}.pdf`;
 
-       // LOGIQUE SÉPARÉE : APPLE VS ANDROID/PC
         const isMacTouch = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
         const isApple = /iPhone|iPad|iPod/i.test(navigator.userAgent) || isMacTouch;
         
         let attemptedShare = false;
         try {
-            // UNIQUEMENT POUR APPLE : On ouvre le menu de partage
             if (isApple && navigator.share && navigator.canShare) {
                 const file = new File([blob], fileName, { type: 'application/pdf' });
                 if (navigator.canShare({ files: [file] })) {
@@ -1431,14 +1591,434 @@ async function exportToPDF() {
             if (err.name !== 'AbortError') attemptedShare = false;
         }
 
-        // POUR ANDROID ET PC : On sauvegarde directement le fichier en local
         if (!attemptedShare) {
             const url = window.URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
             link.download = fileName;
             document.body.appendChild(link);
-            link.click(); // Force le téléchargement direct dans le dossier de la tablette
+            link.click(); 
+            document.body.removeChild(link);
+            setTimeout(() => window.URL.revokeObjectURL(url), 100);
+        }
+        
+        if (btn) {
+            btn.textContent = originalText;
+            btn.disabled = false;
+        }
+
+    } catch (error) {
+        console.error("Erreur lors de l'export PDF :", error);
+        showToast("Erreur lors de l'export PDF. Vérifiez la console.", "error");
+        const btn = document.querySelector('button[onclick="exportToPDF()"]');
+        if (btn) {
+            btn.textContent = "📄 Exporter en PDF";
+            btn.disabled = false;
+        }
+    }
+} 
+
+/*
+// === MOTEUR D'EXPORT MULTI-TEMPLATE (OFFLINE BASE64) === //
+async function exportToPDF() {
+    try {
+        const btn = document.querySelector('button[onclick="exportToPDF()"]');
+        const originalText = btn ? btn.textContent : "📄 Exporter en PDF";
+        if (btn) {
+            btn.textContent = "⏳ Génération en cours...";
+            btn.disabled = true;
+        }
+
+        let compiledRemarks = [];
+        for (let i = 1; i <= 8; i++) {
+            const check = document.getElementById(`f1-s${i}-remarques-check`);
+            const text = document.getElementById(`f1-s${i}-remarques-text`);
+            if (check && check.checked && text && text.value.trim() !== "") {
+                compiledRemarks.push(`${i}. ${text.value.trim()}`);
+            }
+        }
+        
+        let userS9Text = document.getElementById('f1-s9-remarques-compilation')?.value.trim() || "";
+        let finalS9Text = userS9Text;
+        if (compiledRemarks.length > 0) {
+            finalS9Text = userS9Text ? (userS9Text + "\n\n" + compiledRemarks.join('; ')) : compiledRemarks.join('; ');
+        }
+
+        const mergedPdf = await PDFLib.PDFDocument.create();
+        mergedPdf.registerFontkit(fontkit);
+        
+        const getBuffer = (base64) => {
+            const str = window.atob(base64);
+            const bytes = new Uint8Array(str.length);
+            for (let i = 0; i < str.length; i++) bytes[i] = str.charCodeAt(i);
+            return bytes.buffer;
+        };
+
+        const fontBytes = new Uint8Array(getBuffer(TAHOMA_FONT));
+        const tahomaFont = await mergedPdf.embedFont(fontBytes);
+
+        // ==========================================
+        // ETAPE 1 : Formulaire 1
+        // ==========================================
+        const subDocF1 = await PDFLib.PDFDocument.load(getBuffer(TEMPLATE_F1));
+        subDocF1.registerFontkit(fontkit);
+        const formF1 = subDocF1.getForm();
+        
+        formF1.getFields().forEach(field => {
+            const name = field.getName();
+            const el = document.getElementById(name);
+            if (el) {
+                try {
+                    if (name === 'f1-s9-remarques-compilation') {
+                        formF1.getTextField(name).setText(finalS9Text);
+                    } else if (el.type === 'checkbox') {
+                        el.checked ? formF1.getCheckBox(name).check() : formF1.getCheckBox(name).uncheck();
+                    } else {
+                        formF1.getTextField(name).setText(el.value || "");
+                    }
+                } catch (e) {}
+            }
+        });
+
+        try {
+            const subFont = await subDocF1.embedFont(fontBytes);
+            formF1.updateFieldAppearances(subFont);
+            if (formF1.acroForm) formF1.acroForm.dict.set(PDFLib.PDFName.of('NeedAppearances'), PDFLib.PDFBool.False);
+        } catch (e) {}
+
+        formF1.getFields().forEach(f => { try { f.acroField.setPartialName(f.getName() + '_F1'); } catch(e){} });
+
+        const copiedPagesF1 = await mergedPdf.copyPages(subDocF1, subDocF1.getPageIndices());
+        copiedPagesF1.forEach(page => mergedPdf.addPage(page));
+
+        // ==========================================
+        // ETAPE 2 : Formulaire 2 (Multi-pages Dynamique)
+        // ==========================================
+        const allTrucks = Array.from(document.querySelectorAll('.truck-card'));
+        const maxTrucksPerPage = 17;
+        const nbPagesF2 = Math.max(1, Math.ceil(allTrucks.length / maxTrucksPerPage));
+        let volumeCumuleF2 = 0;
+        
+        const allRemarksText = document.getElementById('f2-remarques-globales').value || "";
+        const remarksDict = {};
+        const generalText = [];
+        
+        allRemarksText.split(';').forEach(part => {
+            const match = part.trim().match(/^([A-Z])\.\s*(.*)/);
+            if (match) {
+                remarksDict[match[1]] = `${match[1]}. ${match[2].trim()}`;
+            } else if (part.trim() !== "") {
+                generalText.push(part.trim());
+            }
+        });
+
+        for (let p = 0; p < nbPagesF2; p++) {
+            const subDocF2 = await PDFLib.PDFDocument.load(getBuffer(TEMPLATE_F2));
+            subDocF2.registerFontkit(fontkit);
+            const formF2 = subDocF2.getForm();
+
+            formF2.getFields().forEach(field => {
+                const name = field.getName();
+                if (name === 'f2-remarques-globales') return; 
+                
+                const el = document.getElementById(name);
+                if (el) {
+                    try {
+                        if (el.type === 'checkbox') {
+                            el.checked ? formF2.getCheckBox(name).check() : formF2.getCheckBox(name).uncheck();
+                        } else {
+                            let val = el.value || "";
+                            // NOUVEAU: Conversion virgule pour les 3 totaux
+                            if (['f2-total-coulee', 'f2-total-refuse', 'f2-total-verifie'].includes(name)) {
+                                val = val.replace('.', ',');
+                            }
+                            formF2.getTextField(name).setText(val);
+                        }
+                    } catch (e) {}
+                }
+            });
+
+            try { formF2.getTextField('f2-page-number').setText(`${p + 1} de ${nbPagesF2}`); } catch(e) {}
+
+            const chunk = allTrucks.slice(p * maxTrucksPerPage, (p + 1) * maxTrucksPerPage);
+            const pageRemarksSet = new Set();
+            
+            chunk.forEach((card, index) => {
+                const row = index + 1; 
+                const trySetF2 = (cls, pdfName, isCheck = false) => {
+                    const el = card.querySelector(cls);
+                    if (!el) return;
+                    try {
+                        if (isCheck) {
+                            el.checked ? formF2.getCheckBox(pdfName).check() : formF2.getCheckBox(pdfName).uncheck();
+                        } else if (el.value) {
+                            let val = el.value;
+                            // NOUVEAU: Conversion virgule pour eau, plastifiant, air 1/2, température
+                            if (['.truck-water', '.truck-plast', '.truck-air1', '.truck-air2', '.truck-temp'].includes(cls)) {
+                                val = val.replace('.', ',');
+                            }
+                            formF2.getTextField(pdfName).setText(val);
+                        }
+                    } catch (e) {}
+                };
+
+                const isRefused = card.querySelector('.truck-refuse').checked;
+                const volInput = card.querySelector('.truck-volume');
+                
+                if (volInput && volInput.value) {
+                    const vol = parseFloat(volInput.value);
+                    if (!isRefused) {
+                        volumeCumuleF2 += vol;
+                    }
+                    // NOUVEAU: Conversion virgule pour volumes
+                    try { formF2.getTextField(`truck-${row}-vol-un`).setText(vol.toString().replace('.', ',')); } catch(e) {}
+                    try { formF2.getTextField(`truck-${row}-vol-cum`).setText(isRefused ? "" : volumeCumuleF2.toFixed(1).replace('.', ',')); } catch(e) {}
+                }
+
+                trySetF2('.truck-id', `truck-${row}-id`);
+                trySetF2('.truck-bordereau', `truck-${row}-bordereau`);
+                trySetF2('.truck-time-mix', `truck-${row}-time-mix`);
+                trySetF2('.truck-time-start', `truck-${row}-time-start`);
+                trySetF2('.truck-time-end', `truck-${row}-time-end`);
+                trySetF2('.truck-water', `truck-${row}-water`);
+                trySetF2('.truck-plast', `truck-${row}-plast`);
+                trySetF2('.truck-air1', `truck-${row}-air1`);
+                trySetF2('.truck-air2', `truck-${row}-air2`);
+                trySetF2('.truck-temp', `truck-${row}-temp`);
+                trySetF2('.truck-slump1', `truck-${row}-slump1`);
+                trySetF2('.truck-slump1-sp', `truck-${row}-slump1-sp`, true);
+                trySetF2('.truck-slump2', `truck-${row}-slump2`);
+                trySetF2('.truck-slump2-sp', `truck-${row}-slump2-sp`, true);
+                trySetF2('.truck-sample-check', `truck-${row}-sample-check`, true);
+                
+                trySetF2('.truck-sample-num', `truck-${row}-sample-num`);
+                trySetF2('.truck-sample-time', `truck-${row}-sample-time`);
+                
+                const elRem = card.querySelector('.truck-remarques-list');
+                
+                if (isRefused) {
+                    try { formF2.getCheckBox(`truck-${row}-refuse`).check(); } catch(e) {}
+                }
+                
+                if (elRem && elRem.value) {
+                    let cleanText = elRem.value.split(',').map(s=>s.trim()).filter(s=>s!=="").join(',');
+                    try { formF2.getTextField(`truck-${row}-remarque`).setText(cleanText); } 
+                    catch(e1) { try { formF2.getDropdown(`truck-${row}-remarque`).select(cleanText); } catch(e2) {} }
+                    
+                    elRem.value.split(',').forEach(l => {
+                        let cleanL = l.trim();
+                        if(cleanL !== "N/C" && cleanL !== "") pageRemarksSet.add(cleanL);
+                    });
+                } else if (isRefused) { 
+                    try { formF2.getTextField(`truck-${row}-remarque`).setText("N/C"); } 
+                    catch(e1) { try { formF2.getDropdown(`truck-${row}-remarque`).select("N/C"); } catch(e2) {} }
+                }
+            });
+
+            const pageNotes = Array.from(pageRemarksSet).sort().map(L => remarksDict[L]).filter(x => x);
+            const finalRemarksText = [...generalText, ...pageNotes].join('; ') + (pageNotes.length > 0 || generalText.length > 0 ? ';' : ''); 
+            try { formF2.getTextField('f2-remarques-globales').setText(finalRemarksText); } catch(e) {}
+
+            try {
+                const subFont = await subDocF2.embedFont(fontBytes);
+                formF2.updateFieldAppearances(subFont);
+                if (formF2.acroForm) formF2.acroForm.dict.set(PDFLib.PDFName.of('NeedAppearances'), PDFLib.PDFBool.False);
+            } catch (e) {}
+
+            formF2.getFields().forEach(f => { try { f.acroField.setPartialName(f.getName() + '_F2_pg' + p); } catch(e){} });
+
+            const copiedPagesF2 = await mergedPdf.copyPages(subDocF2, subDocF2.getPageIndices());
+            copiedPagesF2.forEach(page => mergedPdf.addPage(page));
+        }
+
+        // ==========================================
+        // ETAPE 3 : Formulaire 3 (1 page par échantillon)
+        // ==========================================
+        const samples = document.querySelectorAll('.sample-card:not(.temoin-only-card)');
+        for (const card of samples) {
+            const subDoc = await PDFLib.PDFDocument.load(getBuffer(TEMPLATE_F3));
+            subDoc.registerFontkit(fontkit);
+            const form = subDoc.getForm();
+
+            const num = Array.from(samples).indexOf(card) + 1;
+            const linkedTruckNum = card.dataset.linkedTruck;
+            const globalDate = document.getElementById('global-date').value;
+            const globalTech = document.getElementById('f2-tech-name')?.value || document.getElementById('f1-tech-name')?.value || '';
+            const techInitials = globalTech.split(' ').filter(n => n).map(n => n[0].toUpperCase()).join('');
+            
+            const f3DateHtml = card.querySelector('.sample-prelev-date');
+            const f3TechHtml = card.querySelector('.sample-prelev-tech');
+            const f3TimeHtml = card.querySelector('.sample-prelev-time');
+
+            if (f3DateHtml && !f3DateHtml.value && globalDate) {
+                try { form.getTextField('sample-prelev-date').setText(globalDate); } catch(e){}
+                try { form.getTextField(`sample-${num}-prelev-date`).setText(globalDate); } catch(e){}
+            }
+            if (f3TechHtml && !f3TechHtml.value && techInitials) {
+                try { form.getTextField('sample-prelev-tech').setText(techInitials); } catch(e){}
+                try { form.getTextField(`sample-${num}-prelev-tech`).setText(techInitials); } catch(e){}
+            }
+
+            if (linkedTruckNum) {
+                const truckCards = document.querySelectorAll('.truck-card');
+                const truckCard = truckCards[linkedTruckNum - 1]; 
+                if (truckCard) {
+                    const tNum = truckCard.querySelector('.truck-sample-num').value;
+                    const tTime = truckCard.querySelector('.truck-sample-time').value;
+                    
+                    if (tNum) {
+                        try { form.getTextField('sample-no').setText(tNum); } catch(e){}
+                        try { form.getTextField(`sample-${num}-no`).setText(tNum); } catch(e){}
+                    }
+                    if (f3TimeHtml && !f3TimeHtml.value && tTime) {
+                        try { form.getTextField('sample-prelev-time').setText(tTime); } catch(e){}
+                        try { form.getTextField(`sample-${num}-prelev-time`).setText(tTime); } catch(e){}
+                    }
+                }
+            }
+
+            card.querySelectorAll('input, textarea').forEach(input => {
+                const targetClass = Array.from(input.classList).find(c => c.startsWith('sample-'));
+                if (targetClass) {
+                    const numberedName = targetClass.replace('sample-', `sample-${num}-`);
+                    try {
+                        if (input.type === 'checkbox') {
+                            input.checked ? form.getCheckBox(targetClass).check() : form.getCheckBox(targetClass).uncheck();
+                            input.checked ? form.getCheckBox(numberedName).check() : form.getCheckBox(numberedName).uncheck();
+                        } else if (input.value) {
+                            form.getTextField(targetClass).setText(input.value);
+                            form.getTextField(numberedName).setText(input.value);
+                        }
+                    } catch(e) {}
+                }
+            });
+
+            form.getFields().forEach(field => {
+                const name = field.getName();
+                if (name.startsWith('global-')) {
+                    const el = document.getElementById(name);
+                    if (el && el.value) {
+                        try { form.getTextField(name).setText(el.value); } catch(e) {}
+                    }
+                }
+            });
+
+            try {
+                const subFont = await subDoc.embedFont(fontBytes);
+                form.updateFieldAppearances(subFont);
+                if (form.acroForm) form.acroForm.dict.set(PDFLib.PDFName.of('NeedAppearances'), PDFLib.PDFBool.False);
+            } catch (e) {}
+
+            form.getFields().forEach(f => { try { f.acroField.setPartialName(f.getName() + '_F3_s' + num); } catch(e){} });
+
+            const copiedPages = await mergedPdf.copyPages(subDoc, subDoc.getPageIndices());
+            copiedPages.forEach(page => mergedPdf.addPage(page));
+        }
+
+        // ==========================================
+        // ETAPE 4 : Formulaire 4 (1 page par témoin)
+        // ==========================================
+        const temoinCheckboxes = document.querySelectorAll('.sample-temoin-check:checked');
+        const temoinStandalone = document.querySelectorAll('.temoin-only-card');
+        
+        const allTemoins = [];
+        temoinCheckboxes.forEach(cb => allTemoins.push(cb.closest('.sample-card').querySelector('.temoin-container')));
+        temoinStandalone.forEach(card => allTemoins.push(card));
+
+        for (const container of allTemoins) {
+            const subDoc = await PDFLib.PDFDocument.load(getBuffer(TEMPLATE_TEMOIN));
+            subDoc.registerFontkit(fontkit);
+            const form = subDoc.getForm();
+
+            const num = Array.from(allTemoins).indexOf(container) + 1;
+            const globalDate = document.getElementById('global-date').value;
+            const globalTech = document.getElementById('f2-tech-name')?.value || document.getElementById('f1-tech-name')?.value || '';
+            const techInitials = globalTech.split(' ').filter(n => n).map(n => n[0].toUpperCase()).join('');
+
+            container.querySelectorAll('input, textarea').forEach(input => {
+                const targetClass = Array.from(input.classList).find(c => c.startsWith('temoin-'));
+                if (targetClass) {
+                    const numberedName = targetClass.replace('temoin-', `temoin-${num}-`);
+                    try {
+                        if (input.type === 'checkbox') {
+                            input.checked ? form.getCheckBox(targetClass).check() : form.getCheckBox(targetClass).uncheck();
+                            input.checked ? form.getCheckBox(numberedName).check() : form.getCheckBox(numberedName).uncheck();
+                        } else if (input.value) {
+                            form.getTextField(targetClass).setText(input.value);
+                            form.getTextField(numberedName).setText(input.value);
+                        }
+                    } catch(e) {}
+                }
+            });
+
+            const tDateHtml = container.querySelector('.temoin-prelev-date');
+            const tTechHtml = container.querySelector('.temoin-prelev-tech');
+
+            if (tDateHtml && !tDateHtml.value && globalDate) {
+                try { form.getTextField('temoin-prelev-date').setText(globalDate); } catch(e){}
+                try { form.getTextField(`temoin-${num}-prelev-date`).setText(globalDate); } catch(e){}
+            }
+            if (tTechHtml && !tTechHtml.value && techInitials) {
+                try { form.getTextField('temoin-prelev-tech').setText(techInitials); } catch(e){}
+                try { form.getTextField(`temoin-${num}-prelev-tech`).setText(techInitials); } catch(e){}
+            }
+
+            form.getFields().forEach(field => {
+                const name = field.getName();
+                if (name.startsWith('global-')) {
+                    const el = document.getElementById(name);
+                    if (el && el.value) {
+                        try { form.getTextField(name).setText(el.value); } catch(e) {}
+                    }
+                }
+            });
+
+            try {
+                const subFont = await subDoc.embedFont(fontBytes);
+                form.updateFieldAppearances(subFont);
+                if (form.acroForm) form.acroForm.dict.set(PDFLib.PDFName.of('NeedAppearances'), PDFLib.PDFBool.False);
+            } catch (e) {}
+
+            form.getFields().forEach(f => { try { f.acroField.setPartialName(f.getName() + '_F4_t' + num); } catch(e){} });
+
+            const copiedPages = await mergedPdf.copyPages(subDoc, subDoc.getPageIndices());
+            copiedPages.forEach(page => mergedPdf.addPage(page));
+        }
+
+        const noProjetVal = document.getElementById('global-no-projet').value.trim() || 'SANS-NUMERO';
+        const rawDateVal = document.getElementById('global-date').value || new Date().toISOString().split('T')[0];
+        const resistanceVal = document.getElementById('f2-spec-resistance')?.value.trim() || 'Mix';
+        const techNameVal = document.getElementById('f2-tech-name')?.value || document.getElementById('f1-tech-name')?.value || '';
+        const initialsVal = techNameVal.split(' ').filter(n => n).map(n => n[0].toUpperCase()).join('') || 'TECH';
+
+        const pdfBytes = await mergedPdf.save();
+        const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+        const fileName = `Rapport_${rawDateVal}_${noProjetVal}_${resistanceVal}_${initialsVal}.pdf`;
+
+        const isMacTouch = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+        const isApple = /iPhone|iPad|iPod/i.test(navigator.userAgent) || isMacTouch;
+        
+        let attemptedShare = false;
+        try {
+            if (isApple && navigator.share && navigator.canShare) {
+                const file = new File([blob], fileName, { type: 'application/pdf' });
+                if (navigator.canShare({ files: [file] })) {
+                    attemptedShare = true;
+                    await navigator.share({ files: [file] });
+                }
+            }
+        } catch (err) {
+            console.log("Partage annulé ou échoué:", err);
+            if (err.name !== 'AbortError') attemptedShare = false;
+        }
+
+        if (!attemptedShare) {
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click(); 
             document.body.removeChild(link);
             setTimeout(() => window.URL.revokeObjectURL(url), 100);
         }
@@ -1458,9 +2038,5 @@ async function exportToPDF() {
         }
     }
 }
-document.addEventListener('input', function(e) {
-    if (e.target.matches('.truck-air1, .truck-air2, .truck-slump1, .truck-slump2')) {
-        const card = e.target.closest('.truck-card');
-        if (card) updateTruckColor(card);
-    }
-});
+
+*/
