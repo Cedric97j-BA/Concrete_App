@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hub-inspection-v1.2.0.0d'; 
+const CACHE_NAME = 'hub-inspection-v1.3.0.0'; 
 
 const APP_ASSETS = [
     './',
@@ -7,14 +7,18 @@ const APP_ASSETS = [
     './index_compaction.html',
     './index_echsolgra.html',
     './index_journal.html',
+    './index_journal_old.html',
     './index_planche.html',
+    './index_photo.html',
     './changelog.html',
     './styles.css',
     './app_beton.js',
     './app_compaction.js',
     './app_echsolgra.js',
     './app_journal.js',
+    './app_journal_old.js',
     './app_planche.js',
+    './app_photo.js',
     './pdf_templates.js',
     './logo.png',
     './logo_beton.png',
@@ -22,6 +26,8 @@ const APP_ASSETS = [
     './logo_echsolgra.png',
     './logo_journal.png',
     './logo_planche.png',
+    './logo_photo.png',
+    './logo_enrob.png',
     './fonts/tahoma.ttf'
 ];
 
@@ -65,6 +71,37 @@ self.addEventListener('message', (event) => {
     }
 });
 
+
+// NOUVEAU: Stratégie "Cache-First" avec filet de sécurité réseau
+self.addEventListener('fetch', (event) => {
+    if (event.request.method !== 'GET') return;
+
+    event.respondWith(
+        caches.match(event.request).then((cachedResponse) => {
+            // 1. Retourne la version hors-ligne instantanément si elle existe
+            if (cachedResponse) {
+                return cachedResponse;
+            }
+            
+            // 2. Sinon, tente de la télécharger sur internet
+            return fetch(event.request).then((networkResponse) => {
+                if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
+                    return networkResponse;
+                }
+                const responseToCache = networkResponse.clone();
+                caches.open(CACHE_NAME).then((cache) => {
+                    cache.put(event.request, responseToCache);
+                });
+                return networkResponse;
+            }).catch(() => {
+                // Filet de sécurité anti-écran blanc
+                return new Response("Hors-ligne", { status: 503, statusText: "Service Unavailable" });
+            });
+        })
+    );
+});
+
+/*
 self.addEventListener('fetch', (event) => {
     if (event.request.method !== 'GET') return;
 
@@ -82,3 +119,5 @@ self.addEventListener('fetch', (event) => {
             .catch(() => caches.match(event.request))
     );
 });
+
+*/

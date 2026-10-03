@@ -42,9 +42,17 @@
         </a>
         
         <h1 style="margin-bottom: 10px;">Historique des mises à jour</h1>
+
+        <!-- v1.3.0.0 -->
+        <h2 class="version-title">v1.3.0.0 — Lancement du journal de chantier (Standard) et du journal photo</h2>
+        <ul class="changelog-list">
+            <li><span class="tag-nouveau">Nouveau :</span> Ajout de l'application "Journal photo" pour la documentation photographique isolée.</li>
+            <li><span class="tag-nouveau">Nouveau :</span> Ajout de l'application "Journal de chantier (Ancien)" pour assurer la rétrocompatibilité avec le format de rapport EQ-09-IM-143.</li>
+            <li><span class="tag-amelioration">Amélioration :</span> Le système de sauvegarde mémorise désormais les noms personnalisés lors des modifications et duplique intelligemment les rapports avec le suffixe "_copie".</li>                                                                         
+        </ul>
         
         <!-- v1.2.0.0 -->
-        <h2 class="version-title">v1.2.0.0 — Lancement du Journal de Chantier et Corrections Visuelles</h2>
+        <h2 class="version-title">v1.2.0.0 — Lancement du nouveau journal de Chantier et Corrections Visuelles</h2>
         <ul class="changelog-list">
             <li><span class="tag-nouveau">Nouveau :</span> Ajout de l’application : "Journal de Chantier" permettant la saisie des tâches, des heures et l'intégration directe de photos de chantier dans les rapports PDF.</li>
             <li><span class="tag-correction">Correction (Mode Nuit) :</span> Les couleurs d'état des camions dans l'application Béton (échantillonné en vert, refusé en rouge, testé en bleu) s'affichent désormais correctement lorsque le mode nuit est activé.</li>
@@ -52,7 +60,7 @@
             <li><span class="tag-correction">Correction (Interface) :</span> Les horloges de sélection d'heure sur iPad ont retrouvé une taille normale et ne chevauchent plus l'écran. L'alignement des mémos sur les téléphones a également été ajusté.</li>
             <li><span class="tag-amelioration">Amélioration :</span> Le bouton de mise à jour de l'application est plus intelligent : il ne fige plus l'écran et vous avertit clairement si vous possédez déjà la dernière version.</li>
         </ul>
-
+                                                                    
         <!-- v1.1.0.7e -->
         <h2 class="version-title">v1.1.0.7e — Mode Nuit</h2>
         <ul class="changelog-list">
@@ -81,7 +89,7 @@
 
     <!-- Activation du Mode Nuit -->
     <script>
-        if (localStorage.getItem('darkMode') === 'true') {
+        if (localStorage.getItem('darkMode') === 'enabled') {
             document.body.classList.add('dark-mode');
         }
     </script>
