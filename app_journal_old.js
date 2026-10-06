@@ -346,7 +346,7 @@ function deleteReport() {
 // 4. MOTEUR DE DÉCOUPAGE TEXTUEL             //
 // ========================================== //
 
-function splitTextIntelligently(text, maxChars = 120) {
+function splitTextIntelligently(text, maxChars = 100) {
     if (!text) return [];
     const lines = text.split('\n'); 
     const result = [];
@@ -380,7 +380,7 @@ function splitTextIntelligently(text, maxChars = 120) {
 }
 
 function buildPrintableRows() {
-    const maxChars = 120; 
+    const maxChars = 100; 
     const printableRows = [];
     const taskCards = document.querySelectorAll('.task-card');
     
