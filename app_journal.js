@@ -736,34 +736,64 @@ async function exportToPDF() {
         const techInitials = techName.split(' ').filter(n => n).map(n => n[0].toUpperCase()).join('') || 'TECH';
 
         const pdfBytes = await mergedPdf.save();
-        const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-        const fileName = `Journal_${rawDate}_${noProjet}_${techInitials}.pdf`;
+        const fileName = `JDC_${rawDate}_${noProjet}_${techInitials}.pdf`;
 
-        const isMacTouch = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
-        const isApple = /iPhone|iPad|iPod/i.test(navigator.userAgent) || isMacTouch;
-        
-        let attemptedShare = false;
-        try {
-            if (isApple && navigator.share && navigator.canShare) {
-                const file = new File([blob], fileName, { type: 'application/pdf' });
-                if (navigator.canShare({ files: [file] })) {
-                    attemptedShare = true;
-                    await navigator.share({ files: [file] });
+        // BIFURCATION : APPLICATION ANDROID vs WEB
+        if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+            try {
+                const pdfBase64 = await mergedPdf.saveAsBase64(); // Attention ici : mergedPdf
+                const { Filesystem, FileOpener } = window.Capacitor.Plugins;
+                
+                if (!Filesystem || !FileOpener) {
+                    throw new Error("Plugins introuvables. npx cap sync a-t-il été fait ?");
                 }
-            }
-        } catch (err) {
-            if (err.name !== 'AbortError') attemptedShare = false;
-        }
+                
+                // 1. Sauvegarde silencieuse en cache
+                const resultat = await Filesystem.writeFile({
+                    path: fileName,
+                    data: pdfBase64,
+                    directory: 'CACHE',
+                    recursive: true
+                });
 
-        if (!attemptedShare) {
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = fileName;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            setTimeout(() => window.URL.revokeObjectURL(url), 100);
+                // 2. Ouverture automatique (lancera Foxit directement si défini par défaut)
+                await FileOpener.open({ 
+                    filePath: resultat.uri, 
+                    contentType: 'application/pdf' 
+                });
+
+                await Share.share({ title: fileName, url: resultat.uri });
+            } catch (err) {
+                console.error(err);
+                alert("Erreur lors de l'enregistrement sur la tablette.");
+            }
+        } else {
+            // COMPORTEMENT WEB ORIGINAL
+            const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+            const isMacTouch = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+            const isApple = /iPhone|iPad|iPod/i.test(navigator.userAgent) || isMacTouch;
+            
+            let attemptedShare = false;
+            try {
+                if (isApple && navigator.share && navigator.canShare) {
+                    const file = new File([blob], fileName, { type: 'application/pdf' });
+                    if (navigator.canShare({ files: [file] })) {
+                        attemptedShare = true;
+                        await navigator.share({ files: [file] });
+                    }
+                }
+            } catch (err) { if (err.name !== 'AbortError') attemptedShare = false; }
+
+            if (!attemptedShare) {
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = fileName;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                setTimeout(() => window.URL.revokeObjectURL(url), 100);
+            }
         }
         
         if (btn) { btn.textContent = originalText; btn.disabled = false; }
@@ -847,6 +877,9 @@ async function exportToPDF() {
             formF1.updateFieldAppearances(fontF1);
         } catch(e) {}
 
+        // FIX: Dynamic field renaming for Foxit/PDF-XChange compatibility
+        formF1.getFields().forEach(f => { try { f.acroField.setPartialName(f.getName() + '_pg' + currentPage); } catch(e){} });
+
         const f1Pages = await mergedPdf.copyPages(f1Doc, [0]);
         mergedPdf.addPage(f1Pages[0]);
         currentPage++;
@@ -874,6 +907,9 @@ async function exportToPDF() {
                 formF2.updateFieldAppearances(fontF2);
             } catch(e) {}
 
+            // FIX: Dynamic field renaming
+            formF2.getFields().forEach(f => { try { f.acroField.setPartialName(f.getName() + '_pg' + currentPage); } catch(e){} });
+
             const f2Pages = await mergedPdf.copyPages(f2Doc, [0]);
             mergedPdf.addPage(f2Pages[0]);
             currentPage++;
@@ -894,13 +930,11 @@ async function exportToPDF() {
                 try { formF3.getTextField('desc-text-01').setText(document.getElementById(textA)?.value || ""); } catch(e){}
                 try { formF3.getTextField('desc-text-02').setText(document.getElementById(textB)?.value || ""); } catch(e){}
 
-                // FIX ANDROID TEXT: Apply appearances BEFORE drawing images
                 try {
                     const fontF3 = await f3Doc.embedFont(PDFLib.StandardFonts.Helvetica);
                     formF3.updateFieldAppearances(fontF3);
                 } catch(e) {}
 
-                // ORIGINAL WORKING IMAGE LOGIC
                 const drawImg = async (inputId, pdfFieldId) => {
                     const hiddenInput = document.getElementById(inputId);
                     if (hiddenInput && hiddenInput.value) {
@@ -926,6 +960,9 @@ async function exportToPDF() {
 
                 await drawImg(imgA, 'desc-img-01');
                 await drawImg(imgB, 'desc-img-02');
+
+                // FIX: Dynamic field renaming
+                formF3.getFields().forEach(f => { try { f.acroField.setPartialName(f.getName() + '_pg' + pageNum); } catch(e){} });
 
                 const copiedPages = await mergedPdf.copyPages(f3Doc, [0]);
                 mergedPdf.addPage(copiedPages[0]);

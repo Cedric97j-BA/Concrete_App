@@ -903,10 +903,13 @@ function saveReport(isDuplicate = false) {
     const techInitials = techName.split(' ').filter(n => n).map(n => n[0].toUpperCase()).join('') || 'TECH';
     
     let baseName = `englobe_${rawDate}_${noProjet}_${resistance}_${techInitials}`;
+    const autoBaseName = baseName; // Nom automatique calculé avec les champs ACTUELS du formulaire
+    let autoNameToSave = baseName; // Mémorise le dernier nom automatique (pour savoir si l'utilisateur l'a modifié)
 
     // 2. Demande un nom SEULEMENT si c'est un nouveau rapport ou une copie
     if (!saveKey || isDuplicate) {
         if (isDuplicate) baseName += "_copie"; // Ajoute le tag copie par défaut
+        autoNameToSave = baseName;
         const promptMsg = isDuplicate ? "Nom pour la COPIE du rapport :" : "Nom de sauvegarde du rapport (modifiable) :";
         let userPromptName = prompt(promptMsg, baseName);
         if (userPromptName === null) return; 
@@ -917,13 +920,29 @@ function saveReport(isDuplicate = false) {
         // Création de l'identifiant unique invisible
         saveKey = 'ID_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     } else {
-        // 3. C'EST UNE MISE À JOUR : On récupère l'ancien nom pour ne pas l'écraser !
+        // 3. C'EST UNE MISE À JOUR : on garde le nom choisi par l'utilisateur,
+        //    mais si le nom est encore celui généré automatiquement, on le met à jour
+        //    avec les champs actuels (ex: "Mix" remplacé par la vraie résistance).
         const existingDataStr = localStorage.getItem(saveKey);
         if (existingDataStr) {
             try {
                 const existingData = JSON.parse(existingDataStr);
                 if (existingData.displayName) {
-                    baseName = existingData.displayName;
+                    const oldName = existingData.displayName;
+                    const copySuffix = oldName.endsWith('_copie') ? '_copie' : '';
+                    // Rapports récents : on compare avec le dernier nom automatique mémorisé.
+                    // Anciens rapports (sans autoName) : on détecte les valeurs par défaut (Mix, TECH, SANS-NUMERO).
+                    const wasAutoName = existingData.autoName
+                        ? oldName === existingData.autoName
+                        : /_(Mix|TECH)(_|$)|_SANS-NUMERO_/.test(oldName);
+
+                    if (wasAutoName) {
+                        baseName = autoBaseName + copySuffix;
+                        autoNameToSave = baseName;
+                    } else {
+                        baseName = oldName; // Nom personnalisé : on ne touche pas
+                        autoNameToSave = existingData.autoName;
+                    }
                 }
             } catch(e) {}
         }
@@ -993,6 +1012,7 @@ function saveReport(isDuplicate = false) {
 
     const reportData = {
         displayName: baseName, // Le nom préservé est sauvegardé
+        autoName: autoNameToSave, // Dernier nom généré automatiquement (sert à détecter une modification manuelle)
         static: staticData,
         trucks: trucksData,
         samples: samplesData,
@@ -1571,35 +1591,69 @@ async function exportToPDF() {
         const initialsVal = techNameVal.split(' ').filter(n => n).map(n => n[0].toUpperCase()).join('') || 'TECH';
 
         const pdfBytes = await mergedPdf.save();
-        const blob = new Blob([pdfBytes], { type: 'application/pdf' });
         const fileName = `Rapport_${rawDateVal}_${noProjetVal}_${resistanceVal}_${initialsVal}.pdf`;
 
-        const isMacTouch = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
-        const isApple = /iPhone|iPad|iPod/i.test(navigator.userAgent) || isMacTouch;
-        
-        let attemptedShare = false;
-        try {
-            if (isApple && navigator.share && navigator.canShare) {
-                const file = new File([blob], fileName, { type: 'application/pdf' });
-                if (navigator.canShare({ files: [file] })) {
-                    attemptedShare = true;
-                    await navigator.share({ files: [file] });
+        // ==========================================
+        // BIFURCATION : APPLICATION ANDROID vs WEB
+        // ==========================================
+        if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+            // 1. COMPORTEMENT APPLICATION NATIVE (TABLETTE)
+            try {
+                const pdfBase64 = await mergedPdf.saveAsBase64(); // pdf-lib convertit ça parfaitement
+                const { Filesystem, FileOpener } = window.Capacitor.Plugins;
+                
+                if (!Filesystem || !FileOpener) {
+                    throw new Error("Plugins introuvables. npx cap sync a-t-il été fait ?");
                 }
-            }
-        } catch (err) {
-            console.log("Partage annulé ou échoué:", err);
-            if (err.name !== 'AbortError') attemptedShare = false;
-        }
+                
+                // 1. Sauvegarde silencieuse en cache
+                const resultat = await Filesystem.writeFile({
+                    path: fileName,
+                    data: pdfBase64,
+                    directory: 'CACHE',
+                    recursive: true
+                });
 
-        if (!attemptedShare) {
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = fileName;
-            document.body.appendChild(link);
-            link.click(); 
-            document.body.removeChild(link);
-            setTimeout(() => window.URL.revokeObjectURL(url), 100);
+                // 2. Ouverture automatique (lancera Foxit directement si défini par défaut)
+                await FileOpener.open({ 
+                    filePath: resultat.uri, 
+                    contentType: 'application/pdf' 
+                });
+
+            } catch (err) {
+                console.error("Erreur de sauvegarde native:", err);
+                alert("Erreur lors de l'enregistrement sur la tablette.");
+            }
+        } else {
+            // 2. COMPORTEMENT WEB ORIGINAL (GITHUB PAGES / PC)
+            const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+            const isMacTouch = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+            const isApple = /iPhone|iPad|iPod/i.test(navigator.userAgent) || isMacTouch;
+            
+            let attemptedShare = false;
+            try {
+                if (isApple && navigator.share && navigator.canShare) {
+                    const file = new File([blob], fileName, { type: 'application/pdf' });
+                    if (navigator.canShare({ files: [file] })) {
+                        attemptedShare = true;
+                        await navigator.share({ files: [file] });
+                    }
+                }
+            } catch (err) {
+                console.log("Partage annulé ou échoué:", err);
+                if (err.name !== 'AbortError') attemptedShare = false;
+            }
+
+            if (!attemptedShare) {
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = fileName;
+                document.body.appendChild(link);
+                link.click(); 
+                document.body.removeChild(link);
+                setTimeout(() => window.URL.revokeObjectURL(url), 100);
+            }
         }
         
         if (btn) {
@@ -1628,6 +1682,15 @@ async function exportToPDF() {
             btn.textContent = "⏳ Génération en cours...";
             btn.disabled = true;
         }
+
+        // Utilitaire pour la conversion en format francophone sécuritaire
+        const formatNum = (val) => {
+            if (!val) return "";
+            let str = val.toString();
+            if (str.startsWith('.')) str = '0' + str;
+            if (str.startsWith('-.')) str = '-0.' + str.substring(2);
+            return str.replace('.', ',');
+        };
 
         let compiledRemarks = [];
         for (let i = 1; i <= 8; i++) {
@@ -1728,9 +1791,8 @@ async function exportToPDF() {
                             el.checked ? formF2.getCheckBox(name).check() : formF2.getCheckBox(name).uncheck();
                         } else {
                             let val = el.value || "";
-                            // NOUVEAU: Conversion virgule pour les 3 totaux
                             if (['f2-total-coulee', 'f2-total-refuse', 'f2-total-verifie'].includes(name)) {
-                                val = val.replace('.', ',');
+                                val = formatNum(val);
                             }
                             formF2.getTextField(name).setText(val);
                         }
@@ -1753,9 +1815,8 @@ async function exportToPDF() {
                             el.checked ? formF2.getCheckBox(pdfName).check() : formF2.getCheckBox(pdfName).uncheck();
                         } else if (el.value) {
                             let val = el.value;
-                            // NOUVEAU: Conversion virgule pour eau, plastifiant, air 1/2, température
                             if (['.truck-water', '.truck-plast', '.truck-air1', '.truck-air2', '.truck-temp'].includes(cls)) {
-                                val = val.replace('.', ',');
+                                val = formatNum(val);
                             }
                             formF2.getTextField(pdfName).setText(val);
                         }
@@ -1766,13 +1827,14 @@ async function exportToPDF() {
                 const volInput = card.querySelector('.truck-volume');
                 
                 if (volInput && volInput.value) {
-                    const vol = parseFloat(volInput.value);
+                    let volStr = volInput.value;
+                    if (volStr.startsWith('.')) volStr = '0' + volStr;
+                    const vol = parseFloat(volStr) || 0;
                     if (!isRefused) {
                         volumeCumuleF2 += vol;
                     }
-                    // NOUVEAU: Conversion virgule pour volumes
-                    try { formF2.getTextField(`truck-${row}-vol-un`).setText(vol.toString().replace('.', ',')); } catch(e) {}
-                    try { formF2.getTextField(`truck-${row}-vol-cum`).setText(isRefused ? "" : volumeCumuleF2.toFixed(1).replace('.', ',')); } catch(e) {}
+                    try { formF2.getTextField(`truck-${row}-vol-un`).setText(formatNum(volStr)); } catch(e) {}
+                    try { formF2.getTextField(`truck-${row}-vol-cum`).setText(isRefused ? "" : formatNum(volumeCumuleF2.toFixed(1))); } catch(e) {}
                 }
 
                 trySetF2('.truck-id', `truck-${row}-id`);
@@ -2037,6 +2099,6 @@ async function exportToPDF() {
             btn.disabled = false;
         }
     }
-}
+} 
 
 */

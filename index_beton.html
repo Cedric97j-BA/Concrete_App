@@ -58,15 +58,13 @@
             <button type="button" onclick="newReportPrompt()" style="background: #0284c7; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;">➕ Nouveau</button>
             <button type="button" onclick="loadReport()" style="background: #3b82f6; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;">📂 Charger</button>
             <button type="button" onclick="saveReport()" style="background: #10b981; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;">💾 Sauvegarder</button>
-            <button onclick="saveReport(true)" style="background: #3b82f6; color: white; padding: 10px 15px; border-radius: 6px; font-weight: bold; border: none; cursor: pointer; display: flex; align-items: center; gap: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">📄 Dupliquer</button>
+            <button onclick="saveReport(true)" style="background: #3b82f6; color: white; padding: 10px 15px; border-radius: 6px; font-weight: bold; border: none; cursor: pointer; display: flex; align-items: center; gap: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">📑 Dupliquer</button>
             <button type="button" onclick="deleteReport()" style="background: #ef4444; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;">🗑️ Supprimer</button>
         </div>
 
         <!-- Nouvelle ligne dédiée pour l'export PDF -->
         <div style="width: 100%; margin-top: 5px;">
-            <button type="button" onclick="exportToPDF()" style="background: #8b5cf6; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%;">📄 Exporter en PDF</button>
-            <!--<button type="button" onclick="testMyPDF()" style="background: orange; padding: 10px;">Test PDF Fields</button>
-            <input type="file" id="pdf-uploader" accept="application/pdf" onchange="testUploadedPDF(event)" style="background: orange; padding: 10px;">-->
+            <button type="button" onclick="exportToPDF()" style="background: #8b5cf6; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%;">📤 Exporter en PDF</button>
         </div> 
 
     </section>
@@ -79,7 +77,7 @@
         
         <div class="input-group">
             <label>Client</label>
-            <input type="text" id="global-client" placeholder="Nom du client">
+            <input type="text" id="global-client" placeholder="Ex: Municipalité, Entrepreneur, etc.">
         </div>
         
         <div class="input-group">
@@ -94,29 +92,26 @@
 
         <div class="input-group">
             <label>Endroit</label>
-            <input type="text" id="global-endroit" placeholder="Ex: Base X">
+            <input type="text" id="global-endroit" placeholder="Ex: Base X, Axe 5 @ 6">
         </div>
         
         <div class="input-group">
-            <label>No projet</label>
-            <input type="text" id="global-no-projet">
+            <label>N° projet</label>
+            <input type="text" id="global-no-projet" placeholder="0260XXXX.00X">
         </div>
         
         <div class="input-group">
             <label>Date</label>
             <input type="date" id="global-date">
         </div>
-        <div id="last-saved-status" style="width: 100%; color: #475569; font-size: 0.85rem;">Dernière sauvegarde : aucune</div>
+        <div id="last-saved-status" style="width: 100%; color: #475569; font-size: 0.85rem; text-align: center;">Dernière sauvegarde : aucune</div>
     </section>
 
     <!-- ========================================== -->
     <!-- BARRE DE NAVIGATION (TABS)                 -->
     <!-- ========================================== -->
 
-    <small id="form-instructions" style=" display: block;  margin-bottom: 35px;  margin-left: auto; margin-right: auto; max-width: 600px;">
-    </small>
-
-    <small class="form-instructions" style="color: #242930; font-size: 0.8rem; display: block; margin-top: 3px; margin-bottom: 5px; text-align: center; margin-left: auto; margin-right: auto; max-width: 600px;">
+    <small id="form-instructions" class="form-instructions" style="color: #242930; font-size: 0.8rem; display: block; margin-top: 3px; margin-bottom: 5px; text-align: center; margin-left: auto; margin-right: auto; max-width: 600px; font-style: italic;">
         Cliquez sur les onglets pour naviguer entre les sections du formulaire. Les informations sont sauvegardées automatiquement. Vous pouvez passer d'une section à l'autre. Cependant prenez soin de bien sauvegarder votre rapport avant de quitter la page ou de fermer l'application.
     </small>
 
@@ -145,7 +140,7 @@
             <h3>Conditions atmosphériques</h3>
             <div class="input-group">
                 <label>Température extérieure (°C)</label>
-                <input type="number" id="f1-s1-temp" placeholder="°C" style="width: 80px; display: inline-block;">
+                <input type="number" id="f1-s1-temp" placeholder="Ex: 20,5" style="width:120px; display: inline-block;" oninput="if(this.value.length > 5) this.value = this.value.slice(0,5);">
             </div>
             <div class="checkbox-group">
                 <label><input type="checkbox" id="f1-s1-ensoleille"> Ensoleillé</label>
@@ -171,7 +166,7 @@
                 
                 <label class="inline-input">
                     <input type="checkbox" id="f1-s2-remblai-check"> Remblai compacté à 
-                    <input type="text" id="f1-s2-remblai-val" placeholder="" style="width: 80px; display: inline-block;"> % tel que requis au devis
+                    <input type="text" id="f1-s2-remblai-val" placeholder="Ex: 95" style="width: 80px; display: inline-block;"> % tel que requis au devis
                 </label>
                 
                 <label><input type="checkbox" id="f1-s2-englobe"> Contrôle de compactage non effectué par Englobe</label>
@@ -239,7 +234,7 @@
                 
                 <label class="inline-input">
                     <input type="checkbox" id="f1-s5-hauteur-check"> Hauteur de chute 
-                    <input type="number" id="f1-s5-hauteur-val" placeholder="" style="width: 80px; display: inline-block;"> m
+                    <input type="number" id="f1-s5-hauteur-val" placeholder="Ex: 1,5" style="width: 100px; display: inline-block;" oninput="if(this.value.length > 4) this.value = this.value.slice(0,4);"> m
                 </label>
 
                 <label><input type="checkbox" id="f1-s5-remarques-check" class="remarque-trigger" onchange="toggleRemarque('f1-s5-remarques-text', this)"> Voir remarques</label>
@@ -278,7 +273,7 @@
 
                 <label class="inline-input">
                     <input type="checkbox" id="f1-s6-abri"> Abri chauffé; température approximative 
-                    <input type="text" id="f1-s6-abri-val" placeholder="" style="width: 50px; display: inline-block;">  °C
+                    <input type="text" id="f1-s6-abri-val" placeholder="Ex: 15" style="width: 75px; display: inline-block;">°C
                 </label>
 
                 <label><input type="checkbox" id="f1-s6-vapo"> Produit de cure vaporisé</label>
@@ -295,27 +290,27 @@
 
                 <label class="inline-input">
                     <input type="checkbox" id="f1-s7-cylnor"> 
-                    <input type="text" id="f1-s7-cylnor1-val" placeholder="" style="width: 50px; display: inline-block;"> cylindres normalisés (
-                    <input type="text" id="f1-s7-cylnor2-val" placeholder="" style="width: 75px; display: inline-block;"> x 
-                    <input type="text" id="f1-s7-cylnor3-val" placeholder="" style="width: 75px; display: inline-block;"> mm)
+                    <input type="text" id="f1-s7-cylnor1-val" placeholder="3" style="width: 50px; display: inline-block;"> cylindres normalisés (
+                    <input type="text" id="f1-s7-cylnor2-val" placeholder="Ex: 150" style="width: 75px; display: inline-block;"> x 
+                    <input type="text" id="f1-s7-cylnor3-val" placeholder="Ex: 300" style="width: 75px; display: inline-block;"> mm)
                 </label>
 
                 <label class="inline-input">
                     <input type="checkbox" id="f1-s7-cylmur"> 
-                    <input type="text" id="f1-s7-cylmur1-val" placeholder="" style="width: 50px; display: inline-block;"> cylindres mûris en conditions de chantier (
-                    <input type="text" id="f1-s7-cylmur2-val" placeholder="" style="width: 75px; display: inline-block;"> x 
-                    <input type="text" id="f1-s7-cylmur3-val" placeholder="" style="width: 75px; display: inline-block;"> mm)
+                    <input type="text" id="f1-s7-cylmur1-val" placeholder="3" style="width: 50px; display: inline-block;"> cylindres mûris en conditions de chantier (
+                    <input type="text" id="f1-s7-cylmur2-val" placeholder="Ex: 150" style="width: 75px; display: inline-block;"> x 
+                    <input type="text" id="f1-s7-cylmur3-val" placeholder="Ex: 300" style="width: 75px; display: inline-block;"> mm)
                 </label>
 
                 <label class="inline-input">
                     <input type="checkbox" id="f1-s7-cylpre"> 
-                    <input type="text" id="f1-s7-cylpre-val" placeholder="" style="width: 50px; display: inline-block;"> cylindres prélevés dans un chargement non conforme
+                    <input type="text" id="f1-s7-cylpre-val" placeholder="3" style="width: 50px; display: inline-block;"> cylindres prélevés dans un chargement non conforme
                 </label>
 
                 <label><input type="checkbox" id="f1-s7-auccyl"> Aucun cylindre n'a été prélevé</label>
                 <label><input type="checkbox" id="f1-s7-parpil"> Par pilonnage</label>
                 <label><input type="checkbox" id="f1-s7-parvib"> Par vibration</label>
-                <label><input type="checkbox" id="f1-s7-parcoup"> Par coup de lmaillet</label>
+                <label><input type="checkbox" id="f1-s7-parcoup"> Par coup de maillet</label>
 
 
                 <label><input type="checkbox" id="f1-s7-remarques-check" class="remarque-trigger" onchange="toggleRemarque('f1-s7-remarques-text', this)"> Voir remarques</label>
@@ -372,8 +367,10 @@
         <!-- SECTION 9 : Remarques Globales -->
         <div class="form-section">
             <h3>Remarques</h3>
-            <p style="font-size: 0.85rem; color: gray;">(Ce champ sera auto-généré par les cases "Voir remarques" cochées ci-dessus lors de l'export)</p>
-            <textarea id="f1-s9-remarques-compilation" rows="4" style="width: 100%;"></textarea>
+            <p style="font-size: 0.85rem; color: #242930; font-style: italic; margin-bottom: 15px;">
+                (Les remarques ajoutées ci-dessus s'ajouteront automatiquement. Vous pouvez également saisir des commentaires supplémentaires.)
+            </p>
+            <textarea id="f1-s9-remarques-compilation" rows="4" style="width: 100%;" maxlength="500"></textarea>
         </div>
 
         <!-- SIGNATURE TECHNICIEN -->
@@ -381,7 +378,7 @@
             <h3>Préparé par </h3>
             <div class="input-group">
                 <label>Nom du technicien</label>
-                <input type="text" id="f1-tech-name" placeholder="Max Coulombe" style="width: 250px; display: inline-block;">
+                <input type="text" id="f1-tech-name" placeholder="Ex: Jean Tremblay" style="width: 250px; display: inline-block;" placeholder="Jean Tremblay">
             </div>
             <div class="input-group">
                 <label>Date</label>
@@ -406,10 +403,10 @@
         <!-- SECTION : Intervenants & Produit -->
         <div class="form-section">
             <h3>Intervenants et Produit</h3>
-            <div class="input-group"><label>Entrepreneur</label><input type="text" id="f2-entrepreneur"></div>
-            <div class="input-group"><label>Fournisseur</label><input type="text" id="f2-fournisseur"></div>
-            <div class="input-group"><label>Usine</label><input type="text" id="f2-usine"></div>
-            <div class="input-group"><label>Mélange (Formule)</label><input type="text" id="f2-melange"></div>
+            <div class="input-group"><label>Entrepreneur</label><input type="text" id="f2-entrepreneur" placeholder="Ex: Construction Inc."></div>
+            <div class="input-group"><label>Fournisseur</label><input type="text" id="f2-fournisseur" placeholder="Ex: Béton Provincial Ltée"></div>
+            <div class="input-group"><label>Usine</label><input type="text" id="f2-usine" placeholder="Ex: Usine de Montréal"></div>
+            <div class="input-group"><label>Formule du Mélange</label><input type="text" id="f2-melange" placeholder="Ex: 35820PPAW"></div>
         </div>
 
         <!-- SECTION : Spécifications (Informatives) -->
@@ -431,32 +428,32 @@
 
         <!-- SECTION : Équipements utilisés -->
         <div class="form-section">
-            <h3>Équipements (No de série)</h3>
+            <h3>Équipements (N°)</h3>
             <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center;">
                 
                 <div style="display: flex; align-items: center; gap: 5px;">
                     <label style="margin: 0;">Thermomètre</label>
-                    <input type="text" id="f2-equip-thermo" style="width: 100px;">
+                    <input type="number" id="f2-equip-thermo" style="width: 150px;" placeholder="Ex: 123456" inputmode="numeric" oninput="if(this.value.length > 6) this.value = this.value.slice(0,6);">
                 </div>
                 
                 <div style="display: flex; align-items: center; gap: 5px;">
                     <label style="margin: 0;">Airmètre</label>
-                    <input type="text" id="f2-equip-airmetre" style="width: 100px;">
+                    <input type="number" id="f2-equip-airmetre" style="width: 150px;" placeholder="Ex: 789012" inputmode="numeric" oninput="if(this.value.length > 6) this.value = this.value.slice(0,6);">
                 </div>
                 
                 <div style="display: flex; align-items: center; gap: 5px;">
                     <label style="margin: 0;">Cône d'affaissement</label>
-                    <input type="text" id="f2-equip-cone" style="width: 100px;">
+                    <input type="number" id="f2-equip-cone" style="width: 150px;" placeholder="Ex: 345678" inputmode="numeric" oninput="if(this.value.length > 6) this.value = this.value.slice(0,6);">
                 </div>
                 
                 <div style="display: flex; align-items: center; gap: 5px;">
                     <label style="margin: 0;">Bourroir (16 mm)</label>
-                    <input type="text" id="f2-equip-bourroir16" style="width: 100px;">
+                    <input type="number" id="f2-equip-bourroir16" style="width: 150px;" placeholder="Ex: 901234" inputmode="numeric" oninput="if(this.value.length > 6) this.value = this.value.slice(0,6);">
                 </div>
                 
                 <div style="display: flex; align-items: center; gap: 5px;">
                     <label style="margin: 0;">Bourroir (10 mm)</label>
-                    <input type="text" id="f2-equip-bourroir10" style="width: 100px;">
+                    <input type="number" id="f2-equip-bourroir10" style="width: 150px;" placeholder="Ex: 567890" inputmode="numeric" oninput="if(this.value.length > 6) this.value = this.value.slice(0,6);">
                 </div>
 
             </div>
@@ -465,7 +462,7 @@
         <!-- SECTION : GRILLE DES CAMIONS (Dynamique) -->
         <div class="form-section">
             <h3>Registre des Camions</h3>
-            <p class="truck-legend" style="font-size: 0.9rem; color: #475569; margin-bottom: 15px;">* Les camions testés apparaîtront en <span style="color: #0284ca; font-weight: bold;">bleu</span>, les camions échantillonnés en <span style="color: #16a34a; font-weight: bold;">vert</span> et les camions refusés en <span style="color: #dc2626; font-weight: bold;">rouge</span>.</p>
+            <p class="truck-legend" style="font-size: 0.9rem; color: #475569; margin-bottom: 15px; font-style: italic;">* Les camions testés apparaîtront en <span style="color: #0284ca; font-weight: bold;">bleu</span>, les camions échantillonnés en <span style="color: #16a34a; font-weight: bold;">vert</span> et les camions refusés en <span style="color: #dc2626; font-weight: bold;">rouge</span>.</p>
 
             <!-- CONTRÔLES DE PAGINATION -->
             <div id="truck-pagination-controls" style="display: none; justify-content: space-between; align-items: center; background: #e2e8f0; padding: 10px; border-radius: 6px; margin-bottom: 15px;">
@@ -487,24 +484,51 @@
         </div>
 
         <!-- SECTION : Totaux (Calculés automatiquement plus tard) -->
+        <!--
         <div class="form-section">
             <h3>Quantités</h3>
             <div class="input-group"><label>Total coulée</label><input type="number" id="f2-total-coulee" readonly style="background: #f3f4f6; width: 100px; display: inline-block;"> (m³)</div>
             <div class="input-group"><label>Total refusé</label><input type="number" id="f2-total-refuse" readonly style="background: #f3f4f6; width: 100px; display: inline-block;"> (m³)</div>
             <div class="input-group"><label>Total vérifié</label><input type="number" id="f2-total-verifie" readonly style="background: #f3f4f6; width: 100px; display: inline-block;"> (m³)</div>
+        </div> -->
+
+        <!-- SECTION : Totaux (Calculés automatiquement) -->
+        <div class="form-section">
+            <h3>Quantités</h3>
+            <p style="font-size: 0.85rem; color: #242930; margin-bottom: 15px; font-style: italic;">
+                * Ces quantités sont calculées et affichées automatiquement en fonction du registre des camions. Cette zone n'est pas modifiable.
+            </p>
+            
+            <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-end;">
+                <div class="input-group" style="flex: 1; min-width: 120px; margin-bottom: 0;">
+                    <label>Total coulée (m³)</label>
+                    <input type="text" id="f2-total-coulee" readonly style="background: #e2e8f0; font-weight: bold; color: #334155; cursor: not-allowed; text-align: center;" placeholder="-">
+                </div>
+                <div class="input-group" style="flex: 1; min-width: 120px; margin-bottom: 0;">
+                    <label>Total refusé (m³)</label>
+                    <input type="text" id="f2-total-refuse" readonly style="background: #e2e8f0; font-weight: bold; color: #dc2626; cursor: not-allowed; text-align: center;" placeholder="-">
+                </div>
+                <div class="input-group" style="flex: 1; min-width: 120px; margin-bottom: 0;">
+                    <label>Total vérifié (m³)</label>
+                    <input type="text" id="f2-total-verifie" readonly style="background: #e2e8f0; font-weight: bold; color: #16a34a; cursor: not-allowed; text-align: center;" placeholder="-">
+                </div>
+            </div>
         </div>
 
         <!-- SECTION : Remarques Générales Formulaire 2 -->
         <div class="form-section">
-            <h3>Remarques (Suivi de coulée)</h3>
-            <textarea id="f2-remarques-globales" rows="3" style="width: 100%;" placeholder="Notes additionnelles..."></textarea>
+            <h3>Remarques</h3>
+            <p style="font-size: 0.85rem; color: #242930; font-style: italic; margin-bottom: 15px;">
+                (Les remarques ajoutées ci-dessus s'ajouteront automatiquement. Vous pouvez également saisir des commentaires supplémentaires.)
+            </p>
+            <textarea id="f2-remarques-globales" rows="3" style="width: 100%;" maxlength="200" placeholder="Notes additionnelles..."></textarea>
             <button type="button" onclick="editGlobalRemarkPrompt()" style="margin-top: 10px; background: #f59e0b; color: white; border: none; padding: 8px 12px; border-radius: 4px; font-weight: bold; cursor: pointer;">✏️ Modifier un commentaire existant</button>
         </div>
 
         <!-- SIGNATURE TECHNICIEN -->
         <div class="form-section" style="border-top: 2px solid #ccc; padding-top: 15px;">
             <h3>Vérification</h3>
-            <div class="input-group"><label>Nom du technicien</label><input type="text" id="f2-tech-name" style="width: 250px; display: inline-block;"></div>
+            <div class="input-group"><label>Nom du technicien</label><input type="text" id="f2-tech-name" style="width: 250px; display: inline-block;" placeholder="Jean Tremblay"></div>
             <div class="input-group"><label>Date</label><input type="date" id="f2-verif-date" style="width: 200px; display: inline-block;"></div>
         </div>
 
@@ -629,8 +653,8 @@
     <section id="tab-form3" class="tab-section" style="display: none;">
         <h2>Formulaire 3 : Échantillons de béton</h2>
         
-        <p style="color: gray; font-size: 0.9rem;">
-            * Les fiches d'échantillons apparaîtront ici automatiquement lorsque la case "Échantillon prélevé" sera cochée dans le Formulaire 2.
+        <p style="color: gray; font-size: 0.9rem; font-style: italic; margin-bottom: 15px;">
+            * Les fiches d'échantillons apparaîtront ici automatiquement lorsque la case "Échantillon prélevé" sera cochée pour un camion dans le registre des camions.
         </p>
 
         <!-- BOUTONS DE CRÉATION MANUELLE -->
@@ -850,11 +874,11 @@
 
                         <div style="margin-bottom: 15px;">
                             <h4 style="text-align: center; background: #e2e8f0; padding: 5px; margin: 0 0 10px 0;">Conditions initiales de cure et d'entreposage</h4>
-                            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                                <label style="font-weight:bold; width: 100px; ">Prélèvement</label>
-                                <div style="flex: 1; display: flex; gap: 5px;"><label>date</label><input type="date" class="temoin-prelev-date" style="flex:1;"></div>
-                                <div style="flex: 1; display: flex; gap: 5px;"><label>heure</label><input type="time" class="temoin-prelev-time" style="flex:1;"></div>
-                                <div style="flex: 1; display: flex; gap: 5px;"><label>par</label><input type="text" class="temoin-prelev-tech" style="flex:1;"></div>
+                            <div class="prelev-row">
+                                <label class="prelev-title">Prélèvement</label>
+                                <div><label>date</label><input type="date" class="temoin-prelev-date"></div>
+                                <div><label>heure</label><input type="time" class="temoin-prelev-time"></div>
+                                <div><label>par</label><input type="text" class="temoin-prelev-tech"></div>
                             </div>
 
                             <!-- ACCORDION ROWS POUR MOBILE ET BUREAU -->
@@ -1079,22 +1103,13 @@
                     </div>
                 </div>
 
-                <div style="margin-bottom: 15px;">
-                    <h4 style="text-align: center; background: #e2e8f0; padding: 5px; margin: 0 0 10px 0;">Conditions initiales de cure et d'entreposage</h4>
-                    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                        <label style="font-weight:bold; width: 100px;">Prélèvement</label>
-                        <div style="flex: 1; display: flex; gap: 5px;"><label>date</label><input type="date" class="temoin-prelev-date" style="flex:1;"></div>
-                        <div style="flex: 1; display: flex; gap: 5px;"><label>heure</label><input type="time" class="temoin-prelev-time" style="flex:1;"></div>
-                        <div style="flex: 1; display: flex; gap: 5px;"><label>par</label><input type="text" class="temoin-prelev-tech" style="flex:1;"></div>
-                    </div>
-
-                     <div style="margin-bottom: 15px;">
+                    <div style="margin-bottom: 15px;">
                         <h4 style="text-align: center; background: #e2e8f0; padding: 5px; margin: 0 0 10px 0;">Conditions initiales de cure et d'entreposage</h4>
-                        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                            <label style="font-weight:bold; width: 100px;">Prélèvement</label>
-                            <div style="flex: 1; display: flex; gap: 5px;"><label>date</label><input type="date" class="temoin-prelev-date" style="flex:1;"></div>
-                            <div style="flex: 1; display: flex; gap: 5px;"><label>heure</label><input type="time" class="temoin-prelev-time" style="flex:1;"></div>
-                            <div style="flex: 1; display: flex; gap: 5px;"><label>par</label><input type="text" class="temoin-prelev-tech" style="flex:1;"></div>
+                        <div class="prelev-row">
+                            <label class="prelev-title">Prélèvement</label>
+                            <div><label>date</label><input type="date" class="temoin-prelev-date"></div>
+                            <div><label>heure</label><input type="time" class="temoin-prelev-time"></div>
+                            <div><label>par</label><input type="text" class="temoin-prelev-tech"></div>
                         </div>
 
                         <!-- ACCORDION ROWS POUR MOBILE ET BUREAU -->

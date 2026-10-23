@@ -48,332 +48,353 @@
             <button type="button" onclick="newReportPrompt()" style="background: #0284c7; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;">➕ Nouveau</button>
             <button type="button" onclick="loadReport()" style="background: #3b82f6; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;">📂 Charger</button>
             <button type="button" onclick="saveReport()" style="background: #10b981; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;">💾 Sauvegarder</button>
-            <button onclick="saveReport(true)" style="background: #3b82f6; color: white; padding: 10px 15px; border-radius: 6px; font-weight: bold; border: none; cursor: pointer; display: flex; align-items: center; gap: 5px;">📄 Dupliquer</button>
+            <button onclick="saveReport(true)" style="background: #3b82f6; color: white; padding: 10px 15px; border-radius: 6px; font-weight: bold; border: none; cursor: pointer; display: flex; align-items: center; gap: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">📑 Dupliquer</button>
             <button type="button" onclick="deleteReport()" style="background: #ef4444; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;">🗑️ Supprimer</button>
         </div>
 
+        <!-- Nouvelle ligne dédiée pour l'export PDF -->
         <div style="width: 100%; margin-top: 5px;">
-            <button type="button" onclick="exportToPDF()" style="background: #8b5cf6; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%;">📄 Exporter en PDF</button>
+            <button type="button" onclick="exportToPDF()" style="background: #8b5cf6; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%;">📤 Exporter en PDF</button>
+        </div> 
+    </section>
+
+    <!-- === INFORMATIONS GÉNÉRALES === -->
+    <section id="global-header" style="background: #e5e7eb; padding: 15px; margin-bottom: 20px; border-radius: 8px;">
+        <h2>Informations Générales du Projet</h2>
+
+        <div class="input-group">
+            <label>Client</label>
+            <input type="text" id="global-client" placeholder="Ex: Municipalité, Entrepreneur, etc.">
+        </div>
+
+        <div class="input-group">
+            <label>Projet</label>
+            <input type="text" id="global-projet" placeholder="Ex: Réfection 4e rang">
+        </div>
+
+        <div class="input-group">
+            <label>N° projet</label>
+            <input type="text" id="global-no-projet" placeholder="0260XXXX.00X">
+        </div>
+
+        <div class="input-group">
+            <label>Échantillon n°</label>
+            <input type="text" id="ech-no" placeholder="Ex: JT-01">
+        </div>
+
+        <div class="input-group">
+            <label>Spécification</label>
+            <input type="text" id="spec">
+        </div>
+
+        <div class="input-group">
+            <label>Date</label>
+            <input type="date" id="global-date">
         </div>
         <div id="last-saved-status" style="width: 100%; color: #475569; font-size: 0.85rem;">Dernière sauvegarde : aucune</div>
     </section>
 
-    <!-- === INFORMATIONS GÉNÉRALES === -->
-    <section class="form-section" style="background: #e5e7eb;">
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px;">
-            <div class="input-group">
-                <label>N° projet</label>
-                <input type="text" id="global-no-projet">
-            </div>
-            <div class="input-group">
-                <label>Client</label>
-                <input type="text" id="global-client">
-            </div>
-            <div class="input-group">
-                <label>Projet</label>
-                <input type="text" id="global-projet">
-            </div>
-            <div class="input-group">
-                <label>Échantillon n°</label>
-                <input type="text" id="ech-no">
-            </div>
-            <div class="input-group">
-                <label>Spécification</label>
-                <input type="text" id="spec">
-            </div>
-            <div class="input-group">
-                <label>Date</label>
-                <input type="date" id="global-date">
-            </div>
-        </div>
-    </section>
+    <section class="tab-section" style="display: block;">
+        <h2>Échantillonnage</h2>
 
-    <!-- === FOURNISSEUR === -->
-    <section class="form-section">
-        <h3 style="border-bottom: 2px solid #0284c7; padding-bottom: 5px;">Fournisseur</h3>
-        <div style="display: flex; flex-direction: column; gap: 15px;">
-            <div class="input-group">
-                <label>Nom légal</label>
-                <div style="display: flex; gap: 10px; align-items: center;">
-                    <input type="text" id="fourn-nom-text" style="flex: 1; padding: 5px;">
-                    <label style="margin:0; white-space: nowrap;"><input type="checkbox" id="fourn-inc"> inconnu</label>
-                </div>
-            </div>
-            <div class="input-group">
-                <label>Localisation</label>
-                <div style="display: flex; gap: 10px; align-items: center;">
-                    <input type="text" id="fourn-loc-text" style="flex: 1; padding: 5px;">
-                    <label style="margin:0; white-space: nowrap;"><input type="checkbox" id="fourn-en-place"> en place</label>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- === ENDROIT DU PRÉLÈVEMENT === -->
-    <section class="form-section">
-        <h3 style="border-bottom: 2px solid #0284c7; padding-bottom: 5px; text-align: center;">Endroit du prélèvement</h3>
-        
-        <div style="display: flex; flex-direction: column; gap: 20px;">
-            <!-- En chantier -->
-            <div style="background: #f8fafc; padding: 15px; border-radius: 6px; border: 1px solid #cbd5e1;">
-                <div class="checkbox-group" style="margin-bottom: 15px;">
-                    <label><input type="checkbox" id="ep-chan-pile"> <strong>En chantier</strong>, pile de réserve (inscrire localisation)</label>
-                    <label><input type="checkbox" id="ep-chan-avant"> <strong>En chantier</strong>, avant compactage</label>
-                    <label><input type="checkbox" id="ep-chan-apres"> <strong>En chantier</strong>, après compactage</label>
-                </div>
-                
-                <div class="input-group"><label>Rue / Route</label><input type="text" id="ep-chan-rue"></div>
-                <div class="input-group"><label>Ch. / n° civique</label><input type="text" id="ep-chan-civ"></div>
-                
-                <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
-                    <label style="margin:0;">Distance</label>
-                    <input type="number" id="ep-chan-dist" style="width: 80px;" step="0.1">
-                    <span style="font-size: 0.9rem;">m du bord</span>
-                    <input type="text" id="ep-chan-bord" style="flex: 1;">
-                </div>
-                
-                <div class="input-group"><label>Élévation</label><input type="number" id="ep-chan-elev" step="0.01"></div>
-                
-                <div style="display: flex; gap: 15px;">
-                    <div class="input-group" style="flex: 1;"><label>Lot n°</label><input type="text" id="ep-chan-lot-no"></div>
-                    <div class="input-group" style="flex: 1;"><label>Code de produit</label><input type="text" id="ep-chan-code"></div>
-                </div>
-            </div>
-
-            <!-- À la source -->
-            <div style="background: #f8fafc; padding: 15px; border-radius: 6px; border: 1px solid #cbd5e1;">
-                <div class="checkbox-group" style="margin-bottom: 15px;">
-                    <label><input type="checkbox" id="ep-source"> <strong>À la source</strong> (carrière/gravière/sablière), pile de réserve</label>
-                </div>
-                
-                <div class="input-group"><label>Code du produit</label><input type="text" id="ep-source-code"></div>
-                <div class="input-group"><label>Nom / n° pile de réserve</label><input type="text" id="ep-source-pile-no"></div>
-                <div class="input-group"><label>Palier d'exploitation</label><input type="text" id="ep-source-palier"></div>
-                <div class="input-group"><label>Face d'exploitation</label><input type="text" id="ep-source-face"></div>
-                
-                <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 15px;">
-                    <label style="margin:0;">Production cumulée</label>
-                    <input type="number" id="ep-prod-cum" style="flex: 1;">
-                    <span style="font-size: 0.9rem;">tonnes</span>
-                </div>
-
-                <div class="input-group" style="border-top: 1px dashed #ccc; padding-top: 10px;">
+        <!-- === FOURNISSEUR === -->
+        <div class="form-section">
+            <h3>Fournisseur</h3>
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+                <div class="input-group">
+                    <label>Nom légal</label>
                     <div style="display: flex; gap: 10px; align-items: center;">
-                        <label style="margin:0; white-space: nowrap;"><input type="checkbox" id="ep-autre"> <strong>Autre :</strong></label>
-                        <input type="text" id="ep-autre-text" style="flex: 1;">
+                        <input type="text" id="fourn-nom-text" style="flex: 1; padding: 5px;" Placeholder="Ex: Excavations XYZ Ltée">
+                        <label style="margin:0; white-space: nowrap;"><input type="checkbox" id="fourn-inc"> inconnu</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Localisation</label>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <input type="text" id="fourn-loc-text" style="flex: 1; padding: 5px;" placeholder="Rserve Rimouski">
+                        <label style="margin:0; white-space: nowrap;"><input type="checkbox" id="fourn-en-place"> en place</label>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
 
-    <!-- === MATÉRIAUX / USAGE / CALIBRE === -->
-    <section class="form-section">
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+        <!-- === ENDROIT DU PRÉLÈVEMENT === -->
+        <div class="form-section">
+            <h3>Endroit du prélèvement</h3>
             
-            <!-- Colonne 1 : Matériaux -->
-            <div style="border: 1px solid #cbd5e1; border-radius: 6px; overflow: hidden;">
-                <h4 style="background: #e2e8f0; margin: 0; padding: 8px; text-align: center; border-bottom: 1px solid #cbd5e1;">Matériaux</h4>
-                <div style="padding: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.9rem;">
-                    <div class="checkbox-group">
-                        <label><input type="checkbox" id="mat-pier-conc"> Pierre concassée</label>
-                        <label><input type="checkbox" id="mat-crib-pier"> Criblure de pierre</label>
-                        <label><input type="checkbox" id="mat-grav-conc"> Gravier concassé</label>
-                        <label><input type="checkbox" id="mat-grav-nat"> Gravier naturel</label>
-                        <label><input type="checkbox" id="mat-db"> DB</label>
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+                <!-- En chantier -->
+                <div style="background: #f8fafc; padding: 15px; border-radius: 6px; border: 1px solid #cbd5e1;">
+                    <div class="checkbox-group" style="margin-bottom: 15px;">
+                        <label><input type="checkbox" id="ep-chan-pile"> <strong>En chantier</strong>, pile de réserve (inscrire localisation)</label>
+                        <label><input type="checkbox" id="ep-chan-avant"> <strong>En chantier</strong>, avant compactage</label>
+                        <label><input type="checkbox" id="ep-chan-apres"> <strong>En chantier</strong>, après compactage</label>
                     </div>
-                    <div class="checkbox-group">
-                        <label><input type="checkbox" id="mat-sab-nat"> Sable naturel</label>
-                        <label><input type="checkbox" id="mat-sab-man"> Sable manufacturé</label>
-                        <label><input type="checkbox" id="mat-sab-lav"> Sable lavé</label>
-                        <label><input type="checkbox" id="mat-exc"> Matériau d'excavation</label>
+                    
+                    <div class="input-group"><label>Rue / Route</label><input type="text" id="ep-chan-rue" placeholder="Ex: Rue Principale"></div>
+                    <div class="input-group"><label>Ch. / n° civique</label><input type="text" id="ep-chan-civ" placeholder="Ex: 123"></div>
+                    
+                    <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
+                        <label style="margin:0;">Distance</label>
+                        <input type="number" id="ep-chan-dist" style="width: 150px;" step="0.1" placeholder="Ex: 5,0" oninput="if(this.value.length > 4) this.value = this.value.slice(0,4);">
+                        <span style="font-size: 0.9rem;">m du bord</span>
+                        <input type="text" id="ep-chan-bord" style="flex: 1;" placeholder="Ex: Gauche">
+                    </div>
+                    
+                    <div class="input-group"><label>Élévation</label><input type="number" id="ep-chan-elev" step="0.01" placeholder="Ex: 350,500 m"></div>
+                    
+                    <div style="display: flex; gap: 15px;">
+                        <div class="input-group" style="flex: 1;"><label>Lot n°</label><input type="text" id="ep-chan-lot-no" placeholder="Ex: L-001"></div>
+                        <div class="input-group" style="flex: 1;"><label>Code de produit</label><input type="text" id="ep-chan-code" placeholder="Ex: P-001"></div>
                     </div>
                 </div>
-                <div class="checkbox-group" style="padding: 0 10px 10px 10px; font-size: 0.9rem;">
-                    <div style="display: flex; align-items: center; gap: 5px;">
-                        <label style="margin:0;"><input type="checkbox" id="mat-recyc"> Matériau recyclé MR-</label>
-                        <input type="text" id="mat-recyc-mr" style="width: 60px; padding: 2px;">
+
+                <!-- À la source -->
+                <div style="background: #f8fafc; padding: 15px; border-radius: 6px; border: 1px solid #cbd5e1;">
+                    <div class="checkbox-group" style="margin-bottom: 15px;">
+                        <label><input type="checkbox" id="ep-source"> <strong>À la source</strong> (carrière/gravière/sablière), pile de réserve</label>
                     </div>
-                    <label><input type="checkbox" id="mat-deco"> Matériau décohésionné</label>
-                    <label><input type="checkbox" id="mat-recyc-frd"> Matériau recyclé à froid</label>
-                    <label><input type="checkbox" id="mat-stab"> Matériau stabilisé</label>
-                    <div style="display: flex; align-items: center; gap: 5px; margin-top: 5px;">
-                        <label style="margin:0; white-space: nowrap;"><input type="checkbox" id="mat-autre"> Autre</label>
-                        <input type="text" id="mat-autre-text" style="flex: 1; padding: 2px;">
+
+                    <div class="input-group"><label>Code du produit</label><input type="text" id="ep-source-code" placeholder="Ex: P-001"></div>
+                    <div class="input-group"><label>Nom / n° pile de réserve</label><input type="text" id="ep-source-pile-no" placeholder="Ex: Pile 1"></div>
+                    <div class="input-group"><label>Palier d'exploitation</label><input type="text" id="ep-source-palier" placeholder="Ex: Palier 1"></div>
+                    <div class="input-group"><label>Face d'exploitation</label><input type="text" id="ep-source-face" placeholder="Ex: Face A"></div>
+
+                    <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 15px;">
+                        <label style="margin:0;">Production cumulée</label>
+                        <input type="number" id="ep-prod-cum" style="flex: 1;" placeholder="Ex: 100">
+                        <span style="font-size: 0.9rem;">tonnes</span>
+                    </div>
+
+                    <div class="input-group" style="border-top: 1px dashed #ccc; padding-top: 10px;">
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <label style="margin:0; white-space: nowrap;"><input type="checkbox" id="ep-autre"> <strong>Autre :</strong></label>
+                            <input type="text" id="ep-autre-text" style="flex: 1;">
+                        </div>
                     </div>
                 </div>
             </div>
-
-            <!-- Colonne 2 : Usage -->
-            <div style="border: 1px solid #cbd5e1; border-radius: 6px; overflow: hidden;">
-                <h4 style="background: #e2e8f0; margin: 0; padding: 8px; text-align: center; border-bottom: 1px solid #cbd5e1;">Usage</h4>
-                <div style="padding: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.9rem;">
-                    <div class="checkbox-group">
-                        <label><input type="checkbox" id="usa-fond-sup"> Fond. supérieure</label>
-                        <label><input type="checkbox" id="usa-fond-inf"> Fond. inférieure</label>
-                        <label><input type="checkbox" id="usa-sous-fond"> Sous-fondation</label>
-                        <label><input type="checkbox" id="usa-infra"> Infrastructure</label>
-                    </div>
-                    <div class="checkbox-group">
-                        <label><input type="checkbox" id="usa-coussin"> Coussin</label>
-                        <label><input type="checkbox" id="usa-enrobage"> Enrobage</label>
-                        <label><input type="checkbox" id="usa-bet-ciment"> Béton de ciment</label>
-                        <label><input type="checkbox" id="usa-enrob-bit"> Enrobés bitum.</label>
-                        <label><input type="checkbox" id="usa-recyc-frd"> Recyclage à froid</label>
-                    </div>
-                </div>
-                <div class="checkbox-group" style="padding: 0 10px 10px 10px; font-size: 0.9rem;">
-                    <div style="display: flex; align-items: center; gap: 5px; margin-top: 5px;">
-                        <label style="margin:0; white-space: nowrap;"><input type="checkbox" id="usa-autre"> Autre</label>
-                        <input type="text" id="usa-autre-text" style="flex: 1; padding: 2px;">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Colonne 3 : Calibre / Code de produit -->
-            <div style="border: 1px solid #cbd5e1; border-radius: 6px; overflow: hidden;">
-                <h4 style="background: #e2e8f0; margin: 0; padding: 8px; text-align: center; border-bottom: 1px solid #cbd5e1;">Calibre / Code de produit</h4>
-                <div class="checkbox-group" style="padding: 10px; font-size: 0.9rem;">
-                    <div style="display: grid; grid-template-columns: auto 1fr; gap: 5px; align-items: center; margin-bottom: 2px;">
-                        <label style="margin:0;"><input type="checkbox" id="calib-mg-20"> MG 20</label><input type="text" id="calib-mg-20-text" style="padding: 2px;">
-                        <label style="margin:0;"><input type="checkbox" id="calib-mg-20b"> MG 20b</label><input type="text" id="calib-mg-20b-text" style="padding: 2px;">
-                        <label style="margin:0;"><input type="checkbox" id="calib-mg-56"> MG 56</label><input type="text" id="calib-mg-56-text" style="padding: 2px;">
-                        <label style="margin:0;"><input type="checkbox" id="calib-mg-112"> MG 112</label><input type="text" id="calib-mg-112-text" style="padding: 2px;">
-                        
-                        <div style="grid-column: span 2; height: 5px;"></div>
-                        
-                        <label style="margin:0;"><input type="checkbox" id="calib-cg-20"> CG 20</label><input type="text" id="calib-cg-20-text" style="padding: 2px;">
-                        <label style="margin:0;"><input type="checkbox" id="calib-cg-14"> CG 14</label><input type="text" id="calib-cg-14-text" style="padding: 2px;">
-                        <label style="margin:0;"><input type="checkbox" id="calib-cg-14b"> CG 14b</label><input type="text" id="calib-cg-14b-text" style="padding: 2px;">
-                        
-                        <label style="margin:0; grid-column: span 2;"><input type="checkbox" id="calib-classb"> Classe « B »</label>
-                        
-                        <label style="margin:0;"><input type="checkbox" id="calib-autre"> Autre</label><input type="text" id="calib-autre-text" style="padding: 2px;">
-                    </div>
-                </div>
-            </div>
-
         </div>
-    </section>
 
-    <!-- === PRÉLÈVEMENT ET CONSERVATION === -->
-    <section class="form-section">
-        <div style="display: flex; flex-direction: column; gap: 20px;">
-            <!-- Prélèvement -->
-            <div>
-                <h3 style="border-bottom: 2px solid #0284c7; padding-bottom: 5px; text-align: center;">Prélèvement</h3>
-                <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center; margin-bottom: 10px;">
-                    <label style="margin:0; white-space: nowrap;"><input type="checkbox" id="prelev-par"> Prélevé par :</label>
-                    <input type="text" id="prelev-par-text" style="flex: 1; min-width: 200px; padding: 5px;">
-                    <label style="margin:0; white-space: nowrap;">Nb de sacs:</label>
-                    <input type="text" id="prelev-nb-sac" style="width: 80px; padding: 5px;">
+        <!-- === MATÉRIAUX / USAGE / CALIBRE === -->
+        <div class="form-section">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+                
+                <!-- Colonne 1 : Matériaux -->
+                <div style="border: 1px solid #cbd5e1; border-radius: 6px; overflow: hidden;">
+                    <h4 style="background: #e2e8f0; margin: 0; padding: 8px; text-align: center; border-bottom: 1px solid #cbd5e1;">Matériaux</h4>
+                    <div style="padding: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.9rem;">
+                        <div class="checkbox-group">
+                            <label><input type="checkbox" id="mat-pier-conc"> Pierre concassée</label>
+                            <label><input type="checkbox" id="mat-crib-pier"> Criblure de pierre</label>
+                            <label><input type="checkbox" id="mat-grav-conc"> Gravier concassé</label>
+                            <label><input type="checkbox" id="mat-grav-nat"> Gravier naturel</label>
+                            <label><input type="checkbox" id="mat-db"> DB</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <label><input type="checkbox" id="mat-sab-nat"> Sable naturel</label>
+                            <label><input type="checkbox" id="mat-sab-man"> Sable manufacturé</label>
+                            <label><input type="checkbox" id="mat-sab-lav"> Sable lavé</label>
+                            <label><input type="checkbox" id="mat-exc"> Matériau d'excavation</label>
+                        </div>
+                    </div>
+                    <div class="checkbox-group" style="padding: 0 10px 10px 10px; font-size: 0.9rem;">
+                        <div style="display: flex; align-items: center; gap: 5px;">
+                            <label style="margin:0;"><input type="checkbox" id="mat-recyc"> Matériau recyclé MR-</label>
+                            <input type="text" id="mat-recyc-mr" style="width: 60px; padding: 2px;">
+                        </div>
+                        <label><input type="checkbox" id="mat-deco"> Matériau décohésionné</label>
+                        <label><input type="checkbox" id="mat-recyc-frd"> Matériau recyclé à froid</label>
+                        <label><input type="checkbox" id="mat-stab"> Matériau stabilisé</label>
+                        <div style="display: flex; align-items: center; gap: 5px; margin-top: 5px;">
+                            <label style="margin:0; white-space: nowrap;"><input type="checkbox" id="mat-autre"> Autre</label>
+                            <input type="text" id="mat-autre-text" style="flex: 1; padding: 2px;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Colonne 2 : Usage -->
+                <div style="border: 1px solid #cbd5e1; border-radius: 6px; overflow: hidden;">
+                    <h4 style="background: #e2e8f0; margin: 0; padding: 8px; text-align: center; border-bottom: 1px solid #cbd5e1;">Usage</h4>
+                    <div style="padding: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.9rem;">
+                        <div class="checkbox-group">
+                            <label><input type="checkbox" id="usa-fond-sup"> Fond. supérieure</label>
+                            <label><input type="checkbox" id="usa-fond-inf"> Fond. inférieure</label>
+                            <label><input type="checkbox" id="usa-sous-fond"> Sous-fondation</label>
+                            <label><input type="checkbox" id="usa-infra"> Infrastructure</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <label><input type="checkbox" id="usa-coussin"> Coussin</label>
+                            <label><input type="checkbox" id="usa-enrobage"> Enrobage</label>
+                            <label><input type="checkbox" id="usa-bet-ciment"> Béton de ciment</label>
+                            <label><input type="checkbox" id="usa-enrob-bit"> Enrobés bitum.</label>
+                            <label><input type="checkbox" id="usa-recyc-frd"> Recyclage à froid</label>
+                        </div>
+                    </div>
+                    <div class="checkbox-group" style="padding: 0 10px 10px 10px; font-size: 0.9rem;">
+                        <div style="display: flex; align-items: center; gap: 5px; margin-top: 5px;">
+                            <label style="margin:0; white-space: nowrap;"><input type="checkbox" id="usa-autre"> Autre</label>
+                            <input type="text" id="usa-autre-text" style="flex: 1; padding: 2px;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Colonne 3 : Calibre / Code de produit -->
+                <div style="border: 1px solid #cbd5e1; border-radius: 6px; overflow: hidden;">
+                    <h4 style="background: #e2e8f0; margin: 0; padding: 8px; text-align: center; border-bottom: 1px solid #cbd5e1;">Calibre / Code de produit</h4>
+                    <div class="checkbox-group" style="padding: 10px; font-size: 0.9rem;">
+                        <div style="display: grid; grid-template-columns: auto 1fr; gap: 5px; align-items: center; margin-bottom: 2px;">
+                            <label style="margin:0;"><input type="checkbox" id="calib-mg-20"> MG 20</label><input type="text" id="calib-mg-20-text" style="padding: 2px;">
+                            <label style="margin:0;"><input type="checkbox" id="calib-mg-20b"> MG 20b</label><input type="text" id="calib-mg-20b-text" style="padding: 2px;">
+                            <label style="margin:0;"><input type="checkbox" id="calib-mg-56"> MG 56</label><input type="text" id="calib-mg-56-text" style="padding: 2px;">
+                            <label style="margin:0;"><input type="checkbox" id="calib-mg-112"> MG 112</label><input type="text" id="calib-mg-112-text" style="padding: 2px;">
+                            
+                            <div style="grid-column: span 2; height: 5px;"></div>
+                            
+                            <label style="margin:0;"><input type="checkbox" id="calib-cg-20"> CG 20</label><input type="text" id="calib-cg-20-text" style="padding: 2px;">
+                            <label style="margin:0;"><input type="checkbox" id="calib-cg-14"> CG 14</label><input type="text" id="calib-cg-14-text" style="padding: 2px;">
+                            <label style="margin:0;"><input type="checkbox" id="calib-cg-14b"> CG 14b</label><input type="text" id="calib-cg-14b-text" style="padding: 2px;">
+                            
+                            <label style="margin:0; grid-column: span 2;"><input type="checkbox" id="calib-classb"> Classe « B »</label>
+                            
+                            <label style="margin:0;"><input type="checkbox" id="calib-autre"> Autre</label><input type="text" id="calib-autre-text" style="padding: 2px;">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- === PRÉLÈVEMENT ET CONSERVATION === -->
+        <div class="form-section">
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+                <!-- Prélèvement -->
+                <div>
+                    <h3>Prélèvement</h3>
+                    <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center; margin-bottom: 10px;">
+                        <label style="margin:0; white-space: nowrap;"><input type="checkbox" id="prelev-par"> Prélevé par :</label>
+                        <input type="text" id="prelev-par-text" style="flex: 1; min-width: 200px; padding: 5px;" placeholder="Ex: Jean Tremblay">
+                        <label style="margin:0; white-space: nowrap;">Nb de sacs:</label>
+                        <input type="text" id="prelev-nb-sac" style="width: 100px; padding: 5px;" placeholder="Ex: 5" oninput="if(this.value.length > 3) this.value = this.value.slice(0,3);">
+                    </div>
+                    
+                    <div style="display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 10px;">
+                        <div style="display: flex; align-items: center; gap: 5px; flex: 1; min-width: 200px;">
+                            <label style="margin:0;">Date :</label>
+                            <input type="date" id="prelev-date" style="padding: 5px; width: 100%;">
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 5px; flex: 1; min-width: 200px;">
+                            <label style="margin:0;">Heure :</label>
+                            <input type="time" id="prelev-heure" style="padding: 5px; width: 100%;">
+                        </div>
+                    </div>
+
+                    <div class="checkbox-group" style="margin-top: 15px; background: #f8fafc; padding: 10px; border-radius: 4px;">
+                        <label><input type="checkbox" id="prelev-client"> Le prélèvement et le transport ont été effectués par un représentant du client</label>
+                        <div style="display: flex; align-items: center; gap: 5px; margin-top: 5px;">
+                            <label style="margin:0;"># Échantillon du client :</label>
+                            <input type="text" id="prelev-ech-no" style="flex: 1; padding: 5px;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Conservation -->
+                <div style="border: 2px solid #334155; border-radius: 6px; padding: 10px; background: #f8fafc;">
+                    <h4 style="margin: 0 0 10px 0; text-align: center; border-bottom: 1px solid #ccc; padding-bottom: 5px;">Conservation</h4>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" id="cons-apres"> À jeter après essais</label>
+                        <label><input type="checkbox" id="cons-mois"> À jeter (1 mois)</label>
+                        <div style="display: flex; align-items: center; gap: 5px;">
+                            <label style="margin:0;"><input type="checkbox" id="cons-a"> À conserver</label>
+                            <input type="text" id="cons-mois-text" style="width: 60px; padding: 5px;">
+                            <span>Mois</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- === ÉCHANTILLONNAGE CONJOINT === -->
+        <div class="form-section">
+            <h3>Échantillonnage conjoint</h3>
+            <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap; background: #f8fafc; padding: 10px; border-radius: 4px;">
+                <div class="checkbox-group" style="display: flex; gap: 15px;">
+                    <label><input type="checkbox" id="ech-conj-non"> Non</label>
+                    <label><input type="checkbox" id="ech-conj-oui"> Oui ➔</label>
                 </div>
                 
-                <div style="display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 10px;">
-                    <div style="display: flex; align-items: center; gap: 5px; flex: 1; min-width: 200px;">
-                        <label style="margin:0;">Date :</label>
-                        <input type="date" id="prelev-date" style="padding: 5px; width: 100%;">
+                <div style="flex: 1; border-left: 2px solid #cbd5e1; padding-left: 15px;">
+                    <div style="margin-bottom: 5px; font-weight: bold; font-size: 0.85rem;">Personnes présentes :</div>
+                    <div style="display: flex; gap: 10px; align-items: center; margin-top: 5px;">
+                        <label style="margin:0; font-size: 0.85rem;">Noms:</label>
+                        <input type="text" id="pers-text" style="flex: 1; padding: 5px;" placeholder="Ex: Jean Tremblay, Mélanie LeGrand, Elisabeth Macron">
                     </div>
-                    <div style="display: flex; align-items: center; gap: 5px; flex: 1; min-width: 200px;">
-                        <label style="margin:0;">Heure :</label>
-                        <input type="time" id="prelev-heure" style="padding: 5px; width: 100%;">
+                    <div class="checkbox-group" style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 10px;">
+                        <label><input type="checkbox" id="ech-conj-client"> Client</label>
+                        <label><input type="checkbox" id="ech-conj-entre"> Entrepreneur</label>
+                        <label><input type="checkbox" id="ech-conj-fourn"> Fournisseur</label>
+                        <div style="display: flex; align-items: center; gap: 5px;">
+                            <label style="margin:0;"><input type="checkbox" id="ech-conj-autre"> Autre</label>
+                            <input type="text" id="ech-conj-autre-text" style="width: 150px; padding: 5px;">
+                        </div>
                     </div>
-                </div>
-
-                <div class="checkbox-group" style="margin-top: 15px; background: #f8fafc; padding: 10px; border-radius: 4px;">
-                    <label><input type="checkbox" id="prelev-client"> Le prélèvement et le transport ont été effectués par un représentant du client</label>
-                    <div style="display: flex; align-items: center; gap: 5px; margin-top: 5px;">
-                        <label style="margin:0;"># Échantillon du client :</label>
-                        <input type="text" id="prelev-ech-no" style="flex: 1; padding: 5px;">
-                    </div>
+                    
                 </div>
             </div>
+        </div>
 
-            <!-- Conservation -->
-            <div style="border: 2px solid #334155; border-radius: 6px; padding: 10px; background: #f8fafc;">
-                <h4 style="margin: 0 0 10px 0; text-align: center; border-bottom: 1px solid #ccc; padding-bottom: 5px;">Conservation</h4>
-                <div class="checkbox-group">
-                    <label><input type="checkbox" id="cons-apres"> À jeter après essais</label>
-                    <label><input type="checkbox" id="cons-mois"> À jeter (1 mois)</label>
+        <!-- === ESSAIS, MÉTHODE ET SIGNATURES === -->
+        <div class="form-section">
+            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px dashed #ccc;">
+                <strong style="width: 150px;">Essais et remarques</strong>
+                <div class="checkbox-group" style="display: flex; gap: 20px; flex-wrap: wrap; flex: 1;">
+                    <label><input type="checkbox" id="essai-anal-gran"> Analyse granulométrique</label>
+                    <label><input type="checkbox" id="essai-proc-mod"> Proctor modifié</label>
                     <div style="display: flex; align-items: center; gap: 5px;">
-                        <label style="margin:0;"><input type="checkbox" id="cons-a"> À conserver</label>
-                        <input type="text" id="cons-mois-text" style="width: 60px; padding: 5px;">
-                        <span>Mois</span>
+                        <label style="margin:0;"><input type="checkbox" id="essai-autre"> Autres :</label>
+                        <input type="text" id="essai-autre-text" style="flex: 1; padding: 5px;">
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
 
-    <!-- === ÉCHANTILLONNAGE CONJOINT === -->
-    <section class="form-section">
-        <h3 style="border-bottom: 2px solid #0284c7; padding-bottom: 5px; text-align: center;">Échantillonnage conjoint</h3>
-        <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap; background: #f8fafc; padding: 10px; border-radius: 4px;">
-            <div class="checkbox-group" style="display: flex; gap: 15px;">
-                <label><input type="checkbox" id="ech-conj-non"> Non</label>
-                <label><input type="checkbox" id="ech-conj-oui"> Oui ➔</label>
-            </div>
-            
-            <div style="flex: 1; border-left: 2px solid #cbd5e1; padding-left: 15px;">
-                <div style="margin-bottom: 5px; font-weight: bold; font-size: 0.85rem;">Personnes présentes :</div>
-                <div style="display: flex; gap: 10px; align-items: center; margin-top: 5px;">
-                    <label style="margin:0; font-size: 0.85rem;">Noms:</label>
-                    <input type="text" id="pers-text" style="flex: 1; padding: 5px;">
-                </div>
-                <div class="checkbox-group" style="display: flex; gap: 15px; flex-wrap: wrap; align-items: center; margin-top: 10px;">
-                    <label><input type="checkbox" id="ech-conj-client"> Client</label>
-                    <label><input type="checkbox" id="ech-conj-entre"> Entrepreneur</label>
-                    <label><input type="checkbox" id="ech-conj-fourn"> Fournisseur</label>
+            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                <strong style="width: 180px;">Méthode d'échantillonnage :</strong>
+                <div class="checkbox-group" style="display: flex; gap: 20px; align-items: center;">
+                    <strong style="font-size: 1.1rem;">LC 21-010</strong>
                     <div style="display: flex; align-items: center; gap: 5px;">
-                        <label style="margin:0;"><input type="checkbox" id="ech-conj-autre"> Autre</label>
-                        <input type="text" id="ech-conj-autre-text" style="width: 150px; padding: 5px;">
+                        <label style="margin:0;"><input type="checkbox" id="metho-autre"> Autre :</label>
+                        <input type="text" id="metho-autre-text" style="width: 200px; padding: 5px;">
                     </div>
                 </div>
-                
             </div>
-        </div>
-    </section>
 
-    <!-- === ESSAIS, MÉTHODE ET SIGNATURES === -->
-    <section class="form-section">
-        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px dashed #ccc;">
-            <strong style="width: 150px;">Essais et remarques</strong>
-            <div class="checkbox-group" style="display: flex; gap: 20px; flex-wrap: wrap; flex: 1;">
-                <label><input type="checkbox" id="essai-anal-gran"> Analyse granulométrique</label>
-                <label><input type="checkbox" id="essai-proc-mod"> Proctor modifié</label>
-                <div style="display: flex; align-items: center; gap: 5px;">
-                    <label style="margin:0;"><input type="checkbox" id="essai-autre"> Autres :</label>
-                    <input type="text" id="essai-autre-text" style="flex: 1; padding: 5px;">
+            <div style="margin-bottom: 15px;">
+                <strong style="display: block; margin-bottom: 5px;">Remarques :</strong>
+                <textarea id="remarques" rows="3" style="width: 100%; border: 1px solid #ccc; border-radius: 4px; padding: 5px;"></textarea>
+            </div>
+
+            <div style="display: flex; justify-content: center; gap: 15px; border-top: 2px solid #ccc; padding-top: 15px;">
+                <div class="input-group" style="width: 250px;">
+                    <label>Vérifié par</label>
+                    <input type="text" id="sig-prep-nom" style="padding: 5px;" placeholder="Ex: Jean Tremblay">
+                </div>
+                <div class="input-group" style="flex: 1; min-width: 150px; max-width: 200px;">
+                    <label>Date</label>
+                    <input type="date" id="sig-prep-date" style="padding: 5px; width: 100%;">
                 </div>
             </div>
         </div>
 
-        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
-            <strong style="width: 180px;">Méthode d'échantillonnage :</strong>
-            <div class="checkbox-group" style="display: flex; gap: 20px; align-items: center;">
-                <strong style="font-size: 1.1rem;">LC 21-010</strong>
-                <div style="display: flex; align-items: center; gap: 5px;">
-                    <label style="margin:0;"><input type="checkbox" id="metho-autre"> Autre :</label>
-                    <input type="text" id="metho-autre-text" style="width: 200px; padding: 5px;">
-                </div>
-            </div>
+        <small id="form-instructions2" style="color: #242930; font-size: 0.8rem; display: block; margin-top: 3px; margin-bottom: 5px; text-align: center; margin-left: auto; margin-right: auto; max-width: 600px; font-style: italic;">
+            Veuillez exporter le formulaire en PDF pour le soumettre et/ou le sauvegarder avant de fermer la page/l'application. Les données sont sauvegardées localement, mais l'exportation en PDF est nécessaire pour la soumission officielle.
+        </small>
+
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="javascript:void(0);" onclick="document.getElementById('global-header').scrollIntoView({ behavior: 'smooth', block: 'start' });" style="color: var(--primary); font-weight: bold; text-decoration: none; font-size: 1rem; padding: 10px 20px; background: #e2e8f0; border-radius: 6px; display: inline-block;">
+                ⬆️ Retour aux informations générales du formulaire
+            </a>
         </div>
 
-        <div style="margin-bottom: 15px;">
-            <strong style="display: block; margin-bottom: 5px;">Remarques :</strong>
-            <textarea id="remarques" rows="3" style="width: 100%; border: 1px solid #ccc; border-radius: 4px; padding: 5px;"></textarea>
-        </div>
-
-        <div style="display: flex; justify-content: flex-end; gap: 15px; border-top: 2px solid #ccc; padding-top: 15px;">
-            <div class="input-group" style="width: 250px;">
-                <label>Vérifié par</label>
-                <input type="text" id="sig-prep-nom" style="padding: 5px;">
-            </div>
-            <div class="input-group" style="flex: 1; min-width: 150px; max-width: 200px;">
-                <label>Date</label>
-                <input type="date" id="sig-prep-date" style="padding: 5px; width: 100%;">
-            </div>
-        </div>
     </section>
 
 </div>

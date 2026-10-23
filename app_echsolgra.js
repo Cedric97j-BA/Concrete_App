@@ -358,6 +358,158 @@ async function exportToPDF() {
         const echNoVal = document.getElementById('ech-no')?.value.trim() || 'Ech';
 
         const pdfBytes = await mergedPdf.save();
+        const fileName = `Echantillon_${rawDateVal}_${noProjetVal}_${echNoVal}_${initialsVal}.pdf`;
+
+        // BIFURCATION : APPLICATION ANDROID vs WEB
+        if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+            try {
+                const pdfBase64 = await mergedPdf.saveAsBase64(); // 
+                const { Filesystem, FileOpener } = window.Capacitor.Plugins;
+                
+                if (!Filesystem || !FileOpener) {
+                    throw new Error("Plugins introuvables. npx cap sync a-t-il été fait ?");
+                }
+                
+                // 1. Sauvegarde silencieuse en cache
+                const resultat = await Filesystem.writeFile({
+                    path: fileName,
+                    data: pdfBase64,
+                    directory: 'CACHE',
+                    recursive: true
+                });
+
+                // 2. Ouverture automatique (lancera Foxit directement si défini par défaut)
+                await FileOpener.open({ 
+                    filePath: resultat.uri, 
+                    contentType: 'application/pdf' 
+                });
+
+            } catch (err) {
+                console.error(err);
+                alert("Erreur lors de l'enregistrement sur la tablette.");
+            }
+        } else {
+            // COMPORTEMENT WEB ORIGINAL
+            const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+            const isMacTouch = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+            const isApple = /iPhone|iPad|iPod/i.test(navigator.userAgent) || isMacTouch;
+            
+            let attemptedShare = false;
+            try {
+                if (isApple && navigator.share && navigator.canShare) {
+                    const file = new File([blob], fileName, { type: 'application/pdf' });
+                    if (navigator.canShare({ files: [file] })) {
+                        attemptedShare = true;
+                        await navigator.share({ files: [file] });
+                    }
+                }
+            } catch (err) { if (err.name !== 'AbortError') attemptedShare = false; }
+
+            if (!attemptedShare) {
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = fileName;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                setTimeout(() => window.URL.revokeObjectURL(url), 100);
+            }
+        }
+        
+        if (btn) {
+            btn.textContent = originalText;
+            btn.disabled = false;
+        }
+
+    } catch (error) {
+        console.error("Erreur lors de l'export PDF :", error);
+        showToast("Erreur lors de l'export PDF. Avez-vous ajouté TEMPLATE_ECHSOLGRA dans pdf_templates.js ?", "error");
+        const btn = document.querySelector('button[onclick="exportToPDF()"]');
+        if (btn) {
+            btn.textContent = "📄 Exporter en PDF";
+            btn.disabled = false;
+        }
+    }
+}
+
+/*
+async function exportToPDF() {
+    try {
+        const btn = document.querySelector('button[onclick="exportToPDF()"]');
+        const originalText = btn ? btn.textContent : "📄 Exporter en PDF";
+        if (btn) {
+            btn.textContent = "⏳ Génération en cours...";
+            btn.disabled = true;
+        }
+
+        const mergedPdf = await PDFLib.PDFDocument.create();
+        mergedPdf.registerFontkit(fontkit);
+        
+        const getBuffer = (base64) => {
+            const str = window.atob(base64);
+            const bytes = new Uint8Array(str.length);
+            for (let i = 0; i < str.length; i++) bytes[i] = str.charCodeAt(i);
+            return bytes.buffer;
+        };
+
+        const fontBytes = new Uint8Array(getBuffer(TAHOMA_FONT));
+        const tahomaFont = await mergedPdf.embedFont(fontBytes);
+
+        // Assurez-vous que TEMPLATE_ECHSOLGRA est bien défini dans pdf_templates.js !
+        const subDoc = await PDFLib.PDFDocument.load(getBuffer(TEMPLATE_ECHSOLGRA));
+        subDoc.registerFontkit(fontkit);
+        const form = subDoc.getForm();
+        
+        form.getFields().forEach(field => {
+            const pdfName = field.getName();
+            const el = document.getElementById(pdfName);
+            
+            if (el) {
+                let val = el.type === 'checkbox' ? el.checked : el.value;
+                if (val !== null && val !== undefined && val !== '') {
+                    try {
+                        if (el.type === 'checkbox') {
+                            val ? field.check() : field.uncheck();
+                        } else {
+                            let finalStr = val.toString();
+                            
+                            // Logique de point vs virgule
+                            const lowerName = pdfName.toLowerCase();
+                            const isProjectNumber = lowerName.includes('projet') || lowerName.includes('no-') || lowerName.includes('numero') || lowerName.includes('lot') || lowerName.includes('ech-');
+                            
+                            if (!isProjectNumber) {
+                                finalStr = finalStr.replace(/(\d)\.(\d)/g, '$1,$2'); 
+                            }
+                            field.setText(finalStr);
+                        }
+                    } catch (e) {
+                        console.warn(`Impossible de remplir le champ ${pdfName}`, e);
+                    }
+                }
+            }
+        });
+
+        // Mise à jour de l'apparence des champs (Sans "Flatten" pour garder modifiable)
+        try {
+            const subFont = await subDoc.embedFont(fontBytes);
+            form.updateFieldAppearances(subFont);
+            if (form.acroForm) form.acroForm.dict.set(PDFLib.PDFName.of('NeedAppearances'), PDFLib.PDFBool.False);
+        } catch (e) {
+            console.warn("Erreur d'apparence PDF", e);
+        }
+
+        const copiedPages = await mergedPdf.copyPages(subDoc, subDoc.getPageIndices());
+        copiedPages.forEach(page => mergedPdf.addPage(page));
+
+        // Nom du fichier PDF
+        const noProjetVal = document.getElementById('global-no-projet').value.trim() || 'SANS-NUMERO';
+        const rawDateVal = document.getElementById('global-date').value || new Date().toISOString().split('T')[0];
+        const techNameVal = document.getElementById('sig-prep-nom')?.value || '';
+        const initialsVal = techNameVal.split(' ').filter(n => n).map(n => n[0].toUpperCase()).join('') || 'TECH';
+        const echNoVal = document.getElementById('ech-no')?.value.trim() || 'Ech';
+
+        const pdfBytes = await mergedPdf.save();
         const blob = new Blob([pdfBytes], { type: 'application/pdf' });
         const fileName = `Echantillon_${rawDateVal}_${noProjetVal}_${echNoVal}_${initialsVal}.pdf`;
 
@@ -409,3 +561,4 @@ async function exportToPDF() {
         }
     }
 }
+*/

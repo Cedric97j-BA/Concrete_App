@@ -406,6 +406,163 @@ async function exportToPDF() {
         const rawDate = new Date().toISOString().split('T')[0];
         const techName = document.getElementById('sig-prep-nom')?.value || '';
         const techInitials = techName.split(' ').filter(n => n).map(n => n[0].toUpperCase()).join('') || 'TECH';
+        
+        const pdfBytes = await pdfDoc.save();
+        const fileName = `JPhotos_${rawDate}_${noProjet}_${techInitials}.pdf`;
+
+        // BIFURCATION : APPLICATION ANDROID vs WEB
+        if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+            try {
+                const pdfBase64 = await pdfDoc.saveAsBase64(); // Attention ici : pdfDoc
+                const { Filesystem, FileOpener } = window.Capacitor.Plugins;
+                
+                if (!Filesystem || !FileOpener) {
+                    throw new Error("Plugins introuvables. npx cap sync a-t-il été fait ?");
+                }
+                
+                // 1. Sauvegarde silencieuse en cache
+                const resultat = await Filesystem.writeFile({
+                    path: fileName,
+                    data: pdfBase64,
+                    directory: 'CACHE',
+                    recursive: true
+                });
+
+                // 2. Ouverture automatique (lancera Foxit directement si défini par défaut)
+                await FileOpener.open({ 
+                    filePath: resultat.uri, 
+                    contentType: 'application/pdf' 
+                });
+
+            } catch (err) {
+                console.error(err);
+                alert("Erreur lors de l'enregistrement sur la tablette.");
+            }
+        } else {
+            // COMPORTEMENT WEB ORIGINAL
+            const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+            const isMacTouch = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+            const isApple = /iPhone|iPad|iPod/i.test(navigator.userAgent) || isMacTouch;
+            
+            let attemptedShare = false;
+            try {
+                if (isApple && navigator.share && navigator.canShare) {
+                    const file = new File([blob], fileName, { type: 'application/pdf' });
+                    if (navigator.canShare({ files: [file] })) {
+                        attemptedShare = true;
+                        await navigator.share({ files: [file] });
+                    }
+                }
+            } catch (err) { if (err.name !== 'AbortError') attemptedShare = false; }
+
+            if (!attemptedShare) {
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = fileName;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                setTimeout(() => window.URL.revokeObjectURL(url), 100);
+            }
+        }
+        
+        if (btn) { btn.textContent = originalText; btn.disabled = false; }
+    } catch (error) {
+        console.error("Erreur lors de l'export PDF :", error);
+        showToast("Erreur lors de l'export PDF. Vérifiez la console.", "error");
+        const btn = document.querySelector('button[onclick="exportToPDF()"]');
+        if (btn) { btn.textContent = "📄 Exporter en PDF"; btn.disabled = false; }
+    }
+}
+
+/*
+async function exportToPDF() {
+    if (typeof TEMPLATE_JOURNAL_PHOTO === 'undefined') {
+        showToast("Erreur: Le modèle PDF TEMPLATE_JOURNAL_PHOTO est introuvable.", "error");
+        return;
+    }
+
+    try {
+        const btn = document.querySelector('button[onclick="exportToPDF()"]');
+        const originalText = btn ? btn.textContent : "📄 Exporter en PDF";
+        if (btn) { btn.textContent = "⏳ Génération en cours..."; btn.disabled = true; }
+
+        const getBuffer = (base64) => {
+            const str = window.atob(base64);
+            const bytes = new Uint8Array(str.length);
+            for (let i = 0; i < str.length; i++) bytes[i] = str.charCodeAt(i);
+            return bytes.buffer;
+        };
+
+        const pdfDoc = await PDFLib.PDFDocument.load(getBuffer(TEMPLATE_JOURNAL_PHOTO));
+        pdfDoc.registerFontkit(fontkit);
+        const form = pdfDoc.getForm();
+        const pagesArr = pdfDoc.getPages();
+
+        // 1. Remplissage du texte
+        const allInputs = document.querySelectorAll('input[id], textarea[id]');
+        allInputs.forEach(el => {
+            const name = el.id;
+            try {
+                if (el.type !== 'file' && el.type !== 'hidden') {
+                    form.getTextField(name).setText(el.value || "");
+                }
+            } catch (e) {} 
+        });
+
+        // 2. CRITIQUE : Figer le texte AVANT de dessiner les images avec Tahoma
+        try {
+            const fontBytes = new Uint8Array(getBuffer(TAHOMA_FONT));
+            const tahomaFont = await pdfDoc.embedFont(fontBytes);
+            form.updateFieldAppearances(tahomaFont);
+            if (form.acroForm) form.acroForm.dict.set(PDFLib.PDFName.of('NeedAppearances'), PDFLib.PDFBool.False);
+        } catch(e) {}
+
+        // 3. Moteur d'injection des images
+
+        ---- OLD BELOW
+
+        // 3. Moteur d'injection des images
+        const drawImg = async (inputId, pdfFieldId, pageIndex) => {
+            const hiddenInput = document.getElementById(inputId);
+            if (hiddenInput && hiddenInput.value) {
+                try {
+                    const field = form.getField(pdfFieldId);
+                    const widget = field.acroField.getWidgets()[0];
+                    const rect = widget.getRectangle();
+                    
+                    // CRITIQUE : On force la page cible (0 = Page 1, 1 = Page 2)
+                    let targetPage = pagesArr[pageIndex];
+
+                    const base64String = hiddenInput.value.split(',')[1];
+                    const pdfImage = await pdfDoc.embedJpg(base64String);
+
+                    const scaled = pdfImage.scaleToFit(rect.width, rect.height);
+                    const centerX = rect.x + (rect.width - scaled.width) / 2;
+                    const centerY = rect.y + (rect.height - scaled.height) / 2;
+
+                    targetPage.drawImage(pdfImage, { x: centerX, y: centerY, width: scaled.width, height: scaled.height });
+                } catch (e) {
+                    console.error("Erreur image", e);
+                }
+            }
+        };
+
+        // Images 1 et 2 vont sur la Page 1 (index 0)
+        await drawImg('desc-img-01-base64', 'desc-img-01', 0);
+        await drawImg('desc-img-02-base64', 'desc-img-02', 0);
+        
+        // Images 3 et 4 vont sur la Page 2 (index 1)
+        await drawImg('desc-img-03-base64', 'desc-img-03', 1);
+        await drawImg('desc-img-04-base64', 'desc-img-04', 1);
+
+        form.getFields().forEach(f => { try { f.acroField.setPartialName(f.getName() + '_Fphoto'); } catch(e){} });
+
+        const noProjet = document.getElementById('global-no-projet').value.trim() || 'SANS-NUMERO';
+        const rawDate = new Date().toISOString().split('T')[0];
+        const techName = document.getElementById('sig-prep-nom')?.value || '';
+        const techInitials = techName.split(' ').filter(n => n).map(n => n[0].toUpperCase()).join('') || 'TECH';
 
         const pdfBytes = await pdfDoc.save();
         const blob = new Blob([pdfBytes], { type: 'application/pdf' });
@@ -446,50 +603,9 @@ async function exportToPDF() {
         if (btn) { btn.textContent = "📄 Exporter en PDF"; btn.disabled = false; }
     }
 }
+*/
 
 /*
-async function exportToPDF() {
-    if (typeof TEMPLATE_JOURNAL_PHOTO === 'undefined') {
-        showToast("Erreur: Le modèle PDF TEMPLATE_JOURNAL_PHOTO est introuvable.", "error");
-        return;
-    }
-
-    try {
-        const btn = document.querySelector('button[onclick="exportToPDF()"]');
-        const originalText = btn ? btn.textContent : "📄 Exporter en PDF";
-        if (btn) { btn.textContent = "⏳ Génération en cours..."; btn.disabled = true; }
-
-        const getBuffer = (base64) => {
-            const str = window.atob(base64);
-            const bytes = new Uint8Array(str.length);
-            for (let i = 0; i < str.length; i++) bytes[i] = str.charCodeAt(i);
-            return bytes.buffer;
-        };
-
-        // Utilise le document original directement (il contient 2 pages pour 4 photos)
-        const pdfDoc = await PDFLib.PDFDocument.load(getBuffer(TEMPLATE_JOURNAL_PHOTO));
-        const form = pdfDoc.getForm();
-        const pagesArr = pdfDoc.getPages();
-
-        // 1. Remplissage du texte
-        const allInputs = document.querySelectorAll('input[id], textarea[id]');
-        allInputs.forEach(el => {
-            const name = el.id;
-            try {
-                if (el.type !== 'file' && el.type !== 'hidden') {
-                    form.getTextField(name).setText(el.value || "");
-                }
-            } catch (e) {} 
-        });
-
-        // 2. CRITIQUE : Figer le texte AVANT de dessiner les images (Fix Android/Preview)
-        try {
-            const font = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
-            form.updateFieldAppearances(font);
-            if (form.acroForm) form.acroForm.dict.set(PDFLib.PDFName.of('NeedAppearances'), PDFLib.PDFBool.False);
-        } catch(e) {}
-
-        // 3. Moteur d'injection des images
         const drawImg = async (inputId, pdfFieldId) => {
             const hiddenInput = document.getElementById(inputId);
             if (hiddenInput && hiddenInput.value) {
@@ -513,59 +629,4 @@ async function exportToPDF() {
                     console.error("Erreur image", e);
                 }
             }
-        };
-
-        // Injection des 4 photos dans leurs zones PDF correspondantes
-        await drawImg('desc-img-01-base64', 'desc-img-01');
-        await drawImg('desc-img-02-base64', 'desc-img-02');
-        await drawImg('desc-img-03-base64', 'desc-img-03');
-        await drawImg('desc-img-04-base64', 'desc-img-04');
-
-        // Renommage dynamique pour sécuriser l'export (Anti-Foxit bug)
-        form.getFields().forEach(f => { try { f.acroField.setPartialName(f.getName() + '_Fphoto'); } catch(e){} });
-
-        const noProjet = document.getElementById('global-no-projet').value.trim() || 'SANS-NUMERO';
-        const rawDate = new Date().toISOString().split('T')[0];
-        const techName = document.getElementById('sig-prep-nom')?.value || '';
-        const techInitials = techName.split(' ').filter(n => n).map(n => n[0].toUpperCase()).join('') || 'TECH';
-
-        const pdfBytes = await pdfDoc.save();
-        const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-        const fileName = `Photos_${rawDate}_${noProjet}_${techInitials}.pdf`;
-
-        // TÉLÉCHARGEMENT/PARTAGE
-        const isMacTouch = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
-        const isApple = /iPhone|iPad|iPod/i.test(navigator.userAgent) || isMacTouch;
-        
-        let attemptedShare = false;
-        try {
-            if (isApple && navigator.share && navigator.canShare) {
-                const file = new File([blob], fileName, { type: 'application/pdf' });
-                if (navigator.canShare({ files: [file] })) {
-                    attemptedShare = true;
-                    await navigator.share({ files: [file] });
-                }
-            }
-        } catch (err) {
-            if (err.name !== 'AbortError') attemptedShare = false;
-        }
-
-        if (!attemptedShare) {
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = fileName;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            setTimeout(() => window.URL.revokeObjectURL(url), 100);
-        }
-        
-        if (btn) { btn.textContent = originalText; btn.disabled = false; }
-    } catch (error) {
-        console.error("Erreur lors de l'export PDF :", error);
-        showToast("Erreur lors de l'export PDF. Vérifiez la console.", "error");
-        const btn = document.querySelector('button[onclick="exportToPDF()"]');
-        if (btn) { btn.textContent = "📄 Exporter en PDF"; btn.disabled = false; }
-    }
-}*/
+        };*/

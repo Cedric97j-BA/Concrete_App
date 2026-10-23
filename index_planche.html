@@ -56,14 +56,14 @@
             <button type="button" onclick="newReportPrompt()" style="background: #0284c7; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;">➕ Nouveau</button>
             <button type="button" onclick="loadReport()" style="background: #3b82f6; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;">📂 Charger</button>
             <button type="button" onclick="saveReport()" style="background: #10b981; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;">💾 Sauvegarder</button>
-            <button onclick="saveReport(true)" style="background: #3b82f6; color: white; padding: 10px 15px; border-radius: 6px; font-weight: bold; border: none; cursor: pointer; display: flex; align-items: center; gap: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">📄 Dupliquer</button>
+            <button onclick="saveReport(true)" style="background: #3b82f6; color: white; padding: 10px 15px; border-radius: 6px; font-weight: bold; border: none; cursor: pointer; display: flex; align-items: center; gap: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">📑 Dupliquer</button>
             <button type="button" onclick="deleteReport()" style="background: #ef4444; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;">🗑️ Supprimer</button>
         </div>
 
+        <!-- Nouvelle ligne dédiée pour l'export PDF -->
         <div style="width: 100%; margin-top: 5px;">
-            <button type="button" onclick="exportToPDF()" style="background: #8b5cf6; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%;">📄 Exporter en PDF</button>
-        </div>
-        <div id="last-saved-status" style="width: 100%; color: #475569; font-size: 0.85rem;">Dernière sauvegarde : aucune</div>
+            <button type="button" onclick="exportToPDF()" style="background: #8b5cf6; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%;">📤 Exporter en PDF</button>
+        </div> 
     </section>
 
     <!-- ========================================== -->
@@ -71,18 +71,37 @@
     <!-- ========================================== -->
     <section id="global-header" style="background: #e5e7eb; padding: 15px; margin-bottom: 20px; border-radius: 8px;">
         <h2>Informations Générales du Projet</h2>
-        <div class="grid-2">
-            <div class="input-group"><label>Client</label><input type="text" id="global-client" placeholder="Nom du client"></div>
-            <div class="input-group"><label>Réf. client</label><input type="text" id="global-ref-client"></div>
+
+        <div class="input-group">
+            <label>Client</label>
+            <input type="text" id="global-client" placeholder="Ex: Municipalité, Entrepreneur, etc.">
         </div>
-        <div class="grid-2">
-            <div class="input-group"><label>Projet</label><input type="text" id="global-projet" placeholder="Ex: Route 138"></div>
-            <div class="input-group"><label>Endroit</label><input type="text" id="global-endroit" placeholder="Ex: Secteur A"></div>
+
+        <div class="input-group">
+            <label>Réf. client</label>
+            <input type="text" id="global-ref-client">
         </div>
-        <div class="grid-2">
-            <div class="input-group"><label>No projet</label><input type="text" id="global-no-projet"></div>
-            <div class="input-group"><label>Date</label><input type="date" id="global-date"></div>
+
+        <div class="input-group">
+            <label>Projet</label>
+            <input type="text" id="global-projet" placeholder="Ex: Route 138">
         </div>
+
+        <div class="input-group">
+            <label>Endroit</label>
+            <input type="text" id="global-endroit" placeholder="Ex: Secteur A">
+        </div>
+
+        <div class="input-group">
+            <label>N° projet</label>
+            <input type="text" id="global-no-projet" placeholder="0260XXXX.00X">
+        </div>
+
+        <div class="input-group">
+            <label>Date</label>
+            <input type="date" id="global-date">
+        </div>
+        <div id="last-saved-status" style="width: 100%; color: #475569; font-size: 0.85rem; text-align: center;">Dernière sauvegarde : aucune</div>
     </section>
 
     <!-- ========================================== -->
@@ -92,7 +111,7 @@
     <small id="form-instructions" style=" display: block;  margin-bottom: 35px;  margin-left: auto; margin-right: auto; max-width: 600px;">
     </small>
 
-    <small style="color: #242930; font-size: 0.8rem; display: block; margin-top: 3px; margin-bottom: 5px; text-align: center; margin-left: auto; margin-right: auto; max-width: 600px;">
+    <small id="form-instructions" class="form-instructions" style="color: #242930; font-size: 0.8rem; display: block; margin-top: 3px; margin-bottom: 5px; text-align: center; margin-left: auto; margin-right: auto; max-width: 600px; font-style: italic;">
         Cliquez sur les onglets pour naviguer entre les sections du formulaire. Les informations sont sauvegardées automatiquement. Vous pouvez passer d'une section à l'autre. Cependant prenez soin de bien sauvegarder votre rapport avant de quitter la page ou de fermer l'application.
     </small>
 
@@ -124,6 +143,7 @@
                             <option value="Sable">Sable</option>
                             <option value="Sol naturel">Sol naturel</option>
                             <option value="Argile et silt (compactable)">Argile et silt (compactable)</option>
+                            <option value=""></option>
                         </select>
                         <!-- La boîte de texte principale -->
                         <input type="text" id="info-materiau" placeholder="Choisissez ou tapez..." style="flex: 1;">
@@ -134,7 +154,7 @@
                     <label>Calibre</label>
                     <div style="display: flex; gap: 5px;">
                         <select onchange="document.getElementById('info-calibre').value = this.value; this.value='';" style="width: 45px; background: #e2e8f0; border: 1px solid var(--border); border-radius: 4px; cursor: pointer; text-align: center; font-weight: bold; padding: 0;">
-                            <option value="" disabled selected>▼</option>
+                            <option value="" disabled selected>▼</option>                          
                             <option value="MG 20">MG 20</option>
                             <option value="MG 20b">MG 20b</option>
                             <option value="MG 56">MG 56</option>
@@ -148,6 +168,7 @@
                             <option value="MR-3">MR-3</option>
                             <option value="MR-4">MR-4</option>
                             <option value="MR-5">MR-5</option>
+                            <option value=""></option>
                         </select>
                         <input type="text" id="info-calibre" placeholder="Choisissez ou tapez..." style="flex: 1;">
                     </div>
@@ -172,6 +193,7 @@
                             <option value="Remblai latéral">Remblai latéral</option>
                             <option value="Recouvreemnt de protection">Recouvreemnt de protection</option>
                             <option value="Couche de roulement">Couche de roulement"</option>
+                            <option value=""></option>
                         </select>
                         <input type="text" id="info-usage" placeholder="Choisissez ou tapez..." style="flex: 1;">
                     </div>
@@ -185,43 +207,50 @@
             <div class="grid-2">
                 <div class="input-group">
                     <label>Nom du fournisseur</label>
-                    <input type="text" id="info-fournisseur">
+                    <input type="text" id="info-fournisseur" placeholder="Ex: Excavations Simnon Bélanger">
                 </div>
+                
                 <div class="input-group">
                     <label>Épaisseur de planche (mm)</label>
-                    <input type="number" id="info-epaisseur" placeholder="mm">
+                    <input type="number" id="info-epaisseur" placeholder="Ex.: 150" inputmode="numeric" oninput="if(this.value.length > 4) this.value = this.value.slice(0,4);">
                 </div>
             </div>
             <div class="input-group">
-                <label>Dimensions de la planche (m)</label>
-                <div style="display: flex; gap: 8px;">
-                    <input type="number" id="info-dim-long" placeholder="Longueur (m)" step="0.1">
-                    <input type="number" id="info-dim-larg" placeholder="Largeur (m)" step="0.1">
+                <label>Dimensions de la planche</label>
+                <div style="display: flex; gap: 8px; justify-content: center;">
+                    <div class="input-group">
+                        <label for="info-dim-long">Longueur (m)</label>
+                        <input type="number" id="info-dim-long" placeholder="Ex: 10,5" step="0.1" oninput="if(this.value.length > 4) this.value = this.value.slice(0,4);">
+                    </div>
+                    <div class="input-group">
+                        <label for="info-dim-larg">Largeur (m)</label>                  
+                        <input type="number" id="info-dim-larg" placeholder="Ex: 5,5" step="0.1" oninput="if(this.value.length > 4) this.value = this.value.slice(0,4);">
+                    </div>  
                 </div>
             </div>
             <div class="input-group">
                 <label>Matériau sous-jacent / épaisseur (mm)</label>
-                <input type="text" id="info-sous-jacent">
+                <input type="text" id="info-sous-jacent" placeholder="Ex: Sol naturel / 300 mm">
             </div>
             <div class="input-group">
                 <label>Localisation de la planche</label>
-                <input type="text" id="info-localisation">
+                <input type="text" id="info-localisation" placeholder="Ex: Stationnement, côté nord">
             </div>
             <div class="grid-2">
-                <div class="input-group"><label>Entrepreneur</label><input type="text" id="info-entrepreneur"></div>
-                <div class="input-group"><label>Sous-traitant</label><input type="text" id="info-soustraitant"></div>
+                <div class="input-group"><label>Entrepreneur</label><input type="text" id="info-entrepreneur" placeholder="Ex: Excavations Léon Chouinard Inc."></div>
+                <div class="input-group"><label>Sous-traitant</label><input type="text" id="info-soustraitant" placeholder="Ex: SDB"></div>
             </div>
         </div>
 
         <div class="form-section">
-            <h3>Équipement de Compaction</h3>
+            <h3>Équipement de compactage</h3>
             <div class="grid-2">
-                <div class="input-group"><label>Marque</label><input type="text" id="comp-marque"></div>
-                <div class="input-group"><label>Modèle</label><input type="text" id="comp-modele"></div>
+                <div class="input-group"><label>Marque</label><input type="text" id="comp-marque" placeholder="Ex: Caterpillar"></div>
+                <div class="input-group"><label>Modèle</label><input type="text" id="comp-modele" placeholder="Ex: D6T"></div>
             </div>
             <div class="input-group">
                 <label>Masse totale approx. (tonnes)</label>
-                <input type="number" id="comp-masse" step="0.5" style="width: 150px;">
+                <input type="number" id="comp-masse" step="0.5" style="width: 150px;" placeholder="Ex: 15,5" oninput="if(this.value.length > 5) this.value = this.value.slice(0,5);">
             </div>
             <div class="checkbox-group" style="margin-top: 10px;">
                 <label style="font-weight: bold;">Information fournie par :</label>
@@ -233,15 +262,14 @@
         <div class="form-section">
             <h3>Nucléodensimètre</h3>
             <div class="grid-2">
-                <div class="input-group"><label>Marque</label><input type="text" id="nuc-marque"></div>
-                <div class="input-group"><label>Modèle</label><input type="text" id="nuc-modele"></div>
+                <div class="input-group"><label>Marque</label><input type="text" id="nuc-marque" placeholder="Ex: TROXLER"></div>
+                <div class="input-group"><label>Modèle</label><input type="text" id="nuc-modele" placeholder="Ex: 3430"></div>
             </div>
             <div class="grid-2">
-                <div class="input-group"><label>Numéro de série</label><input type="text" id="nuc-serienum"></div>
-                <div class="input-group"><label>Correction de la teneur en eau</label><input type="text" id="nuc-correction"></div>
+                <div class="input-group"><label>N° de série</label><input type="text" id="nuc-serienum" placeholder="Ex: 123456" oninput="if(this.value.length > 7) this.value = this.value.slice(0,7);"></div>
+                <div class="input-group"><label>Correction de la teneur en eau</label><input type="text" id="nuc-correction" placeholder="Ex: 0,5" oninput="if(this.value.length > 4) this.value = this.value.slice(0,4);">
             </div>
         </div>
-
 
         <div style="text-align: center; margin: 30px 0;">
             <a href="javascript:void(0);" onclick="scrollToSection('form-instructions')" style="color: var(--primary); font-weight: bold; text-decoration: none; font-size: 1rem; padding: 10px 20px; background: #e2e8f0; border-radius: 6px; display: inline-block;">
@@ -256,7 +284,7 @@
     <!-- ========================================== -->
     <section id="tab-form2" class="tab-section" style="display: none;">
         <h2>Planche de Référence</h2>
-        <p style="color: #242930; font-size: 0.9rem; margin-bottom: 15px;">
+        <p style="color: #242930; font-size: 0.9rem; margin-bottom: 15px; text-align: center; margin-left: auto; margin-right: auto; max-width: 600px; font-style: italic;">
             Entrez le nombre de passes, les 3 points de masse volumique sèche (MV) et la teneur en eau (w) pour chaque étape. Le système calcule automatiquement les moyennes, l'écart (ΔMV) et valide la stabilisation (&lt; 1%).
         </p>
 
@@ -278,7 +306,7 @@
             <canvas id="densityChart" style="margin-top: 24px; width: 100%; max-height: 250px;"></canvas>
         </div>
 
-        <small  style="color: #242930; font-size: 0.8rem; display: block; margin-top: 3px; margin-bottom: 5px; text-align: center; margin-left: auto; margin-right: auto; max-width: 600px;">
+        <small  style="color: #242930; font-size: 0.8rem; display: block; margin-top: 3px; margin-bottom: 5px; text-align: center; margin-left: auto; margin-right: auto; max-width: 600px; font-style: italic;">
             La planche est complète lorsque l'écart (ΔMV) est inférieur à 1% pour les deux dernières passes. L'option d'ajouté une ligne sera enlevé et le graphique sera généré automatiquement. Vous pouvez toujours modifier les valeurs des passes existantes si nécessaire.
         </small>
 
@@ -296,23 +324,23 @@
     <template id="pass-template">
         <div class="pass-card" style="border: 1px solid var(--border); border-radius: 6px; margin-bottom: 16px; overflow: hidden; background: #f8fafc;">
             <div class="pass-header" style="background: #e2e8f0; padding: 10px 15px; font-weight: bold; display: flex; justify-content: space-between; align-items: center;">
-                <div>Nombre de passes (n) : <input type="number" class="pass-num trigger" style="width:70px; margin-left:8px; display:inline-block;" min="1"></div>
+                <div>Nombre de passes (n) : <input type="number" class="pass-num trigger" style="width:70px; margin-left:8px; display:inline-block;" min="1" oninput="if(this.value.length > 2) this.value = this.value.slice(0,2);"></div>
                 <button type="button" class="btn-delete" onclick="this.closest('.pass-card').remove(); calculateAll();" title="Supprimer" style="background:none; border:none; font-size:1.2rem; cursor:pointer; color:var(--danger);">❌</button>
             </div>
             <div class="pass-body" style="padding: 15px;">
                 <label style="color: var(--primary); margin-bottom: 6px;">Masse volumique sèche (MV) [kg/m³]</label>
                 <div class="points-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 6px;">
-                    <input type="number" class="trigger den-val" placeholder="Pt A">
-                    <input type="number" class="trigger den-val" placeholder="Pt B">
-                    <input type="number" class="trigger den-val" placeholder="Pt C">
+                    <input type="number" class="trigger den-val" placeholder="Pt A | Ex: 1800" oninput="if(this.value.length > 4) this.value = this.value.slice(0,4);">
+                    <input type="number" class="trigger den-val" placeholder="Pt B" oninput="if(this.value.length > 4) this.value = this.value.slice(0,4);">
+                    <input type="number" class="trigger den-val" placeholder="Pt C" oninput="if(this.value.length > 4) this.value = this.value.slice(0,4);">
                 </div>
                 <div class="avg-bar" style="text-align: right; font-weight: bold; color: var(--primary); margin-bottom: 12px;">Moyenne MV : <span class="den-avg">---</span> kg/m³</div>
 
                 <label style="color: var(--primary); margin-bottom: 6px;">Teneur en eau mesurée (w) [%]</label>
                 <div class="points-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 6px;">
-                    <input type="number" class="trigger hum-val" placeholder="Pt A">
-                    <input type="number" class="trigger hum-val" placeholder="Pt B">
-                    <input type="number" class="trigger hum-val" placeholder="Pt C">
+                    <input type="number" class="trigger hum-val" placeholder="Pt A | Ex: 5,5" oninput="if(this.value.length > 4) this.value = this.value.slice(0,4);">
+                    <input type="number" class="trigger hum-val" placeholder="Pt B" oninput="if(this.value.length > 4) this.value = this.value.slice(0,4);">
+                    <input type="number" class="trigger hum-val" placeholder="Pt C" oninput="if(this.value.length > 4) this.value = this.value.slice(0,4);">
                 </div>
                 <div class="avg-bar" style="text-align: right; font-weight: bold; color: var(--primary); margin-bottom: 12px;">Moyenne w : <span class="hum-avg">---</span> %</div>
 
@@ -359,18 +387,19 @@
         </div>
 
         <div class="form-section" style="border-top: 2px solid #ccc; padding-top: 15px;">
-            <h3>Signatures</h3>
+            <h3>Signature</h3>
             <div class="grid-2">
-                <div class="input-group"><label>Préparé par</label><input type="text" id="sig-prep-nom" placeholder="Max Coulombe"></div>
+                <div class="input-group"><label>Préparé par</label><input type="text" id="sig-prep-nom" placeholder="Ex: Jean Tremblay"></div>
                 <div class="input-group"><label>Date de préparation</label><input type="date" id="sig-prep-date"></div>
             </div>
+            <!--
             <div class="grid-2" style="margin-top: 10px;">
                 <div class="input-group"><label>Vérifié par</label><input type="text" id="sig-verif-nom"></div>
-                <div class="input-group"><label>Date de vérification</label><input type="date" id="sig-verif-date"></div>
-            </div>
+                <div class="input-group"><label>Date de vérification</label><input type="date" id="sig-verif-date"></div> 
+            </div>-->
         </div>
 
-        <small id="form-instructions" style="color: #242930; font-size: 0.8rem; display: block; margin-top: 3px; margin-bottom: 5px; text-align: center; margin-left: auto; margin-right: auto; max-width: 600px;">
+        <small id="form-instructions2" style="color: #242930; font-size: 0.8rem; display: block; margin-top: 3px; margin-bottom: 5px; text-align: center; margin-left: auto; margin-right: auto; max-width: 600px; font-style: italic;">
             Veuillez exporter le formulaire en PDF pour le soumettre et/ou le sauvegarder avant de fermer la page/l'application. Les données sont sauvegardées localement, mais l'exportation en PDF est nécessaire pour la soumission officielle.
         </small>
 

@@ -40,33 +40,51 @@
             <button type="button" onclick="newReportPrompt()" style="background: #0284c7; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;">➕ Nouveau</button>
             <button type="button" onclick="loadReport()" style="background: #3b82f6; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;">📂 Charger</button>
             <button type="button" onclick="saveReport()" style="background: #10b981; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;">💾 Sauvegarder</button>
-            <button onclick="saveReport(true)" style="background: #3b82f6; color: white; padding: 10px 15px; border-radius: 6px; font-weight: bold; border: none; cursor: pointer; display: flex; align-items: center; gap: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">📄 Dupliquer</button>
+            <button onclick="saveReport(true)" style="background: #3b82f6; color: white; padding: 10px 15px; border-radius: 6px; font-weight: bold; border: none; cursor: pointer; display: flex; align-items: center; gap: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">📑 Dupliquer</button>
             <button type="button" onclick="deleteReport()" style="background: #ef4444; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;">🗑️ Supprimer</button>
         </div>
         <div style="width: 100%; margin-top: 5px;">
-            <button type="button" onclick="exportToPDF()" style="background: #8b5cf6; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%;">📄 Exporter en PDF</button>
+            <button type="button" onclick="exportToPDF()" style="background: #8b5cf6; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%;">📤 Exporter en PDF</button>
         </div>
-        <div id="last-saved-status" style="width: 100%; color: #475569; font-size: 0.85rem;">Dernière sauvegarde : aucune</div>
     </section>
 
     <!-- INFORMATIONS GÉNÉRALES (HORS ONGLETS, VISIBLES PARTOUT) -->
     <section id="global-header" style="background: #e5e7eb; padding: 15px; margin-bottom: 20px; border-radius: 8px;">
-        <h2 style="margin-top:0;">Informations Générales du Projet</h2>
-        <div class="grid-2">
-            <div class="input-group"><label>Client</label><input type="text" id="global-client"></div>
-            <div class="input-group"><label>Réf. client</label><input type="text" id="global-ref-client"></div>
+        <h2>Informations Générales du Projet</h2>
+
+        <div class="input-group">
+            <label>Client</label>
+            <input type="text" id="global-client" placeholder="Ex: Municipalité, Entrepreneur, etc.">
         </div>
-        <div class="grid-2">
-            <div class="input-group"><label>Projet</label><input type="text" id="global-projet"></div>
-            <div class="input-group"><label>N° Projet</label><input type="text" id="global-no-projet"></div>
+
+        <div class="input-group">
+            <label>Réf. client</label>
+            <input type="text" id="global-ref-client">
         </div>
-        <div class="grid-2">
-            <div class="input-group"><label>Endroit</label><input type="text" id="global-endroit"></div>
-            <div class="input-group"><label>Date d'intervention</label><input type="date" id="global-date"></div>
+
+        <div class="input-group">
+            <label>Projet</label>
+            <input type="text" id="global-projet" placeholder="Ex: Réfection 4e rang">
         </div>
+
+        <div class="input-group">
+            <label>Endroit</label>
+            <input type="text" id="global-endroit" placeholder="Ex: Rue de la Paix, Av. des Champs-Élysées">
+        </div>
+
+        <div class="input-group">
+            <label>N° projet</label>
+            <input type="text" id="global-no-projet" placeholder="0260XXXX.00X">
+        </div>
+
+        <div class="input-group">
+            <label>Date</label>
+            <input type="date" id="global-date">
+        </div>
+        <div id="last-saved-status" style="width: 100%; color: #475569; font-size: 0.85rem; text-align: center;">Dernière sauvegarde : aucune</div>
     </section>
 
-    <small style="color: #242930; font-size: 0.8rem; display: block; margin-top: 3px; margin-bottom: 5px; text-align: center; margin-left: auto; margin-right: auto; max-width: 600px;">
+    <small id="form-instructions" class="form-instructions" style="color: #242930; font-size: 0.8rem; display: block; margin-top: 3px; margin-bottom: 5px; text-align: center; margin-left: auto; margin-right: auto; max-width: 600px; font-style: italic;">
         Cliquez sur les onglets pour naviguer entre les sections du formulaire. Les informations sont sauvegardées automatiquement. Vous pouvez passer d'une section à l'autre. Cependant prenez soin de bien sauvegarder votre rapport avant de quitter la page ou de fermer l'application.
     </small>
 
@@ -79,26 +97,31 @@
 
     <!-- ONGLET 1 : MÉTÉO & TRAVAUX -->
     <section id="tab-form1" class="tab-section">
+        <h2>1. Météo & Travaux</h2>
+
         <div class="form-section">
             <h3>Conditions Atmosphériques</h3>
             <!-- Disposition flex fluide -->
             <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start; background: white; padding: 15px; border-radius: 6px; border: 1px solid var(--border);">
                 
                 <div style="display: flex; flex-wrap: wrap; gap: 15px; flex: 1; min-width: 250px;">
-                    <label style="font-weight: bold; color: var(--primary);"><input type="checkbox" id="meteo-nuageux"> Nuageux</label>
-                    <label style="font-weight: bold; color: var(--primary);"><input type="checkbox" id="meteo-ensoleille"> Ensoleillé</label>
-                    <label style="font-weight: bold; color: var(--primary);"><input type="checkbox" id="meteo-neige"> Neige</label>
-                    <label style="font-weight: bold; color: var(--primary);"><input type="checkbox" id="meteo-pluie"> Pluie</label>
+                    <label><input type="checkbox" id="meteo-nuageux"> Nuageux</label>
+                    <label><input type="checkbox" id="meteo-ensoleille"> Ensoleillé</label>
+                    <label><input type="checkbox" id="meteo-neige"> Neige</label>
+                    <label><input type="checkbox" id="meteo-pluie"> Pluie</label>
                 </div>
 
                 <div style="display: flex; flex-wrap: wrap; gap: 15px; flex: 1; min-width: 250px; align-items: center; border-left: 2px solid #cbd5e1; padding-left: 15px;">
-                    <label style="font-weight: bold;"><input type="checkbox" id="travaux-int"> Travaux Intérieur</label>
-                    <label style="font-weight: bold;"><input type="checkbox" id="travaux-ext"> Travaux Extérieur</label>
+                    <label><input type="checkbox" id="travaux-int"> Travaux Intérieur</label>
+                    <label><input type="checkbox" id="travaux-ext"> Travaux Extérieur</label>
                     
-                    <div style="display: flex; gap: 10px; width: 100%; margin-top: 5px;">
-                        <input type="number" id="temp-min" placeholder="Temp Min °C" style="flex: 1; min-width: 80px;">
-                        <input type="number" id="temp-max" placeholder="Temp Max °C" style="flex: 1; min-width: 80px;">
-                    </div>
+                    
+                </div>
+                <div style="display: flex; gap: 10px; width: 100%; margin-top: 5px; align-items: center; flex-wrap: wrap; text-align: center; justify-content: center;">
+                        <label>Température min °C:</label>
+                        <input type="number" id="temp-min" placeholder="Ex: 9,5" style="width: 150px;" oninput="if(this.value.length > 4) this.value = this.value.slice(0,4);">
+                        <label>Température max °C:</label>
+                        <input type="number" id="temp-max" placeholder="Ex: 25,0" style="width: 150px;" oninput="if(this.value.length > 4) this.value = this.value.slice(0,4);">
                 </div>
             </div>
         </div>
@@ -132,20 +155,26 @@
                         <label><input type="checkbox" id="trav-ext-murs"> Remblai ext. Murs</label>
                         <label><input type="checkbox" id="trav-int-murs"> Remblai int. Murs</label>
                         <label><input type="checkbox" id="trav-empattements"> Remblai sous empattements</label>
+                        
                     </div>
 
                     <label style="font-weight:bold; color:var(--primary); margin-top:10px;"><input type="checkbox" id="trav-digue"> Digue</label>
+                    <div style="margin-top: 50px;">
+                        <label>Autres (Précisez)</label><input type="text" id="trav-autres-texte">
+                    </div>
                     
+                        
+                    <!--
                     <div class="input-group" style="margin-top: 15px;">
                         <label>Autres (Précisez)</label>
                         <input type="text" id="trav-autres-texte">
-                    </div>
+                    </div> -->
                 </div>
             </div>
         </div>
 
         <div style="text-align: center; margin: 30px 0;">
-            <a href="javascript:void(0);" onclick="scrollToSection('form-navigation')" style="color: var(--primary); font-weight: bold; text-decoration: none; font-size: 1rem; padding: 10px 20px; background: #e2e8f0; border-radius: 6px; display: inline-block;">
+            <a href="javascript:void(0);" onclick="scrollToSection('form-instructions')" style="color: var(--primary); font-weight: bold; text-decoration: none; font-size: 1rem; padding: 10px 20px; background: #e2e8f0; border-radius: 6px; display: inline-block;">
                 ⬆️ Retour aux sections du formulaire 
             </a>
         </div>
@@ -153,8 +182,10 @@
 
     <!-- ONGLET 2 : MATÉRIAUX & ÉQUIPEMENTS -->
     <section id="tab-form2" class="tab-section" style="display: none;">
+        <h2>2. Matériaux & Équipements</h2>
+
         <div class="form-section">
-            <div class="input-group"><label>Entrepreneur</label><input type="text" id="entrepreneur"></div>
+            <div class="input-group"><label>Entrepreneur</label><input type="text" id="entrepreneur" placeholder="Ex: Excavations XYZ"></div>
         </div>
 
         <!-- SOUS-JACENT -->
@@ -282,18 +313,18 @@
             
             <div style="border: 2px solid #cbd5e1; padding: 15px; border-radius: 6px; margin: 15px 0;">
                 <div class="grid-2" style="align-items: center;">
-                    <div class="input-group" style="margin:0;">
-                        <label style=" font-size:1.1rem;">M.vol. sèche max (kg/m³)</label>
-                        <input type="number" id="carac-mv-seche-max" step="0.1" style="border: 2px solid; font-size: 1.2rem; font-weight:bold;" oninput="calculateCompacite()">
+                    <div class="input-group" style="margin-bottom: 150px;">
+                        <label style=" font-size:1.1rem; color:var(--primary); font-weight:bold; text-align: center;">M.vol. sèche max (kg/m³)</label>
+                        <input type="number" id="carac-mv-seche-max" step="0.1" style="border: 2px solid; font-size: 1.2rem; font-weight:bold; text-align: center;" placeholder="Ex: 1800" oninput="if(this.value.length > 4) this.value = this.value.slice(0,4); calculateCompacite();">
                     </div>
                     <div>
-                        <div class="input-group"><label>Particules > 5mm (%)</label><input type="number" id="carac-part-5mm" step="0.1"></div>
-                        <div class="input-group" style="margin-top:10px;"><label>% Eau optimum</label><input type="number" id="carac-eau-optimum" step="0.1"></div>
+                        <div class="input-group"><label>Particules > 5mm (%)</label><input type="number" id="carac-part-5mm" step="0.1" placeholder="Ex: 62,5" oninput="if(this.value.length > 5) this.value = this.value.slice(0,5);"></div>
+                        <div class="input-group" style="margin-top:10px;"><label>% Eau optimum</label><input type="number" id="carac-eau-optimum" step="0.1" placeholder="Ex: 5,5" oninput="if(this.value.length > 5) this.value = this.value.slice(0,5);"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- NOUVELLE DISPOSITION DES CASES PROCTOR -->
+            <!-- NOUVELLE DISPOSITION DES CASES PROCTOR 
             <div class="checkbox-group" style="display:flex; flex-wrap:wrap; gap:15px; margin-bottom:15px; padding:10px; background:white; border-radius:6px; border:1px solid var(--border);">
                 <label><input type="checkbox" id="carac-proc-mod"> Proctor modifié</label>
                 <label><input type="checkbox" id="carac-proc-norm"> Proctor normal</label>
@@ -301,8 +332,23 @@
                 <label><input type="checkbox" id="carac-valeur-est"> Valeur estimée</label>
             </div>
             <div class="input-group">
-                <label><input type="checkbox" id="carac-densite-rel"> Densité relative (Gs) : <input type="number" id="carac-densite-rel-gs" style="width:80px;"></label>
+                <label><input type="checkbox" id="carac-densite-rel"> Densité relative (Gs) : <input type="number" id="carac-densite-rel-gs" style="width:150px;"></label>
+            </div> -->
+
+            <!-- NOUVELLE DISPOSITION DES CASES PROCTOR -->
+            <div class="checkbox-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; padding: 10px; background: white; border-radius: 6px; border: 1px solid var(--border);">
+                <label><input type="checkbox" id="carac-proc-mod"> Proctor modifié</label>
+                <label><input type="checkbox" id="carac-proc-norm"> Proctor normal</label>
+                <label><input type="checkbox" id="carac-planche-ref"> Planche de référence</label>
+                <label><input type="checkbox" id="carac-valeur-est"> Valeur estimée</label>
             </div>
+            <div class="input-group">
+                <label style="display: flex; align-items: center; gap: 10px;">
+                    <input type="checkbox" id="carac-densite-rel"> Densité relative (Gs) : 
+                    <input type="number" step="0.001" inputmode="decimal" id="carac-densite-rel-gs" placeholder="Ex: 0,000" oninput="if(this.value.length > 5) this.value = this.value.slice(0,5);" style="width: 150px;">
+                </label>
+            </div>
+
         </div>
 
         <!-- ÉPAISSEUR & ÉQUIPEMENT -->
@@ -314,17 +360,17 @@
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
                         <label style="margin: 0;">Épaisseur de levée (mm)</label>
                         <label style="display: flex; align-items: center; gap: 5px; font-weight:bold; background:#fee2e2; padding:2px 8px; border-radius:4px; color:#b91c1c; cursor:pointer; font-size: 0.8rem; margin: 0;">
-                            <input type="checkbox" id="epaisseur-no" onchange="toggleNO(this, 'input-epaisseur-levee')" style="margin: 0;"> N/O
+                            <input type="checkbox" id="epaisseur-no" onchange="toggleNO(this, 'input-epaisseur-levee')" style="margin: 0;" > N/O
                         </label>
                     </div>
                     <div id="input-epaisseur-levee">
-                        <input type="number" id="epaisseur-levee" style="width: 100%;">
+                        <input type="number" id="epaisseur-levee" style="width: 100%;" placeholder="Ex: 300" oninput="if(this.value.length > 3) this.value = this.value.slice(0,3);">
                     </div>
                 </div>
                 
                 <div class="input-group">
                     <label>Profondeur d'essai (mm)</label>
-                    <input type="number" id="profondeur-essai">
+                    <input type="number" id="profondeur-essai" placeholder="Ex: 200" oninput="if(this.value.length > 3) this.value = this.value.slice(0,3);">
                 </div>
             </div>
 
@@ -349,8 +395,8 @@
                 </div>
                 
                 <div class="grid-2" style="margin-top:10px;">
-                    <div class="input-group"><label>Modèle</label><input type="text" id="equip-modele"></div>
-                    <div class="input-group"><label>Nb de passes</label><input type="text" inputmode="numeric" id="equip-nb-passes"></div>
+                    <div class="input-group"><label>Modèle</label><input type="text" id="equip-modele" placeholder="Ex: Caterpillar D6T"></div>
+                    <div class="input-group"><label>Nb de passes</label><input type="text" inputmode="numeric" id="equip-nb-passes" placeholder="Ex: 10 @ 12"></div>
                 </div>
             </div>
         </div>
@@ -360,24 +406,38 @@
             <h3 style="margin-bottom: 15px;">Nucléodensimètre</h3>
             <div class="grid-2">
                 <div class="input-group">
-                    <label>Nucléo n°</label>
-                    <input type="text" id="nucleo-no">
+                    <label>N° de série</label>
+                    <input type="number" id="nucleo-no" placeholder="Ex: 123456" oninput="if(this.value.length > 7) this.value = this.value.slice(0,7);">
                 </div>
+
+                <!--
                 <div class="grid-2" style="gap: 10px;">
                     <div class="input-group">
                         <label>Écart d</label>
-                        <input type="text" id="nucleo-ecart-d">
+                        <input type="text" id="nucleo-ecart-d" placeholder="Ex: 0,05">
                     </div>
                     <div class="input-group">
                         <label>Écart h</label>
-                        <input type="text" id="nucleo-ecart-h">
+                        <input type="text" id="nucleo-ecart-h" placeholder="Ex: 0,05">
+                    </div>
+                </div> -->
+
+                <div class="grid-2" style="gap: 10px;">
+                    <div class="input-group">
+                        <label>Écart d</label>
+                        <input type="number" step="0.01" inputmode="decimal" id="nucleo-ecart-d" placeholder="Ex: 0,05" oninput="if(this.value.length > 5) this.value = this.value.slice(0,5);">
+                    </div>
+                    <div class="input-group">
+                        <label>Écart h</label>
+                        <input type="number" step="0.01" inputmode="decimal" id="nucleo-ecart-h" placeholder="Ex: 0,05" oninput="if(this.value.length > 5) this.value = this.value.slice(0,5);">
                     </div>
                 </div>
+
             </div>
         </div>
 
         <div style="text-align: center; margin: 30px 0;">
-            <a href="javascript:void(0);" onclick="scrollToSection('form-navigation')" style="color: var(--primary); font-weight: bold; text-decoration: none; font-size: 1rem; padding: 10px 20px; background: #e2e8f0; border-radius: 6px; display: inline-block;">
+            <a href="javascript:void(0);" onclick="scrollToSection('form-instructions')" style="color: var(--primary); font-weight: bold; text-decoration: none; font-size: 1rem; padding: 10px 20px; background: #e2e8f0; border-radius: 6px; display: inline-block;">
                 ⬆️ Retour aux sections du formulaire 
             </a>
         </div>
@@ -385,12 +445,13 @@
 
     <!-- ONGLET 3 : ESSAIS & RÉSULTATS -->
     <section id="tab-form3" class="tab-section" style="display: none;">
+        <h2>3. Essais & Résultats</h2>
         
         <div class="form-section">
             <div class="grid-2" style="align-items:center;">
                 <div class="input-group" style="margin:0;">
-                    <label style="font-size:1.1rem; font-weight:bold;">Exigence de compacité (%)</label>
-                    <input type="number" id="exigence-compacite" step="0.1" style="font-size: 1.2rem; font-weight:bold;" oninput="calculateCompacite()">
+                    <label style="font-size:1.1rem; font-weight:bold; color:var(--primary);">Exigence de compacité (%)</label>
+                    <input type="number" id="exigence-compacite" step="0.1" style="font-size: 1.2rem;" oninput="calculateCompacite()" placeholder="Ex: 95">
                 </div>
                 <div class="checkbox-group" style="margin:0;">
                     <label><input type="checkbox" id="methode-nucleo"> Essais in situ au nucléodensimètre</label>
@@ -403,18 +464,22 @@
 
         <div class="form-section">
             <div class="input-group">
-                <label style="font-weight:bold; color:var(--primary);">Secteur représenté</label>
+                <label style="font-weight:bold;">Secteur représenté</label>
                 <input type="text" id="essai-secteur" placeholder="Ex: Chaînage 12+300 à 12+450">
             </div>
         </div>
 
-        <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:10px;">
-            <h3 style="margin:0;">Tableau des Essais</h3>
-            <button type="button" onclick="addEssai()" style="background:#0284c7; color:white; border:none; padding:8px 12px; border-radius:4px; font-weight:bold; cursor:pointer;">➕ Ajouter un essai</button>
-        </div>
+        <div class="form-section">
+            <h3>Tableau des Essais</h3>
 
-        <div id="essais-container">
-            <!-- Lignes dynamiques ajoutées ici -->
+            <div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
+                <button type="button" class="collapse-trucks-button" onclick="collapseAllEssais()" style="background: #475569; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">Tout réduire</button>
+            </div>
+
+            <div id="essais-container">
+                <!-- Lignes dynamiques ajoutées ici -->
+            </div>
+            <button type="button" onclick="addEssai()" style="margin-top: 10px; background-color: #0284c7; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; width: 100%;">➕ Ajouter un essai</button>
         </div>
 
         <div class="form-section">
@@ -425,21 +490,25 @@
         <div class="form-section">
             <h3>Conclusion & Signatures</h3>
             <div class="grid-2">
-                <div class="input-group"><label>Rapport sommaire numéro</label><input type="text" id="rap-sommaire-no"></div>
-                <div class="input-group"><label>Remis à</label><input type="text" id="rap-remis-a"></div>
+                <div class="input-group"><label>Rapport sommaire numéro</label><input type="text" id="rap-sommaire-no" placeholder="Ex: 12345"></div>
+                <div class="input-group"><label>Remis à</label><input type="text" id="rap-remis-a" placeholder="Ex: Durand Marie"></div>
             </div>
             <div class="grid-2" style="margin-top:15px; border-top:1px solid #ccc; padding-top:15px;">
-                <div class="input-group"><label>Nom du technicien</label><input type="text" id="sig-englobe-nom"></div>
+                <div class="input-group"><label>Nom du technicien</label><input type="text" id="sig-englobe-nom" placeholder="Ex: Dupont Jean"></div>
                 <div class="input-group"><label>Date</label><input type="date" id="sig-englobe-date"></div>
             </div>
             <div class="grid-2">
-                <div class="input-group"><label>Responsable de chantier</label><input type="text" id="sig-resp-nom"></div>
+                <div class="input-group"><label>Responsable de chantier</label><input type="text" id="sig-resp-nom" placeholder="Ex: Martin Pierre"></div>
                 <div class="input-group"><label>Date</label><input type="date" id="sig-resp-date"></div>
             </div>
         </div>
 
+        <small id="form-instructions2" style="color: #242930; font-size: 0.8rem; display: block; margin-top: 3px; margin-bottom: 5px; text-align: center; margin-left: auto; margin-right: auto; max-width: 600px; font-style: italic;">
+            Veuillez exporter le formulaire en PDF pour le soumettre et/ou le sauvegarder avant de fermer la page/l'application. Les données sont sauvegardées localement, mais l'exportation en PDF est nécessaire pour la soumission officielle.
+        </small>
+
         <div style="text-align: center; margin: 30px 0;">
-            <a href="javascript:void(0);" onclick="scrollToSection('form-navigation')" style="color: var(--primary); font-weight: bold; text-decoration: none; font-size: 1rem; padding: 10px 20px; background: #e2e8f0; border-radius: 6px; display: inline-block;">
+            <a href="javascript:void(0);" onclick="scrollToSection('form-instructions')" style="color: var(--primary); font-weight: bold; text-decoration: none; font-size: 1rem; padding: 10px 20px; background: #e2e8f0; border-radius: 6px; display: inline-block;">
                 ⬆️ Retour aux sections du formulaire 
             </a>
         </div>
@@ -448,26 +517,42 @@
 </div>
 
 <template id="essai-template">
-    <div class="essai-card" style="border: 2px solid var(--border); border-radius: 8px; margin-bottom: 15px; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-        <div style="background: #e2e8f0; padding: 8px 15px; display: flex; justify-content: space-between; align-items: center; font-weight:bold;">
-            <span class="essai-title">Essai #<span class="row-index">1</span></span>
-            <div style="display:flex; gap:10px;">
-                <button type="button" onclick="duplicateEssai(this)" style="background:#3b82f6; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:0.85rem;">📋 Dupliquer</button>
-                <button type="button" onclick="deleteEssai(this)" style="background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:0.85rem;">❌ Supprimer</button>
+    <div class="essai-card" style="border: 1px solid #0284c7; border-radius: 6px; margin-bottom: 15px; background: #f8fafc; overflow: hidden;">
+        
+        <!-- EN-TÊTE RÉTRACTABLE (ACCORDÉON) -->
+        <div class="accordion-header" onclick="toggleAccordion(this)" style="background: #e2e8f0; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; cursor: pointer;">
+            <div style="display: flex; align-items: center;">
+                <span class="chevron" style="margin-right: 10px;">▼</span>
+                <span class="essai-title">Essai #<span class="row-index">1</span></span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <button type="button" onclick="duplicateEssai(this, event)" style="background: #3b82f6; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; font-weight: bold;">📋 Dupliquer</button>
+                <button type="button" onclick="deleteEssai(this, event)" style="background: none; border: none; color: #ef4444; font-weight: bold; font-size: 1.2rem; cursor: pointer; padding: 0 5px; margin-left: 5px;">✖</button>
             </div>
         </div>
-        <div style="padding: 15px;">
+
+        <!-- CONTENU DE LA CARTE -->
+        <div class="accordion-content active" style="padding: 15px;">
+            
+            <!-- AVERTISSEMENTS DYNAMIQUES (Sans "background" pour rester orange vif en Mode Nuit) -->
+            <div class="warn-mv-max" style="color: #f97316; border: 2px solid #f97316; padding: 8px 12px; border-radius: 6px; font-weight: bold; font-size: 0.9rem; margin-bottom: 8px; text-align: center;">
+                ⚠️ Veuillez saisir la M.vol. sèche max (kg/m³) dans l'onglet Matériaux & Équipements.
+            </div>
+            <div class="warn-exigence" style="color: #f97316; border: 2px solid #f97316; padding: 8px 12px; border-radius: 6px; font-weight: bold; font-size: 0.9rem; margin-bottom: 15px; text-align: center;">
+                ⚠️ Veuillez saisir l'exigence de compacité (%) au haut de cette page.
+            </div>
+
             <div class="grid-2" style="margin-bottom:10px;">
-                <div class="input-group"><label>Localisation de l'essai</label><input type="text" class="essai-secteur"></div>
+                <div class="input-group"><label>Localisation de l'essai</label><input type="text" class="essai-secteur" placeholder="Ex: 12+340"></div>
                 <!-- CHAMP RENDU LECTURE SEULE ET AUTO-GÉRÉ PAR JS -->
                 <div class="input-group"><label>N° essai</label><input type="text" class="essai-no" readonly style="background:#f8fafc; font-weight:bold; color:#334155;"></div>
             </div>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px;">
-                <div class="input-group"><label>Élévation (m)</label><input type="number" step="0.01" class="essai-elevation"></div>
-                <div class="input-group"><label>Part. > 5mm</label><input type="number" step="0.1" class="essai-part"></div>
-                <div class="input-group"><label>Teneur eau (%)</label><input type="number" step="0.1" class="essai-eau"></div>
-                <div class="input-group"><label>MV Sèche (kg/m³)</label><input type="number" step="0.1" class="essai-mv-seche trigger-calc"></div>
-                <div class="input-group"><label>MV Max Corr. (kg/m³)</label><input type="number" step="0.1" class="essai-mv-max-corr trigger-calc" placeholder="Sinon Globale"></div>
+                <div class="input-group"><label>Élévation (m)</label><input type="number" step="0.01" class="essai-elevation" placeholder="Ex: 380,000" oninput="if(this.value.length > 10) this.value = this.value.slice(0,10);"></div>
+                <div class="input-group"><label>Part. > 5mm</label><input type="number" step="0.1" class="essai-part" placeholder="Ex: 62,5" oninput="if(this.value.length > 5) this.value = this.value.slice(0,5);"></div>
+                <div class="input-group"><label>Teneur eau (%)</label><input type="number" step="0.1" class="essai-eau" placeholder="Ex: 5,0" oninput="if(this.value.length > 5) this.value = this.value.slice(0,5);"></div>
+                <div class="input-group"><label>MV Sèche (kg/m³)</label><input type="number" class="essai-mv-seche trigger-calc" placeholder="Ex: 1800" oninput="if(this.value.length > 4) this.value = this.value.slice(0,4);"></div>
+                <div class="input-group"><label>MV Max Corr. (kg/m³)</label><input type="number" class="essai-mv-max-corr trigger-calc" placeholder="Ex: 1900" oninput="if(this.value.length > 4) this.value = this.value.slice(0,4);"></div>
             </div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; padding-top: 15px; border-top: 1px solid #e2e8f0;">
                 <div class="input-group" style="margin:0;">

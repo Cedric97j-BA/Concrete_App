@@ -841,6 +841,295 @@ async function exportToPDF() {
         const techNameVal = document.getElementById('sig-prep-nom')?.value || '';
         const initialsVal = techNameVal.split(' ').filter(n => n).map(n => n[0].toUpperCase()).join('') || 'TECH';
 
+        const pdfBytes = await pdfDoc.save();
+        const fileName = `Planche_${noProjetVal}_${rawDateVal}_${calibreVal}_${initialsVal}.pdf`;
+
+        // BIFURCATION : APPLICATION ANDROID vs WEB
+        if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+            try {
+                const pdfBase64 = await pdfDoc.saveAsBase64(); // Attention ici : pdfDoc
+                const { Filesystem, FileOpener } = window.Capacitor.Plugins;
+                
+                if (!Filesystem || !FileOpener) {
+                    throw new Error("Plugins introuvables. npx cap sync a-t-il été fait ?");
+                }
+                
+                // 1. Sauvegarde silencieuse en cache
+                const resultat = await Filesystem.writeFile({
+                    path: fileName,
+                    data: pdfBase64,
+                    directory: 'CACHE',
+                    recursive: true
+                });
+
+                // 2. Ouverture automatique (lancera Foxit directement si défini par défaut)
+                await FileOpener.open({ 
+                    filePath: resultat.uri, 
+                    contentType: 'application/pdf' 
+                });
+
+                await Share.share({ title: fileName, url: resultat.uri });
+            } catch (err) {
+                console.error(err);
+                alert("Erreur lors de l'enregistrement sur la tablette.");
+            }
+        } else {
+            // COMPORTEMENT WEB ORIGINAL
+            const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+            const isMacTouch = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+            const isApple = /iPhone|iPad|iPod/i.test(navigator.userAgent) || isMacTouch;
+            
+            let attemptedShare = false;
+            try {
+                if (isApple && navigator.share && navigator.canShare) {
+                    const file = new File([blob], fileName, { type: 'application/pdf' });
+                    if (navigator.canShare({ files: [file] })) {
+                        attemptedShare = true;
+                        await navigator.share({ files: [file] });
+                    }
+                }
+            } catch (err) { if (err.name !== 'AbortError') attemptedShare = false; }
+
+            if (!attemptedShare) {
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = fileName;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                setTimeout(() => window.URL.revokeObjectURL(url), 100);
+            }
+        }
+        
+        if (btn) {
+            btn.textContent = originalText;
+            btn.disabled = false;
+        }
+
+    } catch (error) {
+        console.error("Erreur lors de l'export PDF :", error);
+        showToast("Erreur lors de l'export PDF. Vérifiez la console.", "error");
+        const btn = document.querySelector('button[onclick="exportToPDF()"]');
+        if (btn) {
+            btn.textContent = "📄 Exporter en PDF";
+            btn.disabled = false;
+        }
+    }
+}
+
+/*
+async function exportToPDF() {
+    try {
+        const btn = document.querySelector('button[onclick="exportToPDF()"]');
+        const originalText = btn ? btn.textContent : "📄 Exporter en PDF";
+        if (btn) {
+            btn.textContent = "⏳ Génération en cours...";
+            btn.disabled = true;
+        }
+
+        const mergedPdf = await PDFLib.PDFDocument.create();
+        mergedPdf.registerFontkit(fontkit);
+        
+        const getBuffer = (base64) => {
+            const str = window.atob(base64);
+            const bytes = new Uint8Array(str.length);
+            for (let i = 0; i < str.length; i++) bytes[i] = str.charCodeAt(i);
+            return bytes.buffer;
+        };
+
+        const fontBytes = new Uint8Array(getBuffer(TAHOMA_FONT));
+        const tahomaFont = await mergedPdf.embedFont(fontBytes);
+
+        const subDoc = await PDFLib.PDFDocument.load(getBuffer(TEMPLATE_PLANCHE));
+        subDoc.registerFontkit(fontkit);
+        const form = subDoc.getForm();
+        
+        // ========================================================
+        // REVERSE-MAPPING ENGINE
+        // ========================================================
+        form.getFields().forEach(field => {
+            const pdfName = field.getName();
+            let val = null;
+
+            let el = document.getElementById(pdfName);
+            if (el) {
+                if (el.tagName === 'SPAN' || el.tagName === 'DIV') val = el.textContent; 
+                else if (el.type === 'checkbox') val = el.checked;
+                else val = el.value;
+            } 
+            else if (pdfName.startsWith('pass-')) {
+                const parts = pdfName.split('-');
+                if (parts.length >= 3) {
+                    const row = parseInt(parts[1]); 
+                    const prop = parts.slice(2).join('-'); 
+                    
+                    const passes = document.querySelectorAll('.pass-card');
+                    if (row > 0 && row <= passes.length) {
+                        const card = passes[row - 1];
+                        
+                        if (prop === 'num') val = card.querySelector('.pass-num').value;
+                        else if (prop === 'den-1') val = card.querySelectorAll('.den-val')[0]?.value;
+                        else if (prop === 'den-2') val = card.querySelectorAll('.den-val')[1]?.value;
+                        else if (prop === 'den-3') val = card.querySelectorAll('.den-val')[2]?.value;
+                        else if (prop === 'den-avg') val = card.querySelector('.den-avg').textContent;
+                        else if (prop === 'hum-1') val = card.querySelectorAll('.hum-val')[0]?.value;
+                        else if (prop === 'hum-2') val = card.querySelectorAll('.hum-val')[1]?.value;
+                        else if (prop === 'hum-3') val = card.querySelectorAll('.hum-val')[2]?.value;
+                        else if (prop === 'hum-avg') val = card.querySelector('.hum-avg').textContent;
+                        else if (prop === 'delta') {
+                            const dText = card.querySelector('.delta-mv').textContent;
+                            val = (dText !== '---' && dText !== 'N/A') ? dText : '';
+                        }
+                        else if (prop === 'sd') val = card.querySelector('.sd-select').value;
+                    }
+                }
+            }
+
+            if (val !== null && val !== undefined && val !== '---' && val !== '') {
+            try {
+                let finalStr = val.toString();
+                
+                // EXCLUSION TOTALE : Si le champ concerne un numéro de projet, on garde le point (ex: 2026.04)
+                const lowerName = pdfName.toLowerCase();
+                const isProjectNumber = lowerName.includes('projet') || lowerName.includes('no-') || lowerName.includes('numero');
+                
+                if (!isProjectNumber) {
+                    finalStr = finalStr.replace(/(\d)\.(\d)/g, '$1,$2');
+                }
+
+                if (typeof field.setText === 'function') {
+                    field.setText(finalStr);
+                } else if (typeof field.select === 'function') {
+                    try { field.addOptions([finalStr]); } catch(e) {}
+                    field.select(finalStr);
+                } else if (typeof field.check === 'function') {
+                    if (val === true) field.check();
+                    else field.uncheck();
+                }
+            } catch (e) {
+                console.warn(`Warning: Could not set PDF field ${pdfName}`, e);
+            }
+        }
+
+        });
+
+        try {
+            const subFont = await subDoc.embedFont(fontBytes);
+            form.updateFieldAppearances(subFont);
+            if (form.acroForm) form.acroForm.dict.set(PDFLib.PDFName.of('NeedAppearances'), PDFLib.PDFBool.False);
+        } catch (e) {}
+
+        // ========================================================
+        // 4. MAPPAGE DU GRAPHIQUE (BORDURE INVISIBLE & COINS RONDS)
+        // ========================================================
+        let rect = null;
+        try {
+            const chartField = form.getButton('densityChart');
+            if (chartField) {
+                const widget = chartField.acroField.getWidgets()[0];
+                rect = widget.getRectangle();
+                form.removeField('densityChart');
+            }
+        } catch (e) {
+            console.warn("Impossible de trouver le bouton densityChart", e);
+        }
+
+        const copiedPages = await mergedPdf.copyPages(subDoc, subDoc.getPageIndices());
+        copiedPages.forEach(page => mergedPdf.addPage(page));
+
+        try {
+            const canvas = document.getElementById('densityChart');
+            
+            if (canvas && rect && typeof myChart !== 'undefined') {
+                
+                const tabSection = canvas.closest('.tab-section');
+                let wasHidden = false;
+                if (tabSection && window.getComputedStyle(tabSection).display === 'none') {
+                    wasHidden = true;
+                    tabSection.style.display = 'block'; 
+                    tabSection.style.visibility = 'hidden'; 
+                    tabSection.style.position = 'absolute'; 
+                    await new Promise(resolve => setTimeout(resolve, 50)); 
+                }
+
+                const originalWidth = canvas.style.width;
+                const originalHeight = canvas.style.height;
+                const originalMaxHeight = canvas.style.maxHeight;
+                const originalMinHeight = canvas.style.minHeight;
+
+                const oldAnimation = myChart.options.animation;
+                myChart.options.animation = false;
+
+                canvas.style.width = (rect.width * 3) + 'px'; 
+                canvas.style.height = (rect.height * 3) + 'px'; 
+                canvas.style.maxHeight = 'none'; 
+                canvas.style.minHeight = 'none'; 
+                
+                myChart.resize();
+                if (typeof myChart.update === 'function') myChart.update('none'); 
+
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = canvas.width;
+                tempCanvas.height = canvas.height;
+                const tCtx = tempCanvas.getContext('2d');
+                
+                const cornerRadius = tempCanvas.width * 0.015; 
+                tCtx.beginPath();
+                tCtx.moveTo(cornerRadius, 0);
+                tCtx.lineTo(tempCanvas.width - cornerRadius, 0);
+                tCtx.quadraticCurveTo(tempCanvas.width, 0, tempCanvas.width, cornerRadius);
+                tCtx.lineTo(tempCanvas.width, tempCanvas.height - cornerRadius);
+                tCtx.quadraticCurveTo(tempCanvas.width, tempCanvas.height, tempCanvas.width - cornerRadius, tempCanvas.height);
+                tCtx.lineTo(cornerRadius, tempCanvas.height);
+                tCtx.quadraticCurveTo(0, tempCanvas.height, 0, tempCanvas.height - cornerRadius);
+                tCtx.lineTo(0, cornerRadius);
+                tCtx.quadraticCurveTo(0, 0, cornerRadius, 0);
+                tCtx.closePath();
+                tCtx.clip();
+
+                tCtx.fillStyle = 'white';
+                tCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+                tCtx.drawImage(canvas, 0, 0);
+                
+                // (La bordure a été supprimée ici pour la rendre invisible)
+
+                const chartImageBase64 = tempCanvas.toDataURL('image/png', 1.0);
+                const pngImageBytes = await fetch(chartImageBase64).then(res => res.arrayBuffer());
+                const pdfImage = await mergedPdf.embedPng(pngImageBytes);
+
+                canvas.style.width = originalWidth;
+                canvas.style.height = originalHeight;
+                canvas.style.maxHeight = originalMaxHeight;
+                canvas.style.minHeight = originalMinHeight;
+                myChart.options.animation = oldAnimation;
+                myChart.resize();
+
+                if (wasHidden && tabSection) {
+                    tabSection.style.display = 'none';
+                    tabSection.style.visibility = ''; 
+                    tabSection.style.position = '';
+                }
+
+                const finalPages = mergedPdf.getPages();
+                finalPages[0].drawImage(pdfImage, {
+                    x: rect.x,
+                    y: rect.y,
+                    width: rect.width, 
+                    height: rect.height 
+                });
+            }
+        } catch (e) {
+            console.warn("Erreur lors de la génération de l'image du graphique", e);
+        }
+        // ========================================================
+
+        const noProjetVal = document.getElementById('global-no-projet').value.trim() || 'SANS-NUMERO';
+        const rawDateVal = document.getElementById('global-date').value || new Date().toISOString().split('T')[0];
+        const calibreVal = document.getElementById('info-calibre')?.value.trim() || 'Calibre';
+        const techNameVal = document.getElementById('sig-prep-nom')?.value || '';
+        const initialsVal = techNameVal.split(' ').filter(n => n).map(n => n[0].toUpperCase()).join('') || 'TECH';
+
         const pdfBytes = await mergedPdf.save();
         const blob = new Blob([pdfBytes], { type: 'application/pdf' });
         const fileName = `Planche_${noProjetVal}_${rawDateVal}_${calibreVal}_${initialsVal}.pdf`;
@@ -891,3 +1180,4 @@ async function exportToPDF() {
         }
     }
 }
+*/ 

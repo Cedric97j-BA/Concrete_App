@@ -18,6 +18,8 @@ files_to_convert = {
     "TEMPLATE_JOURNAL_F1": os.path.join(BASE_DIR, "templates", "template_journal_f1.pdf"),
     "TEMPLATE_JOURNAL_F2": os.path.join(BASE_DIR, "templates", "template_journal_f2.pdf"),
     "TEMPLATE_JOURNAL_F3": os.path.join(BASE_DIR, "templates", "template_journal_f3.pdf"),
+    "TEMPLATE_PAVAGE_CONCORDANCE": os.path.join(BASE_DIR, "templates", "template_pavage_concordance.pdf"),
+    "TEMPLATE_COULIS": os.path.join(BASE_DIR, "templates", "template_coulis.pdf"),
     "TAHOMA_FONT": os.path.join(BASE_DIR, "fonts", "tahoma.ttf") 
 }
 

@@ -307,6 +307,49 @@ button[onclick^="add"]:hover {
 }
 
 /* ========================================= */
+/* TÉMOIN : CONDITIONS INITIALES DE CURE       */
+/* (ligne Prélèvement + lignes a à i)          */
+/* ========================================= */
+.prelev-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    width: 100%;
+    max-width: 100%;
+}
+.prelev-row .prelev-title {
+    flex: 0 0 100px;
+    font-weight: bold;
+}
+.prelev-row > div {
+    flex: 1 1 140px;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.prelev-row > div > label {
+    flex: 0 0 auto;
+}
+.prelev-row > div > input {
+    flex: 1 1 auto;
+    width: auto;
+    min-width: 0;
+}
+.temoin-container details,
+.temoin-only-card details {
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+.temoin-container details .input-group,
+.temoin-only-card details .input-group {
+    min-width: 0;
+}
+
+/* ========================================= */
 /* RESPONSIVITÉ MOBILE (CORRECTIFS iPHONE/iPAD)*/
 /* ========================================= */
 @media (max-width: 820px) {
@@ -424,6 +467,20 @@ button[onclick^="add"]:hover {
         display: flex !important;
         flex-direction: column !important;
         gap: 15px !important;
+    }
+    .prelev-row {
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
+    .prelev-row .prelev-title {
+        flex: 0 0 auto !important;
+    }
+    .prelev-row > div {
+        flex: 1 1 auto !important;
+        width: 100% !important;
+    }
+    .prelev-row > div > label {
+        min-width: 50px;
     }
 
     /* 6. NETTOYAGE DES INPUTS TEMPS/DATE APPLE */

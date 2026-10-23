@@ -78,7 +78,7 @@ function toggleNO(checkbox, sectionId) {
 // ========================================== //
 // 2. GESTION DES ESSAIS ET CALCULS "N-C"     //
 // ========================================== //
-
+/*
 function addEssai() {
     const container = document.getElementById('essais-container');
     const template = document.getElementById('essai-template');
@@ -197,6 +197,158 @@ function calculateCompacite() {
     });
 }
 
+*/
+
+// ========================================== //
+// 2. GESTION DES ESSAIS ET CALCULS "N-C"     //
+// ========================================== //
+
+function toggleAccordion(headerElement) {
+    const content = headerElement.nextElementSibling;
+    const chevron = headerElement.querySelector('.chevron');
+    
+    content.classList.toggle('active');
+    chevron.classList.toggle('rotated');
+}
+
+function addEssai() {
+    const container = document.getElementById('essais-container');
+    const template = document.getElementById('essai-template');
+    const clone = template.content.cloneNode(true);
+    
+    clone.querySelectorAll('.trigger-calc').forEach(input => {
+        input.addEventListener('input', calculateCompacite);
+    });
+
+    container.appendChild(clone);
+    updateRowIndices();
+    calculateCompacite();
+}
+
+function duplicateEssai(btn, event) {
+    if (event) event.stopPropagation();
+    const originalCard = btn.closest('.essai-card');
+    const newCard = originalCard.cloneNode(true);
+    
+    // Ajout des listeners sur la nouvelle carte
+    newCard.querySelectorAll('.trigger-calc').forEach(input => {
+        input.addEventListener('input', calculateCompacite);
+    });
+
+    // Insertion juste après la carte copiée
+    originalCard.insertAdjacentElement('afterend', newCard);
+    updateRowIndices();
+    calculateCompacite();
+}
+
+function deleteEssai(btn, event) {
+    if (event) event.stopPropagation();
+    if (confirm("Supprimer cette ligne d'essai ?")) {
+        btn.closest('.essai-card').remove();
+        updateRowIndices();
+        calculateCompacite();
+    }
+}
+
+function collapseAllEssais() {
+    document.querySelectorAll('.essai-card .accordion-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    document.querySelectorAll('.essai-card .chevron').forEach(chevron => {
+        chevron.classList.add('rotated');
+    });
+}
+
+function updateRowIndices() {
+    const cards = document.querySelectorAll('.essai-card');
+    cards.forEach((card, index) => {
+        const rowNum = index + 1; // 1, 2, 3...
+        // Met à jour le titre visuel de la carte
+        card.querySelector('.row-index').textContent = rowNum;
+        // Injecte la valeur automatique dans le champ "N° essai"
+        const noInput = card.querySelector('.essai-no');
+        if (noInput) noInput.value = rowNum;
+    });
+}
+
+function scrollToSection(sectionId) {
+    const element = document.getElementById(sectionId);
+    if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+
+function calculateCompacite() {
+    const globalMaxStr = document.getElementById('carac-mv-seche-max').value;
+    const globalMax = parseFloat(globalMaxStr);
+    
+    const exigenceStr = document.getElementById('exigence-compacite').value;
+    const exigence = parseFloat(exigenceStr);
+
+    const hasGlobalMax = globalMaxStr.trim() !== '' && !isNaN(globalMax) && globalMax > 0;
+    const hasExigence = exigenceStr.trim() !== '' && !isNaN(exigence) && exigence > 0;
+
+    document.querySelectorAll('.essai-card').forEach(card => {
+        // Gestion de la visibilité des avertissements
+        const warnMv = card.querySelector('.warn-mv-max');
+        const warnExig = card.querySelector('.warn-exigence');
+        if (warnMv) warnMv.style.display = hasGlobalMax ? 'none' : 'block';
+        if (warnExig) warnExig.style.display = hasExigence ? 'none' : 'block';
+
+        const mvSecheStr = card.querySelector('.essai-mv-seche').value;
+        const mvMaxCorrStr = card.querySelector('.essai-mv-max-corr').value;
+        const compaciteInput = card.querySelector('.essai-compacite');
+        const remInput = card.querySelector('.essai-rem');
+
+        if (!mvSecheStr) {
+            compaciteInput.value = '';
+            compaciteInput.style.borderColor = '#cbd5e1';
+            compaciteInput.style.backgroundColor = '#f8fafc';
+            compaciteInput.style.color = '#334155';
+            return;
+        }
+
+        const mvSeche = parseFloat(mvSecheStr);
+        // Utilise la valeur corrigée de la ligne, SINON la globale
+        const referenceMax = mvMaxCorrStr ? parseFloat(mvMaxCorrStr) : globalMax;
+
+        if (!isNaN(mvSeche) && !isNaN(referenceMax) && referenceMax > 0) {
+            const compacite = Math.min((mvSeche / referenceMax) * 100, 100);
+            compaciteInput.value = compacite.toFixed(1).replace('.', ',');
+
+            // Logique N-C Intelligente
+            if (!isNaN(exigence)) {
+                if (compacite < exigence) {
+                    compaciteInput.style.borderColor = '#ef4444'; // Rouge
+                    compaciteInput.style.backgroundColor = '#fef2f2';
+                    compaciteInput.style.color = '#b91c1c';
+                    
+                    let currentRem = remInput.value.trim();
+                    if (!currentRem.includes("N-C")) {
+                        remInput.value = currentRem ? "N-C, " + currentRem : "N-C";
+                    }
+                } else {
+                    compaciteInput.style.borderColor = '#22c55e'; // Vert
+                    compaciteInput.style.backgroundColor = '#f0fdf4';
+                    compaciteInput.style.color = '#15803d';
+                    
+                    // Retire le N-C automatique si le chiffre redevient bon
+                    if (remInput.value.includes("N-C")) {
+                        let parts = remInput.value.split(',').map(s=>s.trim()).filter(s => s !== "N-C" && s !== "");
+                        remInput.value = parts.join(', ');
+                    }
+                }
+            } else {
+                compaciteInput.style.borderColor = '#cbd5e1';
+                compaciteInput.style.backgroundColor = '#f8fafc';
+                compaciteInput.style.color = '#334155';
+            }
+        } else {
+            compaciteInput.value = '';
+        }
+    });
+}
+
 // ========================================== //
 // 3. MOTEUR DE SAUVEGARDE (LOCALSTORAGE)     //
 // ========================================== //
@@ -212,25 +364,7 @@ function updateLastSavedStatus(timestamp = Date.now()) {
         status.textContent = `Dernière sauvegarde : ${dateText} - ${timeText}`;
     }
 }
-/*
-function updateDropdown() {
-    const dropdown = document.getElementById('saved-reports-dropdown');
-    if (!dropdown) return;
-    
-    dropdown.innerHTML = '<option value="">-- Sélectionnez un rapport --</option>';
-    let savedKeys = [];
-    for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && key.startsWith('compactage_')) savedKeys.push(key);
-    }
-    savedKeys.sort().forEach(key => {
-        const option = document.createElement('option');
-        option.value = key;
-        option.textContent = key.replace('compactage_', '').replace(/_/g, ' ');
-        dropdown.appendChild(option);
-    });
-    if (currentActiveReportKey) dropdown.value = currentActiveReportKey;
-} */
+
 
 function updateDropdown() {
     const dropdown = document.getElementById('saved-reports-dropdown');
@@ -573,44 +707,65 @@ async function exportToPDF() {
         const techNameVal = document.getElementById('sig-englobe-nom')?.value || '';
         const initialsVal = techNameVal.split(' ').filter(n => n).map(n => n[0].toUpperCase()).join('') || 'TECH';
 
+        
         const pdfBytes = await mergedPdf.save();
-        const blob = new Blob([pdfBytes], { type: 'application/pdf' });
         const fileName = `Compactage_${noProjetVal}_${rawDateVal}_${initialsVal}.pdf`;
 
-        // LOGIQUE SÉPARÉE : APPLE VS ANDROID/PC
-        const isMacTouch = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
-        const isApple = /iPhone|iPad|iPod/i.test(navigator.userAgent) || isMacTouch;
-        
-        let attemptedShare = false;
-        try {
-            // UNIQUEMENT POUR APPLE : On ouvre le menu de partage
-            if (isApple && navigator.share && navigator.canShare) {
-                const file = new File([blob], fileName, { type: 'application/pdf' });
-                if (navigator.canShare({ files: [file] })) {
-                    attemptedShare = true;
-                    await navigator.share({ files: [file] });
+        // BIFURCATION : APPLICATION ANDROID vs WEB
+        if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+            try {
+                const pdfBase64 = await mergedPdf.saveAsBase64(); // Attention ici : mergedPdf
+                const { Filesystem, FileOpener } = window.Capacitor.Plugins;
+                
+                if (!Filesystem || !FileOpener) {
+                    throw new Error("Plugins introuvables. npx cap sync a-t-il été fait ?");
                 }
-            }
-        } catch (err) {
-            console.log("Partage annulé ou échoué:", err);
-            if (err.name !== 'AbortError') attemptedShare = false;
-        }
+                
+                // 1. Sauvegarde silencieuse en cache
+                const resultat = await Filesystem.writeFile({
+                    path: fileName,
+                    data: pdfBase64,
+                    directory: 'CACHE',
+                    recursive: true
+                });
 
-        // POUR ANDROID ET PC : On sauvegarde directement le fichier en local
-        if (!attemptedShare) {
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = fileName;
-            document.body.appendChild(link);
-            link.click(); // Force le téléchargement direct dans le dossier de la tablette
-            document.body.removeChild(link);
-            setTimeout(() => window.URL.revokeObjectURL(url), 100);
-        }
-        
-        if (btn) {
-            btn.textContent = originalText;
-            btn.disabled = false;
+                // 2. Ouverture automatique (lancera Foxit directement si défini par défaut)
+                await FileOpener.open({ 
+                    filePath: resultat.uri, 
+                    contentType: 'application/pdf' 
+                });
+
+            } catch (err) {
+                console.error(err);
+                alert("Erreur lors de l'enregistrement sur la tablette.");
+            }
+        } else {
+            // COMPORTEMENT WEB ORIGINAL
+            const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+            const isMacTouch = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+            const isApple = /iPhone|iPad|iPod/i.test(navigator.userAgent) || isMacTouch;
+            
+            let attemptedShare = false;
+            try {
+                if (isApple && navigator.share && navigator.canShare) {
+                    const file = new File([blob], fileName, { type: 'application/pdf' });
+                    if (navigator.canShare({ files: [file] })) {
+                        attemptedShare = true;
+                        await navigator.share({ files: [file] });
+                    }
+                }
+            } catch (err) { if (err.name !== 'AbortError') attemptedShare = false; }
+
+            if (!attemptedShare) {
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = fileName;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                setTimeout(() => window.URL.revokeObjectURL(url), 100);
+            }
         }
 
     } catch (error) {
@@ -736,6 +891,9 @@ async function exportToPDF() {
             } catch (e) {
                 console.warn("Erreur d'apparence PDF", e);
             }
+
+            // FIX: Dynamic Field Renaming
+            form.getFields().forEach(f => { try { f.acroField.setPartialName(f.getName() + '_pg' + p); } catch(e){} });
 
             const copiedPages = await mergedPdf.copyPages(subDoc, subDoc.getPageIndices());
             copiedPages.forEach(page => mergedPdf.addPage(page));

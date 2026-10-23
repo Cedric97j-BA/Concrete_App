@@ -518,34 +518,64 @@ async function exportToPDF() {
         const techInitials = techName.split(' ').filter(n => n).map(n => n[0].toUpperCase()).join('') || 'TECH';
 
         const pdfBytes = await mergedPdf.save();
-        const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-        const fileName = `Journal_Ancien_${rawDate}_${noProjet}_${techInitials}.pdf`;
+        const fileName = `JDC_${rawDate}_${noProjet}_${techInitials}.pdf`;
 
-        const isMacTouch = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
-        const isApple = /iPhone|iPad|iPod/i.test(navigator.userAgent) || isMacTouch;
-        
-        let attemptedShare = false;
-        try {
-            if (isApple && navigator.share && navigator.canShare) {
-                const file = new File([blob], fileName, { type: 'application/pdf' });
-                if (navigator.canShare({ files: [file] })) {
-                    attemptedShare = true;
-                    await navigator.share({ files: [file] });
+        // BIFURCATION : APPLICATION ANDROID vs WEB
+        if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+            try {
+                const pdfBase64 = await mergedPdf.saveAsBase64(); // Attention ici : mergedPdf
+                const { Filesystem, FileOpener } = window.Capacitor.Plugins;
+                
+                if (!Filesystem || !FileOpener) {
+                    throw new Error("Plugins introuvables. npx cap sync a-t-il été fait ?");
                 }
-            }
-        } catch (err) {
-            if (err.name !== 'AbortError') attemptedShare = false;
-        }
+                
+                // 1. Sauvegarde silencieuse en cache
+                const resultat = await Filesystem.writeFile({
+                    path: fileName,
+                    data: pdfBase64,
+                    directory: 'CACHE',
+                    recursive: true
+                });
 
-        if (!attemptedShare) {
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = fileName;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            setTimeout(() => window.URL.revokeObjectURL(url), 100);
+                // 2. Ouverture automatique (lancera Foxit directement si défini par défaut)
+                await FileOpener.open({ 
+                    filePath: resultat.uri, 
+                    contentType: 'application/pdf' 
+                });
+
+                await Share.share({ title: fileName, url: resultat.uri });
+            } catch (err) {
+                console.error(err);
+                alert("Erreur lors de l'enregistrement sur la tablette.");
+            }
+        } else {
+            // COMPORTEMENT WEB ORIGINAL
+            const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+            const isMacTouch = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+            const isApple = /iPhone|iPad|iPod/i.test(navigator.userAgent) || isMacTouch;
+            
+            let attemptedShare = false;
+            try {
+                if (isApple && navigator.share && navigator.canShare) {
+                    const file = new File([blob], fileName, { type: 'application/pdf' });
+                    if (navigator.canShare({ files: [file] })) {
+                        attemptedShare = true;
+                        await navigator.share({ files: [file] });
+                    }
+                }
+            } catch (err) { if (err.name !== 'AbortError') attemptedShare = false; }
+
+            if (!attemptedShare) {
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = fileName;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                setTimeout(() => window.URL.revokeObjectURL(url), 100);
+            }
         }
         
         if (btn) { btn.textContent = originalText; btn.disabled = false; }
@@ -580,13 +610,18 @@ async function exportToPDF() {
         const totalPages = Math.max(1, Math.ceil(printableRows.length / ROWS_PER_PAGE));
 
         const mergedPdf = await PDFLib.PDFDocument.create();
+        mergedPdf.registerFontkit(fontkit);
+        
+        // FIX: Inject Tahoma Font to prevent Foxit crash
+        const fontBytes = new Uint8Array(getBuffer(TAHOMA_FONT));
+        await mergedPdf.embedFont(fontBytes);
 
         const fillGlobalFields = (form) => {
             const allInputs = document.querySelectorAll('input[id], textarea[id], select[id]');
             allInputs.forEach(el => {
                 const name = el.id;
                 
-                // Découpage automatique pour le Projet (33 caractères max par ligne)
+                // Découpage automatique Projet
                 if (name === 'global-projet') {
                     const chunks = splitTextIntelligently(el.value, 33);
                     try { form.getTextField('global-projet-1').setText(chunks[0] || ""); } catch(e){}
@@ -594,7 +629,7 @@ async function exportToPDF() {
                     return; 
                 }
                 
-                // Découpage automatique pour l'Endroit (30 caractères max par ligne)
+                // Découpage automatique Endroit
                 if (name === 'global-endroit') {
                     const chunks = splitTextIntelligently(el.value, 30);
                     try { form.getTextField('global-endroit-1').setText(chunks[0] || ""); } catch(e){}
@@ -632,9 +667,11 @@ async function exportToPDF() {
                 }
             }
             
+            // FIX: Use Tahoma for appearances
             try {
-                const font = await doc.embedFont(PDFLib.StandardFonts.Helvetica);
-                form.updateFieldAppearances(font);
+                const subFont = await doc.embedFont(fontBytes);
+                form.updateFieldAppearances(subFont);
+                if (form.acroForm) form.acroForm.dict.set(PDFLib.PDFName.of('NeedAppearances'), PDFLib.PDFBool.False);
             } catch(e) {}
 
             form.getFields().forEach(f => { try { f.acroField.setPartialName(f.getName() + '_pg' + (p + 1)); } catch(e){} });
@@ -687,5 +724,4 @@ async function exportToPDF() {
         if (btn) { btn.textContent = "📄 Exporter en PDF"; btn.disabled = false; }
     }
 }
-
 */

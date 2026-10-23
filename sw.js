@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hub-inspection-v1.3.0.1'; 
+const CACHE_NAME = 'hub-inspection-v0.4.0.7'; 
 
 const APP_ASSETS = [
     './',
@@ -10,6 +10,8 @@ const APP_ASSETS = [
     './index_journal_old.html',
     './index_planche.html',
     './index_photo.html',
+    './index_pavage.html',
+    './index_coulis.html',
     './changelog.html',
     './styles.css',
     './app_beton.js',
@@ -19,6 +21,8 @@ const APP_ASSETS = [
     './app_journal_old.js',
     './app_planche.js',
     './app_photo.js',
+    './app_pavage.js',
+    './app_coulis.js',
     './pdf_templates.js',
     './logo.png',
     './logo_beton.png',
@@ -28,6 +32,7 @@ const APP_ASSETS = [
     './logo_planche.png',
     './logo_photo.png',
     './logo_enrob.png',
+    './logo_coulis.png',
     './fonts/tahoma.ttf'
 ];
 
@@ -101,23 +106,3 @@ self.addEventListener('fetch', (event) => {
     );
 });
 
-/*
-self.addEventListener('fetch', (event) => {
-    if (event.request.method !== 'GET') return;
-
-    event.respondWith(
-        fetch(event.request)
-            .then((response) => {
-                if (response.ok || response.type === 'opaque') {
-                    const responseToCache = response.clone();
-                    caches.open(CACHE_NAME).then((cache) => {
-                        cache.put(event.request, responseToCache);
-                    });
-                }
-                return response;
-            })
-            .catch(() => caches.match(event.request))
-    );
-});
-
-*/

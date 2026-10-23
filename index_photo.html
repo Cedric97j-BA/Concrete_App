@@ -40,112 +40,139 @@
         </div>
         
         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-            <button type="button" onclick="newReportPrompt()" style="background: #0284c7; color: white; border: none; padding: 10px 15px; border-radius: 4px; font-weight: bold;">➕ Nouveau</button>
-            <button type="button" onclick="loadReport()" style="background: #3b82f6; color: white; border: none; padding: 10px 15px; border-radius: 4px; font-weight: bold;">📂 Charger</button>
-            <button type="button" onclick="saveReport()" style="background: #10b981; color: white; border: none; padding: 10px 15px; border-radius: 4px; font-weight: bold;">💾 Sauvegarder</button>
-            <button type="button" onclick="saveReport(true)" style="background: #3b82f6; color: white; border: none; padding: 10px 15px; border-radius: 4px; font-weight: bold;">📄 Dupliquer</button>
-            <button type="button" onclick="deleteReport()" style="background: #ef4444; color: white; border: none; padding: 10px 15px; border-radius: 4px; font-weight: bold;">🗑️ Supprimer</button>
+            <button type="button" onclick="newReportPrompt()" style="background: #0284c7; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;">➕ Nouveau</button>
+            <button type="button" onclick="loadReport()" style="background: #3b82f6; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;">📂 Charger</button>
+            <button type="button" onclick="saveReport()" style="background: #10b981; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;">💾 Sauvegarder</button>
+            <button onclick="saveReport(true)" style="background: #3b82f6; color: white; padding: 10px 15px; border-radius: 6px; font-weight: bold; border: none; cursor: pointer; display: flex; align-items: center; gap: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">📑 Dupliquer</button>
+            <button type="button" onclick="deleteReport()" style="background: #ef4444; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;">🗑️ Supprimer</button>
         </div>
+
+        <!-- Nouvelle ligne dédiée pour l'export PDF -->
         <div style="width: 100%; margin-top: 5px;">
-            <button type="button" onclick="exportToPDF()" style="background: #8b5cf6; color: white; border: none; padding: 10px 15px; border-radius: 4px; font-weight: bold; width: 100%;">📄 Exporter en PDF</button>
+            <button type="button" onclick="exportToPDF()" style="background: #8b5cf6; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%;">📤 Exporter en PDF</button>
         </div> 
     </section>
 
-    <div id="last-saved-status" style="width: 100%; color: #475569; font-size: 0.85rem; margin-bottom: 15px; text-align: center;">Dernière sauvegarde : aucune</div>
-
     <!-- INFORMATIONS GÉNÉRALES -->
-    <section class="form-section">
-        <h3>Informations Générales</h3>
-        <div class="input-group"><label>Projet</label><input type="text" id="global-projet"></div>
-        <div class="input-group"><label>Numéro de projet</label><input type="text" id="global-no-projet"></div>
-        <div class="input-group"><label>Endroit</label><input type="text" id="global-endroit"></div>
+    <section id="global-header" style="background: #e5e7eb; padding: 15px; margin-bottom: 20px; border-radius: 8px;">
+        <h2>Informations Générales du Projet</h2>
+
+        <div class="input-group">
+            <label>Projet</label>
+            <input type="text" id="global-projet" placeholder="Ex: Réfection 4e rang">
+        </div>
+
+        <div class="input-group">
+            <label>Endroit</label>
+            <input type="text" id="global-endroit" placeholder="Ex: Site A">
+        </div>
+
+        <div class="input-group">
+            <label>N° projet</label>
+            <input type="text" id="global-no-projet" placeholder="0260XXXX.00X">
+        </div>
+        <div id="last-saved-status" style="width: 100%; color: #475569; font-size: 0.85rem; text-align: center;">Dernière sauvegarde : aucune</div>
     </section>
 
     <!-- SECTION DES PHOTOS (1 à 4) -->
-    <section class="form-section">
-        <h3>Photos et Descriptions</h3>
-        
-        <!-- PHOTO 1 -->
-        <div style="margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px dashed #cbd5e1;">
-            <h4 style="color: #0284c7; margin-top: 0;">Photo 1</h4>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 10px;">
-                <div class="input-group"><label>Numéro</label><input type="text" id="img-num-1"></div>
-                <div class="input-group"><label>Date</label><input type="date" id="img-date-1"></div>
-                <div class="input-group"><label>Chaînage</label><input type="text" id="img-chn-1"></div>
-                <div class="input-group" style="grid-column: 1 / -1;"><label>Identification</label><input type="text" id="img-id-1"></div>
-                <div class="input-group" style="grid-column: 1 / -1;"><label>Remarques</label><textarea id="img-rem-1" style="width: 100%;"></textarea></div>
+    <section class="tab-section" style="display: block;">
+        <h2>Photos et Descriptions</h2>
+        <div class="form-section">
+            <h3>Photos</h3>
+            
+            <!-- PHOTO 1 -->
+            <div style="margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px dashed #cbd5e1;">
+                <h4 style="color: #0284c7; margin-top: 0;">Photo 1</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 10px;">
+                    <div class="input-group"><label>Numéro</label><input type="text" id="img-num-1"></div>
+                    <div class="input-group"><label>Date</label><input type="date" id="img-date-1"></div>
+                    <div class="input-group"><label>Chaînage</label><input type="text" id="img-chn-1"></div>
+                    <div class="input-group" style="grid-column: 1 / -1;"><label>Identification</label><input type="text" id="img-id-1"></div>
+                    <div class="input-group" style="grid-column: 1 / -1;"><label>Remarques</label><textarea id="img-rem-1" style="width: 100%;"></textarea></div>
+                </div>
+                <input type="file" id="desc-img-01" accept="image/*" onchange="encodeImage(this, '01')" style="font-size: 0.85rem; margin-bottom: 10px;">
+                <input type="hidden" id="desc-img-01-base64">
+                <div>
+                    <img id="desc-img-01-preview" src="" style="display: none; max-width: 100%; max-height: 250px; border: 1px solid #cbd5e1; border-radius: 4px; margin-bottom: 5px;">
+                    <br>
+                    <button type="button" id="desc-img-01-clear" onclick="clearImage('01')" style="display: none; background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">🗑️ Retirer l'image</button>
+                </div>
             </div>
-            <input type="file" id="desc-img-01" accept="image/*" onchange="encodeImage(this, '01')" style="font-size: 0.85rem; margin-bottom: 10px;">
-            <input type="hidden" id="desc-img-01-base64">
-            <div>
-                <img id="desc-img-01-preview" src="" style="display: none; max-width: 100%; max-height: 250px; border: 1px solid #cbd5e1; border-radius: 4px; margin-bottom: 5px;">
-                <br>
-                <button type="button" id="desc-img-01-clear" onclick="clearImage('01')" style="display: none; background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">🗑️ Retirer l'image</button>
+
+            <!-- PHOTO 2 -->
+            <div style="margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px dashed #cbd5e1;">
+                <h4 style="color: #0284c7; margin-top: 0;">Photo 2</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 10px;">
+                    <div class="input-group"><label>Numéro</label><input type="text" id="img-num-2"></div>
+                    <div class="input-group"><label>Date</label><input type="date" id="img-date-2"></div>
+                    <div class="input-group"><label>Chaînage</label><input type="text" id="img-chn-2"></div>
+                    <div class="input-group" style="grid-column: 1 / -1;"><label>Identification</label><input type="text" id="img-id-2"></div>
+                    <div class="input-group" style="grid-column: 1 / -1;"><label>Remarques</label><textarea id="img-rem-2" style="width: 100%;"></textarea></div>
+                </div>
+                <input type="file" id="desc-img-02" accept="image/*" onchange="encodeImage(this, '02')" style="font-size: 0.85rem; margin-bottom: 10px;">
+                <input type="hidden" id="desc-img-02-base64">
+                <div>
+                    <img id="desc-img-02-preview" src="" style="display: none; max-width: 100%; max-height: 250px; border: 1px solid #cbd5e1; border-radius: 4px; margin-bottom: 5px;">
+                    <br>
+                    <button type="button" id="desc-img-02-clear" onclick="clearImage('02')" style="display: none; background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">🗑️ Retirer l'image</button>
+                </div>
+            </div>
+
+            <!-- PHOTO 3 -->
+            <div style="margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px dashed #cbd5e1;">
+                <h4 style="color: #0284c7; margin-top: 0;">Photo 3</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 10px;">
+                    <div class="input-group"><label>Numéro</label><input type="text" id="img-num-3"></div>
+                    <div class="input-group"><label>Date</label><input type="date" id="img-date-3"></div>
+                    <div class="input-group"><label>Chaînage</label><input type="text" id="img-chn-3"></div>
+                    <div class="input-group" style="grid-column: 1 / -1;"><label>Identification</label><input type="text" id="img-id-3"></div>
+                    <div class="input-group" style="grid-column: 1 / -1;"><label>Remarques</label><textarea id="img-rem-3" style="width: 100%;"></textarea></div>
+                </div>
+                <input type="file" id="desc-img-03" accept="image/*" onchange="encodeImage(this, '03')" style="font-size: 0.85rem; margin-bottom: 10px; max-height: 250px">
+                <input type="hidden" id="desc-img-03-base64">
+                <div>
+                    <img id="desc-img-03-preview" src="" style="display: none; max-width: 100%; max-height: 250px; border: 1px solid #cbd5e1; border-radius: 4px; margin-bottom: 5px;">
+                    <br>
+                    <button type="button" id="desc-img-03-clear" onclick="clearImage('03')" style="display: none; background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">🗑️ Retirer l'image</button>
+                </div>
+            </div>
+
+            <!-- PHOTO 4 -->
+            <div style="margin-bottom: 10px;">
+                <h4 style="color: #0284c7; margin-top: 0;">Photo 4</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 10px;">
+                    <div class="input-group"><label>Numéro</label><input type="text" id="img-num-4"></div>
+                    <div class="input-group"><label>Date</label><input type="date" id="img-date-4"></div>
+                    <div class="input-group"><label>Chaînage</label><input type="text" id="img-chn-4"></div>
+                    <div class="input-group" style="grid-column: 1 / -1;"><label>Identification</label><input type="text" id="img-id-4"></div>
+                    <div class="input-group" style="grid-column: 1 / -1;"><label>Remarques</label><textarea id="img-rem-4" style="width: 100%;"></textarea></div>
+                </div>
+                <input type="file" id="desc-img-04" accept="image/*" onchange="encodeImage(this, '04')" style="font-size: 0.85rem; margin-bottom: 10px;">
+                <input type="hidden" id="desc-img-04-base64">
+                <div>
+                    <img id="desc-img-04-preview" src="" style="display: none; max-width: 100%; max-height: 250px; border: 1px solid #cbd5e1; border-radius: 4px; margin-bottom: 5px;">
+                    <br>
+                    <button type="button" id="desc-img-04-clear" onclick="clearImage('04')" style="display: none; background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">🗑️ Retirer l'image</button>
+                </div>
             </div>
         </div>
 
-        <!-- PHOTO 2 -->
-        <div style="margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px dashed #cbd5e1;">
-            <h4 style="color: #0284c7; margin-top: 0;">Photo 2</h4>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 10px;">
-                <div class="input-group"><label>Numéro</label><input type="text" id="img-num-2"></div>
-                <div class="input-group"><label>Date</label><input type="date" id="img-date-2"></div>
-                <div class="input-group"><label>Chaînage</label><input type="text" id="img-chn-2"></div>
-                <div class="input-group" style="grid-column: 1 / -1;"><label>Identification</label><input type="text" id="img-id-2"></div>
-                <div class="input-group" style="grid-column: 1 / -1;"><label>Remarques</label><textarea id="img-rem-2" style="width: 100%;"></textarea></div>
-            </div>
-            <input type="file" id="desc-img-02" accept="image/*" onchange="encodeImage(this, '02')" style="font-size: 0.85rem; margin-bottom: 10px;">
-            <input type="hidden" id="desc-img-02-base64">
-            <div>
-                <img id="desc-img-02-preview" src="" style="display: none; max-width: 100%; max-height: 250px; border: 1px solid #cbd5e1; border-radius: 4px; margin-bottom: 5px;">
-                <br>
-                <button type="button" id="desc-img-02-clear" onclick="clearImage('02')" style="display: none; background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">🗑️ Retirer l'image</button>
-            </div>
+        <!-- SIGNATURE -->
+        <div class="form-section" style="border-top: 2px solid #ccc; padding-top: 15px;">
+            <h3>Préparé par</h3>
+            <div class="input-group"><label>Nom du technicien</label><input type="text" id="sig-prep-nom" style="width: 250px;" placeholder="Ex: Jean Tremblay"></div>
         </div>
 
-        <!-- PHOTO 3 -->
-        <div style="margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px dashed #cbd5e1;">
-            <h4 style="color: #0284c7; margin-top: 0;">Photo 3</h4>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 10px;">
-                <div class="input-group"><label>Numéro</label><input type="text" id="img-num-3"></div>
-                <div class="input-group"><label>Date</label><input type="date" id="img-date-3"></div>
-                <div class="input-group"><label>Chaînage</label><input type="text" id="img-chn-3"></div>
-                <div class="input-group" style="grid-column: 1 / -1;"><label>Identification</label><input type="text" id="img-id-3"></div>
-                <div class="input-group" style="grid-column: 1 / -1;"><label>Remarques</label><textarea id="img-rem-3" style="width: 100%;"></textarea></div>
-            </div>
-            <input type="file" id="desc-img-03" accept="image/*" onchange="encodeImage(this, '03')" style="font-size: 0.85rem; margin-bottom: 10px; max-height: 250px">
-            <input type="hidden" id="desc-img-03-base64">
-            <div>
-                <img id="desc-img-03-preview" src="" style="display: none; max-width: 100%; max-height: 250px; border: 1px solid #cbd5e1; border-radius: 4px; margin-bottom: 5px;">
-                <br>
-                <button type="button" id="desc-img-03-clear" onclick="clearImage('03')" style="display: none; background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">🗑️ Retirer l'image</button>
-            </div>
+        <small id="form-instructions2" style="color: #242930; font-size: 0.8rem; display: block; margin-top: 3px; margin-bottom: 5px; text-align: center; margin-left: auto; margin-right: auto; max-width: 600px; font-style: italic;">
+            Veuillez exporter le formulaire en PDF pour le soumettre et/ou le sauvegarder avant de fermer la page/l'application. Les données sont sauvegardées localement, mais l'exportation en PDF est nécessaire pour la soumission officielle.
+        </small>
+
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="javascript:void(0);" onclick="document.getElementById('global-header').scrollIntoView({ behavior: 'smooth', block: 'start' });" style="color: var(--primary); font-weight: bold; text-decoration: none; font-size: 1rem; padding: 10px 20px; background: #e2e8f0; border-radius: 6px; display: inline-block;">
+                ⬆️ Retour aux informations générales du formulaire
+            </a>
         </div>
 
-        <!-- PHOTO 4 -->
-        <div style="margin-bottom: 10px;">
-            <h4 style="color: #0284c7; margin-top: 0;">Photo 4</h4>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 10px;">
-                <div class="input-group"><label>Numéro</label><input type="text" id="img-num-4"></div>
-                <div class="input-group"><label>Date</label><input type="date" id="img-date-4"></div>
-                <div class="input-group"><label>Chaînage</label><input type="text" id="img-chn-4"></div>
-                <div class="input-group" style="grid-column: 1 / -1;"><label>Identification</label><input type="text" id="img-id-4"></div>
-                <div class="input-group" style="grid-column: 1 / -1;"><label>Remarques</label><textarea id="img-rem-4" style="width: 100%;"></textarea></div>
-            </div>
-            <input type="file" id="desc-img-04" accept="image/*" onchange="encodeImage(this, '04')" style="font-size: 0.85rem; margin-bottom: 10px;">
-            <input type="hidden" id="desc-img-04-base64">
-            <div>
-                <img id="desc-img-04-preview" src="" style="display: none; max-width: 100%; max-height: 250px; border: 1px solid #cbd5e1; border-radius: 4px; margin-bottom: 5px;">
-                <br>
-                <button type="button" id="desc-img-04-clear" onclick="clearImage('04')" style="display: none; background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">🗑️ Retirer l'image</button>
-            </div>
-        </div>
-    </section>
-
-    <!-- SIGNATURE -->
-    <section class="form-section" style="border-top: 2px solid #ccc; padding-top: 15px;">
-        <h3>Préparé par</h3>
-        <div class="input-group"><label>Nom du technicien</label><input type="text" id="sig-prep-nom" style="width: 250px;"></div>
     </section>
 
 </div>

@@ -44,16 +44,58 @@
         </div>
         
         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-            <button type="button" onclick="newReportPrompt()" style="background: #0284c7; color: white; border: none; padding: 10px 15px; border-radius: 4px; font-weight: bold;">➕ Nouveau</button>
-            <button type="button" onclick="loadReport()" style="background: #3b82f6; color: white; border: none; padding: 10px 15px; border-radius: 4px; font-weight: bold;">📂 Charger</button>
-            <button type="button" onclick="saveReport()" style="background: #10b981; color: white; border: none; padding: 10px 15px; border-radius: 4px; font-weight: bold;">💾 Sauvegarder</button>
-            <button type="button" onclick="saveReport(true)" style="background: #3b82f6; color: white; border: none; padding: 10px 15px; border-radius: 4px; font-weight: bold;">📄 Dupliquer</button>
-            <button type="button" onclick="deleteReport()" style="background: #ef4444; color: white; border: none; padding: 10px 15px; border-radius: 4px; font-weight: bold;">🗑️ Supprimer</button>
+            <button type="button" onclick="newReportPrompt()" style="background: #0284c7; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;">➕ Nouveau</button>
+            <button type="button" onclick="loadReport()" style="background: #3b82f6; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;">📂 Charger</button>
+            <button type="button" onclick="saveReport()" style="background: #10b981; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;">💾 Sauvegarder</button>
+            <button onclick="saveReport(true)" style="background: #3b82f6; color: white; padding: 10px 15px; border-radius: 6px; font-weight: bold; border: none; cursor: pointer; display: flex; align-items: center; gap: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">📑 Dupliquer</button>
+            <button type="button" onclick="deleteReport()" style="background: #ef4444; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;">🗑️ Supprimer</button>
         </div>
+
+        <!-- Nouvelle ligne dédiée pour l'export PDF -->
         <div style="width: 100%; margin-top: 5px;">
-            <button type="button" onclick="exportToPDF()" style="background: #8b5cf6; color: white; border: none; padding: 10px 15px; border-radius: 4px; font-weight: bold; width: 100%;">📄 Exporter en PDF</button>
+            <button type="button" onclick="exportToPDF()" style="background: #8b5cf6; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%;">📤 Exporter en PDF</button>
         </div> 
     </section>
+
+    <!-- INFORMATIONS GÉNÉRALES (HORS ONGLETS, VISIBLES PARTOUT) -->
+    <section id="global-header" style="background: #e5e7eb; padding: 15px; margin-bottom: 20px; border-radius: 8px;">
+        <h2>Informations Générales du Projet</h2>
+
+        <div class="input-group">
+            <label>Client</label>
+            <input type="text" id="global-client" placeholder="Ex: Municipalité, Entrepreneur, etc.">
+        </div>
+
+        <div class="input-group">
+            <label>Réf. client</label>
+            <input type="text" id="global-ref-client">
+        </div>
+
+        <div class="input-group">
+            <label>Projet</label>
+            <input type="text" id="global-projet" placeholder="Ex: Réfection 4e rang">
+        </div>
+
+        <div class="input-group">
+            <label>Endroit</label>
+            <input type="text" id="global-endroit" placeholder="Ex: Site A">
+        </div>
+
+        <div class="input-group">
+            <label>N° projet</label>
+            <input type="text" id="global-no-projet" placeholder="0260XXXX.00X">
+        </div>
+
+        <div class="input-group">
+            <label>Date</label>
+            <input type="date" id="global-date">
+        </div>
+        <div id="last-saved-status" style="width: 100%; color: #475569; font-size: 0.85rem; text-align: center;">Dernière sauvegarde : aucune</div>
+    </section>
+
+    <small id="form-instructions" class="form-instructions" style="color: #242930; font-size: 0.8rem; display: block; margin-top: 3px; margin-bottom: 5px; text-align: center; margin-left: auto; margin-right: auto; max-width: 600px; font-style: italic;">
+        Cliquez sur les onglets pour naviguer entre les sections du formulaire. Les informations sont sauvegardées automatiquement. Vous pouvez passer d'une section à l'autre. Cependant prenez soin de bien sauvegarder votre rapport avant de quitter la page ou de fermer l'application.
+    </small>
 
     <!-- BARRE DE NAVIGATION (TABS) -->
     <nav id="form-navigation" style="margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 5px;">
@@ -61,23 +103,17 @@
         <button type="button" class="tab-btn" onclick="showTab('tab-form2', event)">2. Tâches</button>
         <button type="button" class="tab-btn" onclick="showTab('tab-form3', event)">3. Photos</button>
     </nav>
-    <div id="last-saved-status" style="width: 100%; color: #475569; font-size: 0.85rem; margin-bottom: 15px; text-align: center;">Dernière sauvegarde : aucune</div>
 
     <!-- ONGLET 1 : INFOS ET RESSOURCES -->
     <section id="tab-form1" class="tab-section">
         <h2>1. Informations et Ressources</h2>
         
-        <!-- Informations Générales -->
+        <!-- Informations du chantier -->
         <div class="form-section">
-            <div class="input-group"><label>Client</label><input type="text" id="global-client"></div>
-            <div class="input-group"><label>Réf. client</label><input type="text" id="global-ref-client"></div>
-            <div class="input-group"><label>Projet</label><input type="text" id="global-projet"></div>
-            <div class="input-group"><label>Numéro de projet</label><input type="text" id="global-no-projet"></div>
-            <div class="input-group"><label>Date de l'intervention</label><input type="date" id="global-date"></div>
-            <div class="input-group"><label>Endroit</label><input type="text" id="global-endroit"></div>
-            <div class="input-group"><label>Entrepreneur</label><input type="text" id="info-entrepreneur"></div>
-            <div class="input-group"><label>Type d'ouvrage</label><input type="text" id="info-type-ouvrage"></div>
-            <div class="input-group"><label>Type de travaux</label><input type="text" id="info-type-travaux"></div>
+            <h3>Informations du chantier</h3>
+            <div class="input-group"><label>Entrepreneur</label><input type="text" id="info-entrepreneur" placeholder="Ex: Excavations Léon Chouinard Inc."></div>
+            <div class="input-group"><label>Type d'ouvrage</label><input type="text" id="info-type-ouvrage" placeholder="Ex: Bâtiment commercial"></div>
+            <div class="input-group"><label>Type de travaux</label><input type="text" id="info-type-travaux" placeholder="Ex: Travaux de fondation"></div>
         </div>
 
         <!-- Échantillons -->
@@ -180,8 +216,14 @@
         <!-- Validation / Signature -->
         <div class="form-section" style="border-top: 2px solid #ccc; padding-top: 15px;">
             <h3>Préparé par</h3>
-            <div class="input-group"><label>Nom du technicien</label><input type="text" id="sig-prep-nom" style="width: 250px;"></div>
+            <div class="input-group"><label>Nom du technicien</label><input type="text" id="sig-prep-nom" style="width: 250px;" placeholder="Ex: Jean Tremblay"></div>
         </div>
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="javascript:void(0);" onclick="document.getElementById('form-instructions').scrollIntoView({ behavior: 'smooth', block: 'start' });" style="color: var(--primary); font-weight: bold; text-decoration: none; font-size: 1rem; padding: 10px 20px; background: #e2e8f0; border-radius: 6px; display: inline-block;">
+                ⬆️ Retour aux sections du formulaire
+            </a>
+        </div>
+
     </section>
 
     <!-- ONGLET 2 : TÂCHES -->
@@ -203,6 +245,12 @@
             
             <button type="button" onclick="addTask()" style="margin-top: 10px; padding: 12px; background: #0284c7; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; font-size: 1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">➕ Ajouter une tâche</button>
         </div>
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="javascript:void(0);" onclick="document.getElementById('form-instructions').scrollIntoView({ behavior: 'smooth', block: 'start' });" style="color: var(--primary); font-weight: bold; text-decoration: none; font-size: 1rem; padding: 10px 20px; background: #e2e8f0; border-radius: 6px; display: inline-block;">
+                ⬆️ Retour aux sections du formulaire
+            </a>
+        </div>
+
     </section>
 
     <!-- ONGLET 3 : PHOTOS -->
@@ -213,8 +261,8 @@
             <h3>Description des travaux</h3>
             
             <div style="margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px dashed #ccc;">
-                <label>Description 1</label>
-                <textarea id="desc-text-01" rows="2" maxlength="95" style="width: 100%; margin-bottom: 5px;"></textarea>
+                <label>Description de l'image 1</label>
+                <textarea id="desc-text-01" maxlength="95" style="width: 100%; margin-bottom: 5px;"></textarea>
                 <input type="file" id="desc-img-01" accept="image/*" onchange="encodeImage(this, '01')" style="font-size: 0.85rem; margin-bottom: 10px;">
                 <input type="hidden" id="desc-img-01-base64">
                 <div>
@@ -225,8 +273,8 @@
             </div>
 
             <div style="margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px dashed #ccc;">
-                <label>Description 2</label>
-                <textarea id="desc-text-02" rows="2" maxlength="95" style="width: 100%; margin-bottom: 5px;"></textarea>
+                <label>Description de l'image 2</label>
+                <textarea id="desc-text-02" maxlength="95" style="width: 100%; margin-bottom: 5px;"></textarea>
                 <input type="file" id="desc-img-02" accept="image/*" onchange="encodeImage(this, '02')" style="font-size: 0.85rem; margin-bottom: 10px;">
                 <input type="hidden" id="desc-img-02-base64">
                 <div>
@@ -237,8 +285,8 @@
             </div>
 
             <div style="margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px dashed #ccc;">
-                <label>Description 3</label>
-                <textarea id="desc-text-03" rows="2" maxlength="95" style="width: 100%; margin-bottom: 5px;"></textarea>
+                <label>Description de l'image 3</label>
+                <textarea id="desc-text-03" maxlength="95" style="width: 100%; margin-bottom: 5px;"></textarea>
                 <input type="file" id="desc-img-03" accept="image/*" onchange="encodeImage(this, '03')" style="font-size: 0.85rem; margin-bottom: 10px;">
                 <input type="hidden" id="desc-img-03-base64">
                 <div>
@@ -249,8 +297,8 @@
             </div>
 
             <div style="margin-bottom: 15px;">
-                <label>Description 4</label>
-                <textarea id="desc-text-04" rows="2" maxlength="95" style="width: 100%; margin-bottom: 5px;"></textarea>
+                <label>Description de l'image 4</label>
+                <textarea id="desc-text-04" maxlength="95" style="width: 100%; margin-bottom: 5px;"></textarea>
                 <input type="file" id="desc-img-04" accept="image/*" onchange="encodeImage(this, '04')" style="font-size: 0.85rem; margin-bottom: 10px;">
                 <input type="hidden" id="desc-img-04-base64">
                 <div>
@@ -260,20 +308,26 @@
                 </div>
             </div>
         </div>
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="javascript:void(0);" onclick="document.getElementById('form-instructions').scrollIntoView({ behavior: 'smooth', block: 'start' });" style="color: var(--primary); font-weight: bold; text-decoration: none; font-size: 1rem; padding: 10px 20px; background: #e2e8f0; border-radius: 6px; display: inline-block;">
+                ⬆️ Retour aux sections du formulaire
+            </a>
+        </div>
+
     </section>
 
     <!-- TEMPLATE INVISIBLE POUR LES CARTES DE TÂCHES (Accordéon) -->
     <template id="task-template">
-        <div class="task-card" style="border: 2px solid #0f766e; border-radius: 8px; margin-bottom: 15px; background: #f0fdfa; overflow: hidden;">
+        <div class="task-card" style="border: 1px solid #0284c7; border-radius: 6px; margin-bottom: 15px; background: #f8fafc; overflow: hidden;">
             
             <!-- EN-TÊTE ACCORDÉON -->
-            <div class="task-header" onclick="toggleTask(this)" style="background: #ccfbf1; padding: 10px 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #99f6e4;">
-                <div style="font-weight: bold; color: #0f766e; display: flex; align-items: center; gap: 10px;">
+            <div class="task-header" onclick="toggleTask(this)" style="background-color: #97c6b980; padding: 10px 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+                <div style="font-weight: bold; color: #334155; display: flex; align-items: center; gap: 10px;">
                     <span class="accordion-icon" style="transition: transform 0.2s;">▼</span>
                     <span>Activité #<span class="task-number"></span></span>
-                    <span class="task-summary" style="font-weight: normal; font-size: 0.9em; color: #115e59;"></span>
+                    <span class="task-summary" style="font-weight: normal; font-size: 0.85rem; color: #475569;"></span>
                 </div>
-                <button type="button" onclick="removeTask(this, event)" style="background: #ef4444; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; width: 30px; height: 30px;">✖</button>
+                <button type="button" onclick="removeTask(this, event)" style="background: none; border: none; color: #ef4444; font-weight: bold; font-size: 1.2rem; cursor: pointer; padding: 0 5px; margin-left: 10px;">✖</button>
             </div>
             
             <!-- CORPS DE LA TÂCHE -->
