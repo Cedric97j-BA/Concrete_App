@@ -698,31 +698,30 @@ async function exportToPDF() {
             }
 
             if (val !== null && val !== undefined && val !== '---' && val !== '') {
-            try {
-                let finalStr = val.toString();
-                
-                // EXCLUSION TOTALE : Si le champ concerne un numéro de projet, on garde le point (ex: 2026.04)
-                const lowerName = pdfName.toLowerCase();
-                const isProjectNumber = lowerName.includes('projet') || lowerName.includes('no-') || lowerName.includes('numero');
-                
-                if (!isProjectNumber) {
-                    finalStr = finalStr.replace(/(\d)\.(\d)/g, '$1,$2');
-                }
+                try {
+                    let finalStr = val.toString();
+                    
+                    // EXCLUSION TOTALE : Si le champ concerne un numéro de projet, on garde le point (ex: 2026.04)
+                    const lowerName = pdfName.toLowerCase();
+                    const isProjectNumber = lowerName.includes('projet') || lowerName.includes('no-') || lowerName.includes('numero');
+                    
+                    if (!isProjectNumber) {
+                        finalStr = finalStr.replace(/(\d)\.(\d)/g, '$1,$2');
+                    }
 
-                if (typeof field.setText === 'function') {
-                    field.setText(finalStr);
-                } else if (typeof field.select === 'function') {
-                    try { field.addOptions([finalStr]); } catch(e) {}
-                    field.select(finalStr);
-                } else if (typeof field.check === 'function') {
-                    if (val === true) field.check();
-                    else field.uncheck();
+                    if (typeof field.setText === 'function') {
+                        field.setText(finalStr);
+                    } else if (typeof field.select === 'function') {
+                        try { field.addOptions([finalStr]); } catch(e) {}
+                        field.select(finalStr);
+                    } else if (typeof field.check === 'function') {
+                        if (val === true) field.check();
+                        else field.uncheck();
+                    }
+                } catch (e) {
+                    console.warn(`Warning: Could not set PDF field ${pdfName}`, e);
                 }
-            } catch (e) {
-                console.warn(`Warning: Could not set PDF field ${pdfName}`, e);
             }
-        }
-
         });
 
         try {
@@ -740,7 +739,7 @@ async function exportToPDF() {
             if (chartField) {
                 const widget = chartField.acroField.getWidgets()[0];
                 rect = widget.getRectangle();
-                form.removeField('densityChart');
+                form.removeField(chartField); // FIX 1 : Passer l'objet chartField, pas la string 'densityChart'
             }
         } catch (e) {
             console.warn("Impossible de trouver le bouton densityChart", e);
@@ -751,9 +750,12 @@ async function exportToPDF() {
 
         try {
             const canvas = document.getElementById('densityChart');
+            // FIX 2 : Vérifier que myChart n'est pas null (ou récupérer l'instance Chart.js du canvas)
+            const activeChart = (typeof myChart !== 'undefined' && myChart !== null)
+                ? myChart
+                : (typeof Chart !== 'undefined' && canvas ? Chart.getChart(canvas) : null);
             
-            if (canvas && rect && typeof myChart !== 'undefined') {
-                
+            if (canvas && rect && activeChart) {
                 const tabSection = canvas.closest('.tab-section');
                 let wasHidden = false;
                 if (tabSection && window.getComputedStyle(tabSection).display === 'none') {
@@ -769,16 +771,16 @@ async function exportToPDF() {
                 const originalMaxHeight = canvas.style.maxHeight;
                 const originalMinHeight = canvas.style.minHeight;
 
-                const oldAnimation = myChart.options.animation;
-                myChart.options.animation = false;
+                const oldAnimation = activeChart.options.animation;
+                activeChart.options.animation = false;
 
                 canvas.style.width = (rect.width * 3) + 'px'; 
                 canvas.style.height = (rect.height * 3) + 'px'; 
                 canvas.style.maxHeight = 'none'; 
                 canvas.style.minHeight = 'none'; 
                 
-                myChart.resize();
-                if (typeof myChart.update === 'function') myChart.update('none'); 
+                activeChart.resize();
+                if (typeof activeChart.update === 'function') activeChart.update('none'); 
 
                 const tempCanvas = document.createElement('canvas');
                 tempCanvas.width = canvas.width;
@@ -802,8 +804,6 @@ async function exportToPDF() {
                 tCtx.fillStyle = 'white';
                 tCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
                 tCtx.drawImage(canvas, 0, 0);
-                
-                // (La bordure a été supprimée ici pour la rendre invisible)
 
                 const chartImageBase64 = tempCanvas.toDataURL('image/png', 1.0);
                 const pngImageBytes = await fetch(chartImageBase64).then(res => res.arrayBuffer());
@@ -813,8 +813,8 @@ async function exportToPDF() {
                 canvas.style.height = originalHeight;
                 canvas.style.maxHeight = originalMaxHeight;
                 canvas.style.minHeight = originalMinHeight;
-                myChart.options.animation = oldAnimation;
-                myChart.resize();
+                activeChart.options.animation = oldAnimation;
+                activeChart.resize();
 
                 if (wasHidden && tabSection) {
                     tabSection.style.display = 'none';
@@ -835,19 +835,21 @@ async function exportToPDF() {
         }
         // ========================================================
 
-        const noProjetVal = document.getElementById('global-no-projet').value.trim() || 'SANS-NUMERO';
-        const rawDateVal = document.getElementById('global-date').value || new Date().toISOString().split('T')[0];
+        const noProjetVal = document.getElementById('global-no-projet')?.value.trim() || 'SANS-NUMERO';
+        const rawDateVal = document.getElementById('global-date')?.value || new Date().toISOString().split('T')[0];
         const calibreVal = document.getElementById('info-calibre')?.value.trim() || 'Calibre';
         const techNameVal = document.getElementById('sig-prep-nom')?.value || '';
         const initialsVal = techNameVal.split(' ').filter(n => n).map(n => n[0].toUpperCase()).join('') || 'TECH';
 
-        const pdfBytes = await pdfDoc.save();
+        // FIX 3 : Utiliser mergedPdf au lieu de pdfDoc
+        const pdfBytes = await mergedPdf.save();
         const fileName = `Planche_${noProjetVal}_${rawDateVal}_${calibreVal}_${initialsVal}.pdf`;
 
         // BIFURCATION : APPLICATION ANDROID vs WEB
         if (window.Capacitor && window.Capacitor.isNativePlatform()) {
             try {
-                const pdfBase64 = await pdfDoc.saveAsBase64(); // Attention ici : pdfDoc
+                // FIX 3b : Utiliser mergedPdf.saveAsBase64() au lieu de pdfDoc.saveAsBase64()
+                const pdfBase64 = await mergedPdf.saveAsBase64();
                 const { Filesystem, FileOpener } = window.Capacitor.Plugins;
                 
                 if (!Filesystem || !FileOpener) {
@@ -867,8 +869,6 @@ async function exportToPDF() {
                     filePath: resultat.uri, 
                     contentType: 'application/pdf' 
                 });
-
-                await Share.share({ title: fileName, url: resultat.uri });
             } catch (err) {
                 console.error(err);
                 alert("Erreur lors de l'enregistrement sur la tablette.");
