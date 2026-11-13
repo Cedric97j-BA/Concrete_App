@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Rapport de Compaction</title>
+    
+    <link rel="stylesheet" href="../../../shared/css/styles.css?v=1.0.0.4">
+    <link rel="apple-touch-icon" href="logo_compaction.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Compactage">
+
+    <script src="../../../shared/libs/pdf-lib.min.js"></script>
+    <script src="../../../shared/libs/fontkit.umd.min.js"></script>
+</head>
+<body data-org="eng mtq" data-secteur="ici" data-service="mat" data-brand-name="Englobe">
+
+<div id="app-container">
+
+    <header style="display: flex; align-items: center; gap: 15px; background: var(--brand-primary, #97c6b9); color: white; padding: 15px 20px; border-radius: 8px; margin-bottom: 20px; margin-top: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <img class="brand-logo" src="../../../shared/img/logo_entete.png" alt="Englobe" alt="Logo" style="height: 75px; padding: 5px; border-radius: 4px;"> 
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+            <h1 style="margin: 0; font-size: 1.5rem; letter-spacing: 0.5px;">Essais de densité sur place</h1>
+        </div>
+
+        <a class="home-button" href="../../../index.html" style="margin-left: auto; background: #1e293b; color: white; text-decoration: none; padding: 10px 15px; border-radius: 6px; font-weight: bold; font-size: 0.9rem; display: flex; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+            🏠 Accueil
+        </a>
+    </header>
+
+    <section id="save-manager" style="background: #1e293b; color: white; padding: 15px; margin-bottom: 20px; border-radius: 8px; display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 250px; max-width: 500px;">
+            <label style="display: block; font-size: 0.85rem; margin-bottom: 5px; color: #cbd5e1;">Rapports Sauvegardés (Appareil Local)<span id="imported-indicator" title="Rapport reçu d'un autre appareil" style="display:none; background:#0d9488; color:#fff; border-radius:4px; padding:1px 5px; font-size:0.75rem; margin-left:6px;">📲</span></label>
+            <select id="saved-reports-dropdown" style="width: 100%; padding: 10px; border-radius: 4px; border: none; font-weight: bold; color: #334155;">
+                <option value="">-- Sélectionnez un rapport --</option>
+            </select>
+        </div>
+
+        <div class="report-actions">
+            <button type="button" class="report-btn" onclick="newReportPrompt()" style="--btn-bg: #0284c7;">➕ Nouveau</button>
+            <button type="button" class="report-btn" onclick="loadReport()" style="--btn-bg: #2563eb;">📂 Charger</button>
+            <button type="button" class="report-btn" onclick="triggerJsonImport()" style="--btn-bg: #0d9488;">📥 Importer</button>
+            <button type="button" class="report-btn" onclick="saveReport()" style="--btn-bg: #10b981;">💾 Sauvegarder</button>
+            <button type="button" class="report-btn" onclick="saveReport(true)" style="--btn-bg: #4f46e5;">📑 Dupliquer</button>
+            <button type="button" class="report-btn" onclick="deleteReport()" style="--btn-bg: #ef4444;">🗑️ Supprimer</button>
+            <input type="file" id="json-import-input" accept=".json,application/json,text/plain" style="display:none" onchange="importReportJson(event)">
+        </div>
+
+        <!-- EXPORTATION & TRANSMISSION -->
+        <div class="export-bar">
+            <button type="button" id="btn-export-pdf" class="report-btn report-btn-main" onclick="exportToPDF('eng')" style="--btn-bg: #7c3aed;">📄 PDF</button>
+            <button type="button" id="btn-export-mtq" class="report-btn is-locked is-frozen" onclick="exportToPDF('mtq')" style="--btn-bg: #6495b8;" title="Fonctionnalité non disponible pour ce formulaire" disabled>🏛️ MTQ</button>
+            <button type="button" class="report-btn" onclick="shareReportJson()" style="--btn-bg: #0f766e;">📤 PARTAGER</button>
+            <button type="button" id="btn-export-lims" class="report-btn report-btn-lims is-frozen" style="--btn-bg: #334155;" title="Connexion LIMS bientôt disponible" disabled>🔒 LIMS</button>
+        </div>
+    </section>
+
+    <!-- MODE HYBRIDE : affiche les champs data-client="mtq" juste en dessous et déverrouille l'export MTQ -->
+    <div id="org-mode-bar" class="org-mode-bar" role="group" aria-label="Mode du formulaire">
+        <button type="button" class="org-mode-btn active" data-org-mode="eng" aria-pressed="true" onclick="setOrgMode('eng')">Standard (Englobe)</button>
+        <button type="button" class="org-mode-btn is-frozen" data-org-mode="mtq" aria-pressed="false" onclick="setOrgMode('mtq')" title="Fonctionnalité non disponible pour ce formulaire" disabled>+ Mode MTQ</button>
+    </div>
+
+    <!-- INFORMATIONS GÉNÉRALES (HORS ONGLETS, VISIBLES PARTOUT) -->
+    <section id="global-header" style="background: #e5e7eb; padding: 15px; margin-bottom: 20px; border-radius: 8px;">
+        <h2>Informations Générales du Projet</h2>
+
+        <div class="input-group">
+            <label>Client</label>
+            <input type="text" id="global-client" placeholder="Ex: Municipalité, Entrepreneur, etc.">
+        </div>
+
+        <div class="input-group">
+            <label>Réf. client</label>
+            <input type="text" id="global-ref-client">
+        </div>
+
+        <div class="input-group">
+            <label>Projet</label>
+            <input type="text" id="global-projet" placeholder="Ex: Réfection 4e rang">
+        </div>
+
+        <div class="input-group">
+            <label>Endroit</label>
+            <input type="text" id="global-endroit" placeholder="Ex: Rue de la Paix, Av. des Champs-Élysées">
+        </div>
+
+        <div class="input-group">
+            <label>N° projet</label>
+            <input type="text" id="global-no-projet" placeholder="0260XXXX.00X">
+        </div>
+
+        <div class="input-group">
+            <label>Date</label>
+            <input type="date" id="global-date">
+        </div>
+        <div id="last-saved-status" style="width: 100%; color: #475569; font-size: 0.85rem; text-align: center;">Dernière sauvegarde : aucune</div>
+    </section>
+
+    <small id="form-instructions" class="form-instructions" style="color: #242930; font-size: 0.8rem; display: block; margin-top: 3px; margin-bottom: 5px; text-align: center; margin-left: auto; margin-right: auto; max-width: 600px; font-style: italic;">
+        Cliquez sur les onglets pour naviguer entre les sections du formulaire. Les informations sont sauvegardées automatiquement. Vous pouvez passer d'une section à l'autre. Cependant prenez soin de bien sauvegarder votre rapport avant de quitter la page ou de fermer l'application.
+    </small>
+
+    <!-- NAVIGATION TABS -->
+    <nav id="form-navigation" style="margin-bottom: 20px;">
+        <button type="button" class="tab-btn active" onclick="showTab('tab-form1')">1. Météo & Travaux</button>
+        <button type="button" class="tab-btn" onclick="showTab('tab-form2')">2. Matériaux & Équipments</button>
+        <button type="button" class="tab-btn" onclick="showTab('tab-form3')">3. Essais & Résultats</button>
+    </nav>
+
+    <!-- ONGLET 1 : MÉTÉO & TRAVAUX -->
+    <section id="tab-form1" class="tab-section">
+        <h2>1. Météo & Travaux</h2>
+
+        <div class="form-section">
+            <h3>Conditions Atmosphériques</h3>
+            <!-- Disposition flex fluide -->
+            <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start; background: white; padding: 15px; border-radius: 6px; border: 1px solid var(--border);">
+                
+                <div style="display: flex; flex-wrap: wrap; gap: 15px; flex: 1; min-width: 250px;">
+                    <label><input type="checkbox" id="meteo-nuageux"> Nuageux</label>
+                    <label><input type="checkbox" id="meteo-ensoleille"> Ensoleillé</label>
+                    <label><input type="checkbox" id="meteo-neige"> Neige</label>
+                    <label><input type="checkbox" id="meteo-pluie"> Pluie</label>
+                </div>
+
+                <div style="display: flex; flex-wrap: wrap; gap: 15px; flex: 1; min-width: 250px; align-items: center; border-left: 2px solid #cbd5e1; padding-left: 15px;">
+                    <label><input type="checkbox" id="travaux-int"> Travaux Intérieur</label>
+                    <label><input type="checkbox" id="travaux-ext"> Travaux Extérieur</label>
+                    
+                    
+                </div>
+                <div style="display: flex; gap: 10px; width: 100%; margin-top: 5px; align-items: center; flex-wrap: wrap; text-align: center; justify-content: center;">
+                        <label>Température min °C:</label>
+                        <input type="number" id="temp-min" placeholder="Ex: 9,5" style="width: 150px;" oninput="if(this.value.length > 4) this.value = this.value.slice(0,4);">
+                        <label>Température max °C:</label>
+                        <input type="number" id="temp-max" placeholder="Ex: 25,0" style="width: 150px;" oninput="if(this.value.length > 4) this.value = this.value.slice(0,4);">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>Nature des travaux</h3>
+            <div class="checkbox-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div>
+                    <label style="font-weight:bold; color:var(--primary);"><input type="checkbox" id="trav-route"> Route</label>
+                    <label style="font-weight:bold; color:var(--primary);"><input type="checkbox" id="trav-stationnement"> Stationnement</label>
+                    <div style="margin-left: 20px; border-left: 2px solid #cbd5e1; padding-left: 10px;">
+                        <label><input type="checkbox" id="trav-infra"> Infrastructure</label>
+                        <label><input type="checkbox" id="trav-sous-fond"> Sous-fondation</label>
+                        <label><input type="checkbox" id="trav-fond-inf"> Fond. inférieure</label>
+                        <label><input type="checkbox" id="trav-fond-sup"> Fond. supérieure</label>
+                    </div>
+                    
+                    <label style="font-weight:bold; color:var(--primary); margin-top:10px;"><input type="checkbox" id="trav-tranchee-sous"> Tranchée sous chaussée</label>
+                    <label style="font-weight:bold; color:var(--primary);"><input type="checkbox" id="trav-tranchee-hors"> Tranchée hors chaussée</label>
+                    <div style="margin-left: 20px; border-left: 2px solid #cbd5e1; padding-left: 10px;">
+                        <label><input type="checkbox" id="trav-assise-cond"> Assise de conduite</label>
+                        <label><input type="checkbox" id="trav-enrob-lat"> Enrobage latéral</label>
+                        <label><input type="checkbox" id="trav-enrob-dessus"> Enrobage dessus de conduite</label>
+                        <label><input type="checkbox" id="trav-remblai-dessus"> Remblai dessus de conduite</label>
+                    </div>
+                </div>
+                <div>
+                    <label style="font-weight:bold; color:var(--primary);"><input type="checkbox" id="trav-edifice"> Édifice</label>
+                    <div style="margin-left: 20px; border-left: 2px solid #cbd5e1; padding-left: 10px;">
+                        <label><input type="checkbox" id="trav-dalle"> Remblai sous dalle</label>
+                        <label><input type="checkbox" id="trav-ext-murs"> Remblai ext. Murs</label>
+                        <label><input type="checkbox" id="trav-int-murs"> Remblai int. Murs</label>
+                        <label><input type="checkbox" id="trav-empattements"> Remblai sous empattements</label>
+                        
+                    </div>
+
+                    <label style="font-weight:bold; color:var(--primary); margin-top:10px;"><input type="checkbox" id="trav-digue"> Digue</label>
+                    <div style="margin-top: 50px;">
+                        <label>Autres (Précisez)</label><input type="text" id="trav-autres-texte">
+                    </div>
+                    
+                        
+                    <!--
+                    <div class="input-group" style="margin-top: 15px;">
+                        <label>Autres (Précisez)</label>
+                        <input type="text" id="trav-autres-texte">
+                    </div> -->
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="javascript:void(0);" onclick="scrollToSection('form-instructions')" style="color: var(--primary); font-weight: bold; text-decoration: none; font-size: 1rem; padding: 10px 20px; background: #e2e8f0; border-radius: 6px; display: inline-block;">
+                ⬆️ Retour aux sections du formulaire 
+            </a>
+        </div>
+    </section>
+
+    <!-- ONGLET 2 : MATÉRIAUX & ÉQUIPEMENTS -->
+    <section id="tab-form2" class="tab-section" style="display: none;">
+        <h2>2. Matériaux & Équipements</h2>
+
+        <div class="form-section">
+            <div class="input-group"><label>Entrepreneur</label><input type="text" id="entrepreneur" placeholder="Ex: Excavations XYZ"></div>
+        </div>
+
+        <!-- SOUS-JACENT -->
+        <div class="form-section" style="border-left: 4px solid #f59e0b;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <!--<h3 style="margin: 0; color: #b45309;">Matériau Sous-Jacent</h3>-->
+                <h3 style="margin: 0; color: #b45309;">Matériau Sous-Jacent</h3>
+                <label style="display: flex; align-items: center; gap: 5px; font-weight:bold; background:#fee2e2; padding:5px 10px; border-radius:4px; color:#b91c1c; cursor:pointer;">
+                    <input type="checkbox" id="sous-jacent-no" onchange="toggleNO(this, 'section-sous-jacent')" style="margin: 0;"> N/O
+                </label>
+            </div>
+            
+            <div id="section-sous-jacent">
+                <label style="font-weight:bold; display:block; margin-bottom:5px;">Type</label>
+                <div class="checkbox-group" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom:15px; padding:10px; background:white; border-radius:6px; border:1px solid var(--border);">
+                    <label><input type="checkbox" id="sous-type-pierre"> Pierre conc.</label>
+                    <label><input type="checkbox" id="sous-type-grav-conc"> Gravier conc.</label>
+                    <label><input type="checkbox" id="sous-type-grav-nat"> Gravier nat.</label>
+                    <label><input type="checkbox" id="sous-type-sable"> Sable</label>
+                    <label><input type="checkbox" id="sous-type-recyc"> Mat. recyclé</label>
+                    <label><input type="checkbox" id="sous-type-excav"> Mat. d'excavation</label>
+                    <label><input type="checkbox" id="sous-type-sol"> Sol naturel</label>
+                    <label><input type="checkbox" id="sous-type-roc"> Roc</label>
+                </div>
+
+                <label style="font-weight:bold; color:var(--primary); display:block; margin-bottom:5px;">Calibre</label>
+                <div class="checkbox-group" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; margin-bottom:15px; padding:10px; background:white; border-radius:6px; border:1px solid var(--border);">
+                    <label><input type="checkbox" id="sous-cal-mg-20" class="auto-mg-sous"> MG 20</label>
+                    <label><input type="checkbox" id="sous-cal-mg-20b" class="auto-mg-sous"> MG 20b</label>
+                    <label><input type="checkbox" id="sous-cal-mg-56" class="auto-mg-sous"> MG 56</label>
+                    <label><input type="checkbox" id="sous-cal-mg-80" class="auto-mg-sous"> MG 80</label>
+                    <label><input type="checkbox" id="sous-cal-mg-112" class="auto-mg-sous"> MG 112</label>
+                    <label><input type="checkbox" id="sous-cal-cg-14" class="auto-cg-sous"> CG 14</label>
+                    <label><input type="checkbox" id="sous-cal-cg-20" class="auto-cg-sous"> CG 20</label>
+                    <label><input type="checkbox" id="sous-cal-cg-20c" class="auto-cg-sous"> CG 20c</label>
+                    <label><input type="checkbox" id="sous-cal-cg-56" class="auto-cg-sous"> CG 56</label>
+                    <label><input type="checkbox" id="sous-cal-0-20"> 0-20</label>
+                    <label><input type="checkbox" id="sous-cal-0-56"> 0-56</label>
+                    <label><input type="checkbox" id="sous-cal-class-a"> Classe A</label>
+                    <label><input type="checkbox" id="sous-cal-class-b"> Classe B</label>
+                    <label><input type="checkbox" id="sous-cal-mtq"> MTQ</label>
+                    <label><input type="checkbox" id="sous-cal-mun"> MUN</label>
+                    <label><input type="checkbox" id="sous-cal-tv"> TV</label>
+                    <label><input type="checkbox" id="sous-cal-db"> DB</label>
+                    <div style="display:flex; align-items:center; gap:5px; grid-column: span 2;">
+                        <input type="checkbox" id="sous-cal-mr-check"> MR- <input type="text" id="sous-cal-mr-val" style="width:50px; padding:2px;">
+                    </div>
+                </div>
+
+                <label style="font-weight:bold; color:var(--primary); display:block; margin-bottom:5px;">État</label>
+                <div class="checkbox-group" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; padding:10px; background:white; border-radius:6px; border:1px solid var(--border);">
+                    <label><input type="checkbox" id="sous-etat-stable"> Stable</label>
+                    <label><input type="checkbox" id="sous-etat-gele"> Gelé</label>
+                    <label><input type="checkbox" id="sous-etat-sature"> Saturé</label>
+                    <label><input type="checkbox" id="sous-etat-instable"> Instable</label>
+                    <label><input type="checkbox" id="sous-etat-compacte"> Compacté</label>
+                    <label><input type="checkbox" id="sous-etat-lache"> Lâche</label>
+                    <label><input type="checkbox" id="sous-etat-remanie"> Remanié</label>
+                </div>
+                <input type="text" id="sous-jacent-autres" placeholder="Autres..." style="margin-top:10px; width:100%;">
+            </div>
+        </div>
+
+        <!-- REMBLAI -->
+        <div class="form-section" style="border-left: 4px solid #0284c7;">
+            <h3 style="margin-top: 0; color: #0284c7;">Matériau de Remblai</h3>
+            
+            <label style="font-weight:bold; color:var(--primary); display:block; margin-bottom:5px;">Type</label>
+            <div class="checkbox-group" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom:15px; padding:10px; background:white; border-radius:6px; border:1px solid var(--border);">
+                <label><input type="checkbox" id="rem-type-pierre"> Pierre conc.</label>
+                <label><input type="checkbox" id="rem-type-grav-conc"> Gravier conc.</label>
+                <label><input type="checkbox" id="rem-type-grav-nat"> Gravier nat.</label>
+                <label><input type="checkbox" id="rem-type-sable"> Sable</label>
+                <label><input type="checkbox" id="rem-type-recyc"> Mat. recyclé</label>
+                <label><input type="checkbox" id="rem-type-excav"> Mat. d'excavation</label>
+                <label><input type="checkbox" id="rem-type-sol"> Sol naturel</label>
+            </div>
+
+            <label style="font-weight:bold; color:var(--primary); display:block; margin-bottom:5px;">Calibre</label>
+            <div class="checkbox-group" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; margin-bottom:15px; padding:10px; background:white; border-radius:6px; border:1px solid var(--border);">
+                <label><input type="checkbox" id="rem-cal-mg-20" class="auto-mg-rem"> MG 20</label>
+                <label><input type="checkbox" id="rem-cal-mg-20b" class="auto-mg-rem"> MG 20b</label>
+                <label><input type="checkbox" id="rem-cal-mg-56" class="auto-mg-rem"> MG 56</label>
+                <label><input type="checkbox" id="rem-cal-mg-80" class="auto-mg-rem"> MG 80</label>
+                <label><input type="checkbox" id="rem-cal-mg-112" class="auto-mg-rem"> MG 112</label>
+                <label><input type="checkbox" id="rem-cal-cg-14" class="auto-cg-rem"> CG 14</label>
+                <label><input type="checkbox" id="rem-cal-cg-20" class="auto-cg-rem"> CG 20</label>
+                <label><input type="checkbox" id="rem-cal-cg-20c" class="auto-cg-rem"> CG 20c</label>
+                <label><input type="checkbox" id="rem-cal-cg-56" class="auto-cg-rem"> CG 56</label>
+                <label><input type="checkbox" id="rem-cal-0-20"> 0-20</label>
+                <label><input type="checkbox" id="rem-cal-0-56"> 0-56</label>
+                <label><input type="checkbox" id="rem-cal-class-a"> Classe A</label>
+                <label><input type="checkbox" id="rem-cal-class-b"> Classe B</label>
+                <label><input type="checkbox" id="rem-cal-mtq"> MTQ</label>
+                <label><input type="checkbox" id="rem-cal-mun"> MUN</label>
+                <label><input type="checkbox" id="rem-cal-tv"> TV</label>
+                <label><input type="checkbox" id="rem-cal-db"> DB</label>
+                <div style="display:flex; align-items:center; gap:5px; grid-column: span 2;">
+                    <input type="checkbox" id="rem-cal-mr-check"> MR- <input type="text" id="rem-cal-mr-val" style="width:50px; padding:2px;">
+                </div>
+            </div>
+
+            <label style="font-weight:bold; color:var(--primary); display:block; margin-bottom:5px;">État</label>
+            <div class="checkbox-group" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; padding:10px; background:white; border-radius:6px; border:1px solid var(--border);">
+                <label><input type="checkbox" id="rem-etat-stable"> Stable</label>
+                <label><input type="checkbox" id="rem-etat-gele"> Gelé</label>
+                <label><input type="checkbox" id="rem-etat-sature"> Saturé</label>
+                <label><input type="checkbox" id="rem-etat-instable"> Instable</label>
+                <label><input type="checkbox" id="rem-etat-segreg"> Ségrégation</label>
+            </div>
+            <input type="text" id="remblai-autres" placeholder="Autres..." style="margin-top:10px; width:100%;">
+        </div>
+
+        <!-- CARACTÉRISTIQUES -->
+        <div class="form-section">
+            <h3>Caractéristiques du matériau de remblai</h3>
+            <div class="grid-2">
+                <div class="input-group"><label>Provenance</label><input type="text" id="carac-provenance"></div>
+                <div class="input-group"><label>Code du produit</label><input type="text" id="carac-code-prod"></div>
+            </div>
+            <div class="grid-2">
+                <div class="input-group"><label>N° d'échantillon</label><input type="text" id="carac-no-echantillon"></div>
+                <div class="input-group"><label>N° de spécification</label><input type="text" id="carac-no-spec"></div>
+            </div>
+            
+            <div style="border: 2px solid #cbd5e1; padding: 15px; border-radius: 6px; margin: 15px 0;">
+                <div class="grid-2" style="align-items: center;">
+                    <div class="input-group" style="margin-bottom: 150px;">
+                        <label style=" font-size:1.1rem; color:var(--primary); font-weight:bold; text-align: center;">M.vol. sèche max (kg/m³)</label>
+                        <input type="number" id="carac-mv-seche-max" step="0.1" style="border: 2px solid; font-size: 1.2rem; font-weight:bold; text-align: center;" placeholder="Ex: 1800" oninput="if(this.value.length > 4) this.value = this.value.slice(0,4); calculateCompacite();">
+                    </div>
+                    <div>
+                        <div class="input-group"><label>Particules > 5mm (%)</label><input type="number" id="carac-part-5mm" step="0.1" placeholder="Ex: 62,5" oninput="if(this.value.length > 5) this.value = this.value.slice(0,5);"></div>
+                        <div class="input-group" style="margin-top:10px;"><label>% Eau optimum</label><input type="number" id="carac-eau-optimum" step="0.1" placeholder="Ex: 5,5" oninput="if(this.value.length > 5) this.value = this.value.slice(0,5);"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NOUVELLE DISPOSITION DES CASES PROCTOR 
+            <div class="checkbox-group" style="display:flex; flex-wrap:wrap; gap:15px; margin-bottom:15px; padding:10px; background:white; border-radius:6px; border:1px solid var(--border);">
+                <label><input type="checkbox" id="carac-proc-mod"> Proctor modifié</label>
+                <label><input type="checkbox" id="carac-proc-norm"> Proctor normal</label>
+                <label><input type="checkbox" id="carac-planche-ref"> Planche de référence</label>
+                <label><input type="checkbox" id="carac-valeur-est"> Valeur estimée</label>
+            </div>
+            <div class="input-group">
+                <label><input type="checkbox" id="carac-densite-rel"> Densité relative (Gs) : <input type="number" id="carac-densite-rel-gs" style="width:150px;"></label>
+            </div> -->
+
+            <!-- NOUVELLE DISPOSITION DES CASES PROCTOR -->
+            <div class="checkbox-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; padding: 10px; background: white; border-radius: 6px; border: 1px solid var(--border);">
+                <label><input type="checkbox" id="carac-proc-mod"> Proctor modifié</label>
+                <label><input type="checkbox" id="carac-proc-norm"> Proctor normal</label>
+                <label><input type="checkbox" id="carac-planche-ref"> Planche de référence</label>
+                <label><input type="checkbox" id="carac-valeur-est"> Valeur estimée</label>
+            </div>
+            <div class="input-group">
+                <label style="display: flex; align-items: center; gap: 10px;">
+                    <input type="checkbox" id="carac-densite-rel"> Densité relative (Gs) : 
+                    <input type="number" step="0.001" inputmode="decimal" id="carac-densite-rel-gs" placeholder="Ex: 0,000" oninput="if(this.value.length > 5) this.value = this.value.slice(0,5);" style="width: 150px;">
+                </label>
+            </div>
+
+        </div>
+
+        <!-- ÉPAISSEUR & ÉQUIPEMENT -->
+        <div class="form-section">
+            <h3 style="margin-bottom: 15px;">Épaisseurs & Compactage</h3>
+            
+            <div class="grid-2">
+                <div class="input-group">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                        <label style="margin: 0;">Épaisseur de levée (mm)</label>
+                        <label style="display: flex; align-items: center; gap: 5px; font-weight:bold; background:#fee2e2; padding:2px 8px; border-radius:4px; color:#b91c1c; cursor:pointer; font-size: 0.8rem; margin: 0;">
+                            <input type="checkbox" id="epaisseur-no" onchange="toggleNO(this, 'input-epaisseur-levee')" style="margin: 0;" > N/O
+                        </label>
+                    </div>
+                    <div id="input-epaisseur-levee">
+                        <input type="number" id="epaisseur-levee" style="width: 100%;" placeholder="Ex: 300" oninput="if(this.value.length > 3) this.value = this.value.slice(0,3);">
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label>Profondeur d'essai (mm)</label>
+                    <input type="number" id="profondeur-essai" placeholder="Ex: 200" oninput="if(this.value.length > 3) this.value = this.value.slice(0,3);">
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin: 15px 0 10px 0; border-top: 1px solid #ccc; padding-top:15px;">
+                <h4 style="margin: 0;">Équipement de compactage</h4>
+                <label style="display: flex; align-items: center; gap: 5px;font-weight:bold; background:#fee2e2; padding:5px 10px; border-radius:4px; color:#b91c1c; cursor:pointer;">
+                    <input type="checkbox" id="equip-comp-no" onchange="toggleNO(this, 'section-equip')" style="margin: 0;"> N/O
+                </label>
+            </div>
+            
+            <div id="section-equip">
+                <div class="checkbox-group" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; padding:10px; background:white; border-radius:6px; border:1px solid var(--border);">
+                    <label><input type="checkbox" id="equip-roul-route"> Roul. route</label>
+                    <label><input type="checkbox" id="equip-roul-tranchee"> Roul. tranchée</label>
+                    <label><input type="checkbox" id="equip-roul-mouton"> Pied-de-mouton</label>
+                    <label><input type="checkbox" id="equip-plaque-vib"> Plaque vibrante</label>
+                    <label><input type="checkbox" id="equip-dame-saut"> Dame sauteuse</label>
+                    <label><input type="checkbox" id="equip-vibrant"> Vibrant</label>
+                    <label><input type="checkbox" id="equip-statique"> Statique</label>
+                    <label><input type="checkbox" id="equip-sur-pelle"> sur pelle</label>
+                    <label><input type="checkbox" id="equip-sur-retro"> sur rétrocaveuse</label>
+                </div>
+                
+                <div class="grid-2" style="margin-top:10px;">
+                    <div class="input-group"><label>Modèle</label><input type="text" id="equip-modele" placeholder="Ex: Caterpillar D6T"></div>
+                    <div class="input-group"><label>Nb de passes</label><input type="text" inputmode="numeric" id="equip-nb-passes" placeholder="Ex: 10 @ 12"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- NUCLÉODENSIMÈTRE -->
+        <div class="form-section">
+            <h3 style="margin-bottom: 15px;">Nucléodensimètre</h3>
+            <div class="grid-2">
+                <div class="input-group">
+                    <label>N° de série</label>
+                    <input type="number" id="nucleo-no" placeholder="Ex: 123456" oninput="if(this.value.length > 7) this.value = this.value.slice(0,7);">
+                </div>
+
+                <!--
+                <div class="grid-2" style="gap: 10px;">
+                    <div class="input-group">
+                        <label>Écart d</label>
+                        <input type="text" id="nucleo-ecart-d" placeholder="Ex: 0,05">
+                    </div>
+                    <div class="input-group">
+                        <label>Écart h</label>
+                        <input type="text" id="nucleo-ecart-h" placeholder="Ex: 0,05">
+                    </div>
+                </div> -->
+
+                <div class="grid-2" style="gap: 10px;">
+                    <div class="input-group">
+                        <label>Écart d</label>
+                        <input type="number" step="0.01" inputmode="decimal" id="nucleo-ecart-d" placeholder="Ex: 0,05" oninput="if(this.value.length > 5) this.value = this.value.slice(0,5);">
+                    </div>
+                    <div class="input-group">
+                        <label>Écart h</label>
+                        <input type="number" step="0.01" inputmode="decimal" id="nucleo-ecart-h" placeholder="Ex: 0,05" oninput="if(this.value.length > 5) this.value = this.value.slice(0,5);">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="javascript:void(0);" onclick="scrollToSection('form-instructions')" style="color: var(--primary); font-weight: bold; text-decoration: none; font-size: 1rem; padding: 10px 20px; background: #e2e8f0; border-radius: 6px; display: inline-block;">
+                ⬆️ Retour aux sections du formulaire 
+            </a>
+        </div>
+    </section>
+
+    <!-- ONGLET 3 : ESSAIS & RÉSULTATS -->
+    <section id="tab-form3" class="tab-section" style="display: none;">
+        <h2>3. Essais & Résultats</h2>
+        
+        <div class="form-section">
+            <div class="grid-2" style="align-items:center;">
+                <div class="input-group" style="margin:0;">
+                    <label style="font-size:1.1rem; font-weight:bold; color:var(--primary);">Exigence de compacité (%)</label>
+                    <input type="number" id="exigence-compacite" step="0.1" style="font-size: 1.2rem;" oninput="calculateCompacite()" placeholder="Ex: 95">
+                </div>
+                <div class="checkbox-group" style="margin:0;">
+                    <label><input type="checkbox" id="methode-nucleo"> Essais in situ au nucléodensimètre</label>
+                    <div style="display:flex; align-items:center; gap:5px;">
+                        <input type="checkbox" id="methode-autre"> Autre: <input type="text" id="methode-autre-texte" style="flex:1;">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <div class="input-group">
+                <label style="font-weight:bold;">Secteur représenté</label>
+                <input type="text" id="essai-secteur" placeholder="Ex: Chaînage 12+300 à 12+450">
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>Tableau des Essais</h3>
+
+            <div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
+                <button type="button" class="collapse-trucks-button" onclick="collapseAllEssais()" style="background: #475569; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">Tout réduire</button>
+            </div>
+
+            <div id="essais-container">
+                <!-- Lignes dynamiques ajoutées ici -->
+            </div>
+            <button type="button" onclick="addEssai()" style="margin-top: 10px; background-color: #0284c7; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; width: 100%;">➕ Ajouter un essai</button>
+        </div>
+
+        <div class="form-section">
+            <h3>Remarques Globales</h3>
+            <textarea id="remarques-globales" rows="4" style="width: 100%;"></textarea>
+        </div>
+
+        <div class="form-section">
+            <h3>Conclusion & Signatures</h3>
+            <div class="grid-2">
+                <div class="input-group"><label>Rapport sommaire numéro</label><input type="text" id="rap-sommaire-no" placeholder="Ex: 12345"></div>
+                <div class="input-group"><label>Remis à</label><input type="text" id="rap-remis-a" placeholder="Ex: Durand Marie"></div>
+            </div>
+            <div class="grid-2" style="margin-top:15px; border-top:1px solid #ccc; padding-top:15px;">
+                <div class="input-group"><label>Nom du technicien</label><input type="text" id="sig-englobe-nom" placeholder="Ex: Dupont Jean"></div>
+                <div class="input-group"><label>Date</label><input type="date" id="sig-englobe-date"></div>
+            </div>
+            <div class="grid-2">
+                <div class="input-group"><label>Responsable de chantier</label><input type="text" id="sig-resp-nom" placeholder="Ex: Martin Pierre"></div>
+                <div class="input-group"><label>Date</label><input type="date" id="sig-resp-date"></div>
+            </div>
+        </div>
+
+        <small id="form-instructions2" style="color: #242930; font-size: 0.8rem; display: block; margin-top: 3px; margin-bottom: 5px; text-align: center; margin-left: auto; margin-right: auto; max-width: 600px; font-style: italic;">
+            Veuillez exporter le formulaire en PDF pour le soumettre et/ou le sauvegarder avant de fermer la page/l'application. Les données sont sauvegardées localement, mais l'exportation en PDF est nécessaire pour la soumission officielle.
+        </small>
+
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="javascript:void(0);" onclick="scrollToSection('form-instructions')" style="color: var(--primary); font-weight: bold; text-decoration: none; font-size: 1rem; padding: 10px 20px; background: #e2e8f0; border-radius: 6px; display: inline-block;">
+                ⬆️ Retour aux sections du formulaire 
+            </a>
+        </div>
+    </section>
+
+</div>
+
+<template id="essai-template">
+    <div class="essai-card" style="border: 1px solid #0284c7; border-radius: 6px; margin-bottom: 15px; background: #f8fafc; overflow: hidden;">
+        
+        <!-- EN-TÊTE RÉTRACTABLE (ACCORDÉON) -->
+        <div class="accordion-header" onclick="toggleAccordion(this)" style="background: #e2e8f0; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; cursor: pointer;">
+            <div style="display: flex; align-items: center;">
+                <span class="chevron" style="margin-right: 10px;">▼</span>
+                <span class="essai-title">Essai #<span class="row-index">1</span></span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <button type="button" onclick="duplicateEssai(this, event)" style="background: #3b82f6; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; font-weight: bold;">📋 Dupliquer</button>
+                <button type="button" onclick="deleteEssai(this, event)" style="background: none; border: none; color: #ef4444; font-weight: bold; font-size: 1.2rem; cursor: pointer; padding: 0 5px; margin-left: 5px;">✖</button>
+            </div>
+        </div>
+
+        <!-- CONTENU DE LA CARTE -->
+        <div class="accordion-content active" style="padding: 15px;">
+            
+            <!-- AVERTISSEMENTS DYNAMIQUES (Sans "background" pour rester orange vif en Mode Nuit) -->
+            <div class="warn-mv-max" style="color: #f97316; border: 2px solid #f97316; padding: 8px 12px; border-radius: 6px; font-weight: bold; font-size: 0.9rem; margin-bottom: 8px; text-align: center;">
+                ⚠️ Veuillez saisir la M.vol. sèche max (kg/m³) dans l'onglet Matériaux & Équipements.
+            </div>
+            <div class="warn-exigence" style="color: #f97316; border: 2px solid #f97316; padding: 8px 12px; border-radius: 6px; font-weight: bold; font-size: 0.9rem; margin-bottom: 15px; text-align: center;">
+                ⚠️ Veuillez saisir l'exigence de compacité (%) au haut de cette page.
+            </div>
+
+            <div class="grid-2" style="margin-bottom:10px;">
+                <div class="input-group"><label>Localisation de l'essai</label><input type="text" class="essai-secteur" placeholder="Ex: 12+340"></div>
+                <!-- CHAMP RENDU LECTURE SEULE ET AUTO-GÉRÉ PAR JS -->
+                <div class="input-group"><label>N° essai</label><input type="text" class="essai-no" readonly style="background:#f8fafc; font-weight:bold; color:#334155;"></div>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px;">
+                <div class="input-group"><label>Élévation (m)</label><input type="number" step="0.01" class="essai-elevation" placeholder="Ex: 380,000" oninput="if(this.value.length > 10) this.value = this.value.slice(0,10);"></div>
+                <div class="input-group"><label>Part. > 5mm</label><input type="number" step="0.1" class="essai-part" placeholder="Ex: 62,5" oninput="if(this.value.length > 5) this.value = this.value.slice(0,5);"></div>
+                <div class="input-group"><label>Teneur eau (%)</label><input type="number" step="0.1" class="essai-eau" placeholder="Ex: 5,0" oninput="if(this.value.length > 5) this.value = this.value.slice(0,5);"></div>
+                <div class="input-group"><label>MV Sèche (kg/m³)</label><input type="number" class="essai-mv-seche trigger-calc" placeholder="Ex: 1800" oninput="if(this.value.length > 4) this.value = this.value.slice(0,4);"></div>
+                <div class="input-group"><label>MV Max Corr. (kg/m³)</label><input type="number" class="essai-mv-max-corr trigger-calc" placeholder="Ex: 1900" oninput="if(this.value.length > 4) this.value = this.value.slice(0,4);"></div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; padding-top: 15px; border-top: 1px solid #e2e8f0;">
+                <div class="input-group" style="margin:0;">
+                    <label style="font-size:1.1rem;">Compacité (%)</label>
+                    <input type="text" class="essai-compacite" readonly style="background:#f8fafc; font-size:1.2rem; font-weight:bold; border: 2px solid #cbd5e1; color:#334155;">
+                </div>
+                <div class="input-group" style="margin:0;">
+                    <label>Remarque (N-C auto)</label>
+                    <input type="text" class="essai-rem" style="font-weight:bold;">
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<button type="button" onclick="saveReport()" style="position: fixed; bottom: 15px; right: 15px; z-index: 9999; background: #10b981; color: white; border: none; width: 60px; height: 60px; border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.3); font-size: 1.5rem; cursor: pointer; display: flex; justify-content: center; align-items: center;">💾</button>
+
+<script src="../../../shared/fonts/tahoma.js"></script>
+<script src="tpl_compaction.js"></script>
+<script src="app_compaction.js"></script>
+<script>window.REPORT_CONFIG = { slug: 'compaction', keyPrefix: 'ID_', namePrefix: 'compactage_', orgs: ['eng', 'mtq'], pdfReady: ['eng'], croquis: true, photos: true };</script>
+<script src="../../../shared/js/gestion_rapports.js"></script>
+<script src="../../../shared/js/photo_addon.js"></script>
+<script src="../../../shared/js/croquis_addon.js"></script>
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('../../../sw.js');
+        });
+    }
+</script>
+
+</body>
+</html>

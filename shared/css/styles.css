@@ -1,0 +1,1521 @@
+/* ========================================= */
+/* VARIABLES ET RÉINITIALISATION GLOBALE     */
+/* ========================================= */
+:root {
+    --primary: #0284c7;      
+    --primary-hover: #0369a1;
+    --success: #16a34a;      
+    --success-bg: #f0fdf4;
+    --warning: #b45309;      
+    --danger: #dc2626;       
+    --danger-bg: #fef2f2;
+    --temoin: #8b5cf6;       
+    --temoin-bg: #faf5ff;
+    --bg-page: #f1f5f9;      
+    --bg-card: #ffffff;
+    --border: #cbd5e1;
+    --text-main: #334155;
+    --text-muted: #64748b;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+    background-color: var(--bg-page);
+    color: var(--text-main);
+    padding: 20px;
+    font-size: 16px; 
+}
+
+#app-container {
+    max-width: 1200px; 
+    margin: 0 auto;
+    background: transparent;
+}
+
+/* ========================================= */
+/* TYPOGRAPHIE ET EN-TÊTES                   */
+/* ========================================= */
+
+/* Empêche les en-têtes principaux de devenir gris/noirs en Mode Nuit */
+body.dark-mode header {
+    background-color: var(--brand-primary, #97c6b9) !important;
+    color: white !important;
+}
+
+h2 {
+    color: var(--primary);
+    margin-bottom: 15px;
+    font-size: 1.5rem;
+    border-bottom: 2px solid var(--primary);
+    padding-bottom: 5px;
+}
+
+h3 {
+    color: var(--text-main);
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+    background-color: #e2e8f0;
+    padding: 8px 12px;
+    border-radius: 4px;
+}
+
+h4 {
+    font-size: 1rem;
+    color: var(--text-main);
+}
+
+/* ========================================= */
+/* BARRE DE NAVIGATION (ONGLETS)             */
+/* ========================================= */
+#form-navigation {
+    display: flex;
+    gap: 10px;
+    background: var(--bg-card);
+    padding: 12px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 12px 20px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #1e293b;
+    background-color: #cbd5e1; 
+    border: 2px solid #94a3b8;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.tab-btn.active, .tab-btn:hover {
+    background-color: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+/* ========================================= */
+/* SECTIONS ET CARTES (FORMULAIRES)          */
+/* ========================================= */
+.tab-section {
+    background: var(--bg-card);
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.form-section {
+    margin-bottom: 30px;
+    padding: 15px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: #f8fafc;
+}
+
+/* ========================================= */
+/* GRILLES ET ALIGNEMENTS                    */
+/* ========================================= */
+.grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+/* ========================================= */
+/* INPUTS ET CONTRÔLES                       */
+/* ========================================= */
+.input-group {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end; /* Force l'input à rester aligné vers le bas */
+    height: 100%; /* Permet d'utiliser tout l'espace disponible de la grille */
+    margin-bottom: 15px;
+}
+
+.input-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: var(--text-main);
+    font-size: 0.95rem;
+    text-align: left;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="date"],
+input[type="time"],
+select,
+textarea {
+    width: 100%;
+    height: 44px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 1rem;
+    background-color: white;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+    min-width: 0; 
+    max-width: 100%;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.2);
+}
+
+textarea {
+    resize: vertical;
+    min-height: 80px;
+    height: auto; 
+}
+
+/* ========================================= */
+/* CASES À COCHER (CHECKBOXES)               */
+/* ========================================= */
+.checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.checkbox-group label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+input[type="checkbox"] {
+    width: 22px !important;
+    height: 22px !important;
+    flex-shrink: 0 !important; 
+    cursor: pointer;
+    accent-color: var(--primary);
+    margin: 0;
+}
+
+/* ========================================= */
+/* STYLES SPÉCIFIQUES DES CARTES             */
+/* ========================================= */
+.truck-card {
+    border: 2px solid #94a3b8; /* Gris / Slate 400 */
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    background: #f8fafc; /* Gris très clair / Slate 50 */
+    transition: background-color 0.3s, border-color 0.3s;
+}
+.truck-card.truck-status-refused {
+    border-color: #dc2626 !important;
+    background-color: #fecaca !important;
+}
+.truck-card.truck-status-sampled {
+    border-color: #16a34a !important;
+    background-color: #bbf7d0 !important;
+}
+.truck-card.truck-status-tested {
+    border-color: #0284c7 !important;
+    background-color: #bae6fd !important;
+}
+.truck-card > .accordion-header {
+    background-color: #e2e8f0 !important;
+}
+.truck-card .input-group {
+    margin-bottom: 0; 
+}
+
+.sample-card {
+    border: 2px solid var(--success);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 25px;
+    background: var(--success-bg);
+}
+.sample-card h3 {
+    background-color: #dcfce7;
+    color: var(--success);
+}
+
+.temoin-only-card {
+    border: 2px solid var(--temoin);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 25px;
+    background: var(--temoin-bg);
+}
+.temoin-only-card h3,
+.temoin-only-card h4 {
+    background-color: #f3e8ff;
+    color: var(--temoin);
+}
+
+/* --- ACCORDÉONS --- */
+.accordion-header {
+    background-color: #e0f2fe;
+    padding: 12px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    border-bottom: 1px solid #bae6fd;
+}
+.accordion-content {
+    display: none;
+    padding: 15px;
+}
+.accordion-content.active {
+    display: block;
+}
+.chevron {
+    transition: transform 0.3s ease;
+    font-size: 1.2rem;
+    color: #0284c7;
+}
+.chevron.rotated {
+    transform: rotate(-90deg);
+}
+
+/* ========================================= */
+/* BOUTONS D'ACTION                          */
+/* ========================================= */
+button[onclick^="add"] {
+    padding: 12px 20px;
+    font-size: 1rem;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.1s, filter 0.2s;
+}
+button[onclick^="add"]:active {
+    transform: scale(0.98);
+}
+button[onclick^="add"]:hover {
+    filter: brightness(110%);
+}
+
+/* ========================================= */
+/* TÉMOIN : CONDITIONS INITIALES DE CURE       */
+/* (ligne Prélèvement + lignes a à i)          */
+/* ========================================= */
+.prelev-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    width: 100%;
+    max-width: 100%;
+}
+.prelev-row .prelev-title {
+    flex: 0 0 100px;
+    font-weight: bold;
+}
+.prelev-row > div {
+    flex: 1 1 140px;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.prelev-row > div > label {
+    flex: 0 0 auto;
+}
+.prelev-row > div > input {
+    flex: 1 1 auto;
+    width: auto;
+    min-width: 0;
+}
+.temoin-container details,
+.temoin-only-card details {
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+.temoin-container details .input-group,
+.temoin-only-card details .input-group {
+    min-width: 0;
+}
+
+/* ========================================= */
+/* RESPONSIVITÉ MOBILE (CORRECTIFS iPHONE/iPAD)*/
+/* ========================================= */
+@media (max-width: 820px) {
+    
+    /* 1. PROTECTION ABSOLUE DU JAVASCRIPT */
+    .temoin-container[style*="display: none"],
+    .temoin-container[style*="display:none"],
+    *[style*="display: none"], 
+    *[style*="display:none"] {
+        display: none !important;
+    }
+
+    /* 2. ESPACE GLOBAL */
+    body, #app-container {
+        padding: 4px !important; 
+        overflow-x: hidden !important; 
+    }
+    .tab-section {
+        padding: 15px 10px !important; 
+    }
+
+    /* 3. EN-TÊTE ET NAVIGATION */
+    header, .bg-primary {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        text-align: center !important;
+        height: auto !important;
+        padding: 15px 10px !important;
+    }
+    #main-logo {
+        margin: 0 auto 10px auto !important;
+        max-width: 90% !important;
+    }
+    #form-navigation {
+        flex-direction: column !important; 
+    }
+    .tab-btn {
+        width: 100% !important;
+        margin-bottom: 8px !important;
+    }
+
+    /* 4. TRUCK CARDS : ALIGNEMENT PAR LE BAS DE TOUTES LES LIGNES */
+    .truck-card > div:not(.accordion-content):not(.accordion-header),
+    .truck-card .accordion-content > div:not(.truck-toggles-container) {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: flex-end !important;
+        gap: 6px !important;
+        width: 100% !important;
+        margin-bottom: 10px !important;
+        flex-wrap: nowrap !important;
+    }
+
+    /* Protection absolue de l'accordéon sur mobile */
+    .accordion-content { display: none !important; }
+    .accordion-content.active { display: block !important; }
+
+    .truck-card .input-group {
+        flex: 1 1 0% !important;
+        min-width: 0 !important;
+        margin-bottom: 0 !important;
+    }
+    .truck-card .input-group:has(.truck-remarques-select) {
+        flex: 1 1 100% !important;
+        margin-top: 8px !important;
+    }
+    .truck-card .input-group label {
+        font-size: 0.8rem !important;
+        line-height: 1.15 !important;
+        margin-bottom: 4px !important;
+    }
+    .truck-remarks-controls {
+        flex-wrap: wrap !important;
+    }
+    .truck-remarks-controls .truck-remarques-list {
+        flex: 1 1 100% !important;
+        min-width: 100% !important;
+        width: 100% !important;
+    }
+    .truck-remarks-controls button {
+        flex: 1 1 auto !important;
+        min-height: 42px !important;
+    }
+    .truck-card > div:has(input[type="checkbox"]) {
+        align-items: center !important;
+        flex-wrap: wrap !important;
+    }
+
+    /* 4.1. ALIGNEMENT DES INPUTS D'ÉCHANTILLON DANS LA CARTE CAMION */
+    .truck-sample-fields > div {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 10px !important;
+    }
+    .truck-sample-fields > div > div {
+        flex: 1 1 100% !important;
+        min-width: 100% !important;
+    }
+    .truck-sample-fields label {
+        font-size: 0.8rem !important;
+        line-height: 1.15 !important;
+        margin-bottom: 4px !important;
+    }
+
+    /* 5. FORM 3 : CONDITIONS INITIALES ET SOUS-SECTIONS */
+    .sample-card .form-section div[style*="grid-template-columns: 1fr 1fr"]:not([style*="2fr"]),
+    .temoin-only-card div[style*="grid-template-columns: 1fr 1fr"]:not([style*="2fr"]) {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 15px !important;
+    }
+    .grid-2 {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 15px !important;
+    }
+    .prelev-row {
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
+    .prelev-row .prelev-title {
+        flex: 0 0 auto !important;
+    }
+    .prelev-row > div {
+        flex: 1 1 auto !important;
+        width: 100% !important;
+    }
+    .prelev-row > div > label {
+        min-width: 50px;
+    }
+
+    /* 6. NETTOYAGE DES INPUTS TEMPS/DATE APPLE */
+    input[type="date"], input[type="time"] {
+        -webkit-appearance: none !important; 
+        min-width: 0 !important;
+    }
+    input[type="time"]::-webkit-clear-button,
+    input[type="time"]::-webkit-inner-spin-button,
+    input[type="date"]::-webkit-clear-button,
+    input[type="date"]::-webkit-inner-spin-button {
+        display: none !important;
+    }
+}
+
+/* ========================================== */
+/* STYLES DU DASHBOARD (HUB PRINCIPAL)        */
+/* ========================================== */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 10px 0;
+}
+.app-card {
+    background: white;
+    border-radius: 12px;
+    padding: 30px 20px;
+    text-align: center;
+    text-decoration: none;
+    color: #334155;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    border: 2px solid transparent;
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+.app-card:active, .app-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+    border-color: var(--brand-primary, #97c6b9); 
+}
+.app-icon-img { 
+    width: 65px; 
+    height: 65px; 
+    object-fit: contain; 
+}
+.app-title { font-size: 1.2rem; font-weight: bold; margin: 0; }
+.app-desc { font-size: 0.9rem; color: #64748b; margin: 0; }
+
+/* ========================================== */
+/* PALETTE ORGANISMES / SERVICES (HUB)        */
+/* Ancrée sur le vert Englobe #97c6b9         */
+/* ========================================== */
+:root {
+    /* Bordures / remplissages : organismes */
+    --org-eng: var(--brand-primary, #97c6b9);      /* Englobe : vert sauge */
+    --org-gen: #7fa99b;      /* Général : sauge-ardoise */
+    --org-mtq: #6495b8;      /* MTQ : bleu acier atténué */
+    --org-hdq: #c2955d;      /* Hydro-Québec : ocre atténué */
+    --org-hyb: #82aeb8;      /* Hybride : sarcelle-ardoise */
+
+    /* Bordures / remplissages : secteurs */
+    --svc-env: #7fb8b0;      /* CER : sarcelle douce */
+
+    /* Bordures / remplissages : services (une couleur distincte par service) */
+    --svc-gen: #94a3b8;      /* Transversal - Outils généraux : ardoise */
+    --svc-acq: #2dd4bf;      /* ICI - Acquisition de données : sarcelle */
+    --svc-geo: #fb923c;      /* ICI - Géosciences et géotechnique : orange terre */
+    --svc-gqa: #c084fc;      /* ICI - Gestion de la qualité et des actifs : lavande */
+    --svc-cmt: #60a5fa;      /* ICI - Ingénierie civile, municipale et transports : cobalt */
+    --svc-mat: #4ade80;      /* ICI - Ingénierie et inspection des matériaux : menthe */
+    --svc-bat: #f472b6;      /* ICI - Science et ingénierie du bâtiment : rose */
+    --svc-asa: #e879f9;      /* CER - Acceptabilité sociale : orchidée */
+    --svc-cli: #e879f9;      /* CER - Changements climatiques : orchidée */
+    --svc-eco: #a3e635;      /* CER - Écologie et milieux naturels : lime */
+    --svc-ees: #34d399;      /* CER - Évaluation environnementale de site : émeraude */
+    --svc-sol: #acc860;      /* CER - Gestion des sols contaminés : vert sol */
+    --svc-hyd: #38bdf8;      /* CER - Hydrogéologie : bleu eau */
+
+    /* Textes (assombris pour contraste >= 4.5:1 sur blanc) */
+    --org-eng-text: #3f7a69;
+    --org-gen-text: #4f7366;
+    --org-mtq-text: #3d6f93;
+    --org-hdq-text: #8a6330;
+    --org-hyb-text: #3f7680;
+    --svc-env-text: #2f7068;
+
+    /* Boutons de filtre : texte par défaut / texte sur bouton actif */
+    --filter-text: #475569;
+    --filter-on-fill: #ffffff;
+    --hub-card-bg: #ffffff;
+}
+
+body.dark-mode {
+    --org-eng-text: #a8d4c7;
+    --org-gen-text: #9fc4b6;
+    --org-mtq-text: #93bad8;
+    --org-hdq-text: #dcb383;
+    --org-hyb-text: #9cc8d1;
+    --svc-env-text: #94d0c7;
+    --filter-text: #cbd5e1;
+    --hub-card-bg: #1e293b;
+}
+
+/* --- Titre du Hub --- */
+.hub-heading {
+    color: #334155;
+    margin-bottom: 20px;
+}
+
+/* --- Barre de filtres --- */
+.hub-filters {
+    margin-bottom: 25px;
+    background: var(--bg-card);
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.filter-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+.filter-label {
+    color: #475569;
+    font-size: 0.9rem;
+    font-weight: bold;
+    min-width: 140px;
+}
+.filter-btn {
+    --c: #64748b;            /* couleur de bordure / remplissage */
+    padding: 6px 14px;
+    border: 2px solid var(--c);
+    background: transparent;
+    color: var(--filter-text);
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+}
+.filter-btn:hover {
+    background: color-mix(in srgb, var(--c) 15%, transparent);
+}
+.filter-btn.active,
+.filter-btn.active:hover {
+    background: var(--c);
+    color: var(--filter-on-fill);
+    /* Lisibilité du texte blanc sur les teintes claires (menthe, lime...) */
+    text-shadow: 0 1px 2px rgba(15, 23, 42, 0.45);
+}
+.filter-btn:focus-visible {
+    outline: 2px solid var(--c);
+    outline-offset: 2px;
+}
+
+.org-btn[data-org="eng"]         { --c: var(--org-eng); }
+.org-btn[data-org="mtq"]         { --c: var(--org-mtq); }
+.org-btn[data-org="hdq"]         { --c: var(--org-hdq); }
+.org-btn[data-org="gen"]         { --c: var(--org-gen); }
+
+/* Secteurs : ICI = vert Englobe, CER = sarcelle environnement */
+.secteur-btn[data-secteur="ici"] { --c: var(--org-eng); }
+.secteur-btn[data-secteur="cer"] { --c: var(--svc-env); }
+.secteur-btn[data-secteur="gen"] { --c: var(--svc-gen); }
+
+/* Services : une couleur par service (boutons et étiquettes de cartes) */
+[data-service="gen"] { --svc: var(--svc-gen); }
+[data-service="acq"] { --svc: var(--svc-acq); }
+[data-service="geo"] { --svc: var(--svc-geo); }
+[data-service="gqa"] { --svc: var(--svc-gqa); }
+[data-service="cmt"] { --svc: var(--svc-cmt); }
+[data-service="mat"] { --svc: var(--svc-mat); }
+[data-service="bat"] { --svc: var(--svc-bat); }
+[data-service="asa"] { --svc: var(--svc-asa); }
+[data-service="cli"] { --svc: var(--svc-cli); }
+[data-service="eco"] { --svc: var(--svc-eco); }
+[data-service="ees"] { --svc: var(--svc-ees); }
+[data-service="sol"] { --svc: var(--svc-sol); }
+[data-service="hyd"] { --svc: var(--svc-hyd); }
+
+/* --- Menu déroulant des services --- */
+.hub-filters .filter-dropdown {
+    flex: 1 1 260px;
+    width: auto;
+    max-width: 480px;
+    height: 40px;
+    padding: 0 40px 0 14px;
+    border: 2px solid var(--svc, #94a3b8);   /* couleur du service choisi */
+    border-radius: 20px;
+    background-color: #f8fafc;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    color: var(--filter-text);
+    font-size: 0.85rem;
+    font-weight: bold;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.hub-filters .filter-dropdown:hover {
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--svc, #94a3b8) 20%, transparent);
+}
+.hub-filters .filter-dropdown:focus {
+    outline: none;
+    border-color: var(--svc, #64748b);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--svc, #64748b) 30%, transparent);
+}
+.hub-filters .filter-dropdown optgroup {
+    font-weight: bold;
+    color: #64748b;
+}
+.hub-filters .filter-dropdown option {
+    font-weight: normal;
+    color: #334155;
+}
+
+/* --- Mobile : libellé au-dessus, menu pleine largeur --- */
+@media (max-width: 600px) {
+    .hub-filters .filter-label {
+        min-width: 100%;
+    }
+    .hub-filters .filter-dropdown {
+        flex-basis: 100%;
+        max-width: 100%;
+        height: 44px;   /* cible tactile confortable */
+    }
+}
+
+/* Secteur / Service grisés quand MTQ ou Hydro-Québec est choisi */
+.filter-row-disabled {
+    opacity: 0.35;
+    pointer-events: none;
+    filter: grayscale(90%);
+}
+
+.filter-empty {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 20px 0;
+}
+
+/* --- Hiérarchie des cartes : fond coloré en diagonale = organisme --- */
+/* Intensité de la teinte : plus discrète en mode nuit */
+:root {
+    --card-tint-strong: 42%;
+    --card-tint-soft: 10%;
+}
+body.dark-mode {
+    --card-tint-strong: 30%;
+    --card-tint-soft: 6%;
+}
+
+.app-card[data-org] {
+    --card-org: var(--org-gen);
+    --card-tag: var(--org-gen-text);
+    /* Teintes : couleur d'organisme mélangée au fond de carte (blanc ou ardoise) */
+    --tint-eng: color-mix(in srgb, var(--org-eng) var(--card-tint-strong), var(--hub-card-bg));
+    --tint-mtq: color-mix(in srgb, var(--org-mtq) var(--card-tint-strong), var(--hub-card-bg));
+    --tint-hdq: color-mix(in srgb, var(--org-hdq) var(--card-tint-strong), var(--hub-card-bg));
+    --card-fill: linear-gradient(135deg,
+        color-mix(in srgb, var(--card-org) var(--card-tint-strong), var(--hub-card-bg)) 0%,
+        color-mix(in srgb, var(--card-org) var(--card-tint-soft), var(--hub-card-bg)) 100%);
+    border: 2px solid transparent;
+    background: var(--card-fill);
+}
+.app-card[data-org="eng"] { --card-org: var(--org-eng); --card-tag: var(--org-eng-text); }
+.app-card[data-org="mtq"] { --card-org: var(--org-mtq); --card-tag: var(--org-mtq-text); }
+.app-card[data-org="hdq"] { --card-org: var(--org-hdq); --card-tag: var(--org-hdq-text); }
+
+/* Hybride (plusieurs organismes, data-org contient une espace) :
+   dégradé diagonal entre les couleurs de chaque organisme */
+.app-card[data-org*=" "] {
+    --card-org: var(--org-hyb);
+    --card-tag: var(--org-hyb-text);
+    --card-fill: linear-gradient(135deg, var(--tint-eng), var(--tint-mtq));
+}
+.app-card[data-org~="eng"][data-org~="hdq"] {
+    --card-fill: linear-gradient(135deg, var(--tint-eng), var(--tint-hdq));
+}
+.app-card[data-org~="mtq"][data-org~="hdq"] {
+    --card-fill: linear-gradient(135deg, var(--tint-mtq), var(--tint-hdq));
+}
+.app-card[data-org~="eng"][data-org~="mtq"][data-org~="hdq"] {
+    --card-fill: linear-gradient(135deg, var(--tint-eng), var(--tint-mtq), var(--tint-hdq));
+}
+
+/* Titre : pastille translucide plutôt que le gris plein des h3 */
+.app-card[data-org] .app-title {
+    background: color-mix(in srgb, var(--hub-card-bg) 70%, transparent);
+}
+
+/* Étiquette : couleur du service, assombrie pour rester lisible sur fond blanc
+   (les outils généraux gardent la couleur de l'organisme) */
+.app-card[data-service]:not([data-service="gen"]) {
+    --card-tag: color-mix(in srgb, var(--svc) 55%, #1e293b);
+}
+body.dark-mode .app-card[data-service]:not([data-service="gen"]) {
+    --card-tag: color-mix(in srgb, var(--svc) 85%, #ffffff);
+}
+
+.card-tag {
+    margin: 0 0 5px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    color: var(--card-tag, var(--org-gen-text));
+}
+
+.app-card[data-org]:hover,
+.app-card[data-org]:active {
+    border-color: transparent;
+    box-shadow: 0 10px 20px color-mix(in srgb, var(--card-org) 35%, transparent);
+}
+
+/* Masquage par les filtres (classe plutôt que style inline) */
+.app-card.is-filtered-out {
+    display: none !important;
+}
+
+.new-app-card {
+    background: #f8fafc;
+    border: 2px dashed #cbd5e1;
+    box-shadow: none;
+}
+.new-app-card:hover, .new-app-card:active {
+    border-color: var(--brand-primary, #97c6b9);
+    background: #f0fdfa;
+}
+
+/* --- NOTIFICATIONS TOAST --- */
+.toast-notification {
+    visibility: hidden;
+    min-width: 250px;
+    background-color: #1e293b; /* Gris très foncé */
+    color: #f8fafc;
+    text-align: center;
+    border-radius: 8px;
+    padding: 16px;
+    position: fixed;
+    z-index: 10000;
+    left: 50%;
+    bottom: 40px;
+    transform: translateX(-50%);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+/* Couleurs selon le contexte */
+.toast-success { border-bottom: 4px solid #22c55e; } /* Vert */
+.toast-error { border-bottom: 4px solid #ef4444; } /* Rouge */
+.toast-info { border-bottom: 4px solid #0ea5e9; } /* Bleu */
+
+/* Animation d'apparition et disparition */
+.toast-notification.show {
+    visibility: visible;
+    animation: slideInUp 0.4s ease-out, fadeOut 0.5s ease-in 2.5s;
+}
+
+@keyframes slideInUp {
+    from { bottom: 0; opacity: 0; }
+    to { bottom: 40px; opacity: 1; }
+}
+@keyframes fadeOut {
+    from { bottom: 40px; opacity: 1; }
+    to { bottom: 40px; opacity: 0; }
+}
+
+/* --- MODE NUIT (CORRIGÉ) --- */
+body.dark-mode {
+    background-color: #0f172a; 
+    color: #f8fafc;
+}
+
+/* 1. Main containers and cards */
+body.dark-mode #form-navigation,
+body.dark-mode .tab-section,
+body.dark-mode .form-section,
+body.dark-mode .app-card,
+body.dark-mode .new-app-card {
+    background-color: #1e293b;
+    border-color: #334155;
+}
+
+/* 1b. Hub : garder le fond coloré des cartes (pas de bordure grise) */
+body.dark-mode .app-card[data-org] {
+    border-color: transparent;
+}
+body.dark-mode .hub-heading {
+    color: #f1f5f9;
+}
+body.dark-mode .hub-filters {
+    background-color: #1e293b;
+}
+body.dark-mode .filter-label {
+    color: #cbd5e1;
+}
+body.dark-mode .hub-filters .filter-dropdown {
+    background-color: #0f172a;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23cbd5e1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    border-color: var(--svc, #64748b);
+    color: var(--filter-text);
+}
+body.dark-mode .hub-filters .filter-dropdown option {
+    color: #f8fafc;
+}
+
+/* 2. Specific forms (Keeping the color hierarchy but dark) */
+body.dark-mode .truck-card {
+    background-color: #172554; /* Very dark blue */
+    border-color: #1e3a8a;
+}
+body.dark-mode .truck-card.truck-status-refused {
+    border-color: #f87171 !important;
+    background-color: #450a0a !important;
+}
+body.dark-mode .truck-card.truck-status-sampled {
+    border-color: #4ade80 !important;
+    background-color: #052e16 !important;
+}
+body.dark-mode .truck-card.truck-status-tested {
+    border-color: #38bdf8 !important;
+    background-color: #082f49 !important;
+}
+body.dark-mode .truck-card > .accordion-header {
+    background-color: #334155 !important;
+}
+body.dark-mode .home-button {
+    border: 1px solid #94a3b8 !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.35) !important;
+}
+body.dark-mode .sample-card {
+    background-color: #064e3b; /* Very dark green */
+    border-color: #047857;
+}
+body.dark-mode .temoin-only-card {
+    background-color: #3b0764; /* Very dark purple */
+    border-color: #6b21a8;
+}
+
+/* 3. Headers and Accordions */
+body.dark-mode h2 { border-bottom-color: #38bdf8; color: #38bdf8; }
+body.dark-mode h3 { background-color: #334155; color: #f8fafc; }
+body.dark-mode h4 { color: #f8fafc; }
+body.dark-mode .sample-card h3 { background-color: #047857; color: white; }
+body.dark-mode .temoin-only-card h3, 
+body.dark-mode .temoin-only-card h4 { background-color: #6b21a8; color: white; }
+body.dark-mode .accordion-header { background-color: #1e3a8a; border-bottom-color: #172554; }
+body.dark-mode .truck-header-summary,
+body.dark-mode .form-instructions,
+body.dark-mode .truck-legend,
+body.dark-mode .page-numbering {
+    color: #f8fafc !important;
+}
+body.dark-mode .truck-legend span {
+    color: #7dd3fc !important;
+}
+body.dark-mode .truck-legend span:nth-of-type(2) {
+    color: #86efac !important;
+}
+body.dark-mode .truck-legend span:nth-of-type(3) {
+    color: #fca5a5 !important;
+}
+body.dark-mode #truck-pagination-controls {
+    background-color: #334155 !important;
+}
+body.dark-mode #save-manager button,
+body.dark-mode #truck-pagination-controls button,
+body.dark-mode .collapse-trucks-button {
+    border: 1px solid #94a3b8 !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+/* 4. Navigation Tabs */
+body.dark-mode .tab-btn { background-color: #334155; color: #cbd5e1; border-color: #475569; }
+body.dark-mode .tab-btn.active, 
+body.dark-mode .tab-btn:hover { background-color: #0284c7; color: white; border-color: #0284c7; }
+
+/* 5. Inputs and Textareas */
+body.dark-mode input, 
+body.dark-mode select, 
+body.dark-mode textarea {
+    background-color: #0f172a;
+    color: #ffffff;
+    border-color: #475569;
+}
+body.dark-mode input:focus,
+body.dark-mode select:focus,
+body.dark-mode textarea:focus {
+    border-color: #38bdf8;
+    box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
+}
+
+/* 6. Text and Labels */
+body.dark-mode label, 
+body.dark-mode .app-desc, 
+body.dark-mode .accordion-header {
+    color: #cbd5e1;
+}
+body.dark-mode #save-manager label,
+body.dark-mode #last-saved-status {
+    color: #e2e8f0 !important;
+}
+body.dark-mode .app-title,
+body.dark-mode .chevron {
+    color: #f8fafc;
+}
+
+/* 7. Forcer l'écrasement des couleurs écrites directement dans le HTML (SAUF LE HEADER) */
+body.dark-mode [style*="background"]:not(header):not(header *) {
+    background: #1e293b !important;
+    color: #f8fafc !important;
+    border-color: #334155 !important;
+}
+
+/* Force le header à rester vert (Sécurité maximale avec sélecteur fort) */
+body.dark-mode header,
+body.dark-mode header[style] {
+    background: var(--brand-primary, #97c6b9) !important;
+    color: white !important;
+}
+
+/* Le bouton "Accueil" des formulaires doit rester bleu nuit */
+body.dark-mode header a.home-button {
+    background: #1e293b !important;
+    color: white !important;
+}
+
+/* La petite bulle "Accueil" sur le hub doit garder son vert d'origine */
+body.dark-mode header span[style] {
+    background: var(--brand-primary-dark, #73968c) !important;
+    color: white !important;
+}
+
+/* Inversion du logo (sombre vers blanc) */
+body.dark-mode header img {
+    filter: invert(1);
+    mix-blend-mode: screen;
+}
+
+/* ===================================================================== */
+/* RAFRAÎCHISSEMENT VISUEL (ajouté par SFGEN, 2026-10-28)                 */
+/* Tout est regroupé dans ce bloc : le supprimer rétablit l'apparence     */
+/* d'avant. Aucune image ni police ajoutée : seulement des dégradés CSS   */
+/* calculés par le navigateur (rien de plus à télécharger).               */
+/* Les couleurs d'état des camions et le mode nuit existants ne sont pas  */
+/* modifiés.                                                              */
+/* ===================================================================== */
+
+/* --- 1. Fond des pages (Hub et applications) --------------------------
+   Halo vert Englobe très léger en haut de page plutôt qu'un gris uni.
+   Les formulaires (.tab-section) restent blancs pour la lisibilité. */
+body {
+    background-color: var(--bg-page);
+    background-image:
+        radial-gradient(1100px 460px at 50% -170px, color-mix(in srgb, var(--brand-primary, #97c6b9) 34%, transparent), transparent 72%),
+        linear-gradient(180deg, color-mix(in srgb, var(--brand-primary, #97c6b9) 8%, var(--bg-page)) 0, var(--bg-page) 560px);
+    background-repeat: no-repeat;
+}
+body.dark-mode {
+    background-image:
+        radial-gradient(1100px 460px at 50% -170px, color-mix(in srgb, var(--brand-primary, #97c6b9) 16%, transparent), transparent 72%),
+        linear-gradient(180deg, #111d2f 0, #0f172a 560px);
+}
+
+/* --- 2. Cartes du Hub ----------------------------------------------------
+   Teintes un peu plus présentes + bande de couleur de l'organisme en haut.
+   Hybride : deux teintes franches en diagonale et bande partagée,
+   pour bien distinguer ENG - MTQ de ENG. */
+:root {
+    --card-tint-strong: 52%;
+    --card-tint-soft: 15%;
+}
+body.dark-mode {
+    --card-tint-strong: 38%;
+    --card-tint-soft: 9%;
+}
+.app-card[data-org] {
+    --card-strip: linear-gradient(var(--card-org), var(--card-org));
+    background: var(--card-strip) top / 100% 6px no-repeat, var(--card-fill);
+}
+.app-card[data-org*=" "] {
+    --card-fill: linear-gradient(135deg, var(--tint-eng) 0%, var(--tint-eng) 38%, var(--tint-mtq) 62%, var(--tint-mtq) 100%);
+    --card-strip: linear-gradient(90deg, var(--org-eng) 0 50%, var(--org-mtq) 50% 100%);
+}
+.app-card[data-org~="eng"][data-org~="hdq"] {
+    --card-fill: linear-gradient(135deg, var(--tint-eng) 0%, var(--tint-eng) 38%, var(--tint-hdq) 62%, var(--tint-hdq) 100%);
+    --card-strip: linear-gradient(90deg, var(--org-eng) 0 50%, var(--org-hdq) 50% 100%);
+}
+.app-card[data-org~="mtq"][data-org~="hdq"] {
+    --card-fill: linear-gradient(135deg, var(--tint-mtq) 0%, var(--tint-mtq) 38%, var(--tint-hdq) 62%, var(--tint-hdq) 100%);
+    --card-strip: linear-gradient(90deg, var(--org-mtq) 0 50%, var(--org-hdq) 50% 100%);
+}
+.app-card[data-org~="eng"][data-org~="mtq"][data-org~="hdq"] {
+    --card-fill: linear-gradient(135deg, var(--tint-eng) 0%, var(--tint-eng) 28%, var(--tint-mtq) 42%, var(--tint-mtq) 58%, var(--tint-hdq) 72%, var(--tint-hdq) 100%);
+    --card-strip: linear-gradient(90deg, var(--org-eng) 0 33.3%, var(--org-mtq) 33.3% 66.6%, var(--org-hdq) 66.6% 100%);
+}
+
+/* --- 3. Boutons utilitaires du Hub (diagnostic, historique) ------------
+   Même apparence pour les deux (styles écrits dans le HTML remplacés).
+   Le Mode nuit est un petit interrupteur dans l'en-tête (bloc APPS HORS LIGNE). */
+#diagnostics-toggle,
+button[onclick*="changelog.html"] {
+    background: #1e293b !important;
+    color: #ffffff !important;
+    border: 1px solid color-mix(in srgb, var(--brand-primary, #97c6b9) 75%, #1e293b) !important;
+    border-radius: 999px !important;
+    padding: 10px 22px !important;
+    font-size: 0.95rem !important;
+    font-weight: 600 !important;
+    line-height: 1.2;
+    opacity: 1 !important;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.18);
+    transition: background-color 0.15s, box-shadow 0.15s, transform 0.1s;
+}
+#diagnostics-toggle:hover,
+button[onclick*="changelog.html"]:hover {
+    background: #2b3a52 !important;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25);
+}
+#diagnostics-toggle:active,
+button[onclick*="changelog.html"]:active {
+    transform: scale(0.98);
+}
+body.dark-mode #diagnostics-toggle,
+body.dark-mode button[onclick*="changelog.html"] {
+    background: #334155 !important;
+    color: #f8fafc !important;
+    border-color: var(--brand-primary, #97c6b9) !important;
+}
+body.dark-mode #diagnostics-toggle:hover,
+body.dark-mode button[onclick*="changelog.html"]:hover {
+    background: #3e4f66 !important;
+}
+
+/* ===================================================================== */
+/* APPLICATIONS GÉNÉRÉES PAR SFGEN (ajouté automatiquement par SFGEN)      */
+/* Champs pleine largeur, cartes du tableau des essais, cases à cocher,   */
+/* champs Date / Heure à la même taille que les autres sur iPhone / iPad. */
+/* ===================================================================== */
+.full-width { grid-column: 1 / -1 !important; }
+label.checkbox-label { display: flex; align-items: center; gap: 10px; font-size: 1rem; cursor: pointer; font-weight: bold; }
+.essai-card { border: 2px solid #94a3b8; border-radius: 8px; margin-bottom: 15px; background: #f8fafc; overflow: hidden; transition: background-color 0.3s, border-color 0.3s; }
+.essai-card.truck-status-refused { border-color: #dc2626 !important; background-color: #fecaca !important; }
+.essai-card.truck-status-sampled { border-color: #16a34a !important; background-color: #bbf7d0 !important; }
+.essai-card.truck-status-tested { border-color: #0284c7 !important; background-color: #bae6fd !important; }
+body.dark-mode .essai-card { background-color: #172554; border-color: #1e3a8a; }
+/* Date / Heure : sur iPad (plus large que 820 px), Safari dessinait ces champs à sa façon :
+   plus gros que les champs voisins et débordant de leur case. Même règle partout. */
+input[type="date"], input[type="time"] { -webkit-appearance: none; appearance: none; min-width: 0; }
+input[type="date"]::-webkit-date-and-time-value, input[type="time"]::-webkit-date-and-time-value { text-align: left; margin: 0; }
+.grid-2 > .input-group { min-width: 0; }
+/* Sous-sections : espace entre deux groupes de champs (lisible sur téléphone et tablette) */
+.sfgen-sub-title, hr.sfgen-sub-sep { margin-top: 1.25rem; margin-bottom: 0.85rem; padding-top: 0.85rem; border-top: 1px solid rgba(148, 163, 184, 0.18); }
+.sfgen-sub-title { padding-bottom: 4px; border-bottom: 1px solid var(--border); }
+hr.sfgen-sub-sep { height: 0; padding-top: 0; border: none; border-top: 1px solid rgba(148, 163, 184, 0.18); }
+/* Cases « Sous-élément » qui se suivent : côte à côte, comme les cases standard */
+.subitem-checks .subitem-check-row { display: flex; flex-wrap: wrap; gap: 8px 14px; }
+.subitem-checks .subitem-check-row .checkbox-label { margin: 0; }
+/* FIN DU BLOC SFGEN : APPLICATIONS GÉNÉRÉES PAR SFGEN */
+
+/* ===================================================================== */
+/* EN-TÊTES DES APPS AUX COULEURS DE LEUR CARTE DU HUB (ajouté par SFGEN)  */
+/* SFGEN écrit <body data-org="..."> dans chaque app (génération et        */
+/* bouton « Mettre à jour les liens du Hub »). Sans data-org : vert        */
+/* Englobe comme avant. Mêmes couleurs que les cartes, en jour et en nuit. */
+/* ===================================================================== */
+body[data-org] { --app-header-bg: var(--org-gen); }
+body[data-org="eng"] { --app-header-bg: var(--org-eng); }
+body[data-org="mtq"] { --app-header-bg: var(--org-mtq); }
+body[data-org="hdq"] { --app-header-bg: var(--org-hdq); }
+body[data-org~="eng"][data-org~="mtq"] {
+    --app-header-bg: linear-gradient(135deg, var(--org-eng) 0%, var(--org-eng) 38%, var(--org-mtq) 62%, var(--org-mtq) 100%);
+}
+body[data-org~="eng"][data-org~="hdq"] {
+    --app-header-bg: linear-gradient(135deg, var(--org-eng) 0%, var(--org-eng) 38%, var(--org-hdq) 62%, var(--org-hdq) 100%);
+}
+body[data-org~="mtq"][data-org~="hdq"] {
+    --app-header-bg: linear-gradient(135deg, var(--org-mtq) 0%, var(--org-mtq) 38%, var(--org-hdq) 62%, var(--org-hdq) 100%);
+}
+body[data-org~="eng"][data-org~="mtq"][data-org~="hdq"] {
+    --app-header-bg: linear-gradient(135deg, var(--org-eng) 0%, var(--org-eng) 28%, var(--org-mtq) 42%, var(--org-mtq) 58%, var(--org-hdq) 72%, var(--org-hdq) 100%);
+}
+body[data-org] header[style],
+body.dark-mode[data-org] header[style] {
+    background: var(--app-header-bg) !important;
+}
+/* FIN DU BLOC SFGEN : EN-TÊTES DES APPS AUX COULEURS */
+
+/* ===================================================================== */
+/* APPS HORS LIGNE DU HUB, DIAGNOSTIC ET MODE NUIT (ajouté par SFGEN)      */
+/* Panneau sous les filtres + bouton « Garder hors ligne » sur chaque      */
+/* carte (shared/js/hub_hors_ligne.js), panneau du diagnostic et petit     */
+/* interrupteur Mode nuit dans l'en-tête du Hub.                           */
+/* ===================================================================== */
+.hl-panel { margin: -10px 0 25px; padding: 14px 16px; border-radius: 8px; background-color: var(--bg-card); box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-left: 5px solid var(--brand-primary, #97c6b9); }
+.hl-panel.hl-inactif { padding: 10px 16px; border-left-color: #94a3b8; }
+.hl-panel.hl-inactif .hl-head { margin-bottom: 0; }
+.hl-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; margin-bottom: 10px; }
+.hl-title { font-size: 1rem; color: var(--text-main); }
+.hl-status { font-size: 0.9rem; color: var(--text-muted); }
+.hl-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.hl-actions[hidden] { display: none; }
+.hl-btn { padding: 8px 16px; border-radius: 999px; border: 2px solid #94a3b8; background: transparent; color: var(--text-main); font-weight: 600; font-size: 0.85rem; cursor: pointer; }
+.hl-btn:disabled { opacity: 0.45; cursor: default; }
+.hl-btn.hl-primary { border-color: var(--brand-primary-dark, #73968c); background-color: var(--brand-primary, #97c6b9); color: #0f172a; }
+.hl-btn.hl-danger { border-color: #fca5a5; color: #b91c1c; }
+.hl-btn[aria-pressed="true"] { border-color: var(--brand-primary-dark, #73968c); background-color: color-mix(in srgb, var(--brand-primary, #97c6b9) 35%, transparent); }
+.hl-progress { position: relative; margin-top: 10px; height: 22px; border-radius: 999px; background-color: #e2e8f0; overflow: hidden; }
+.hl-bar { height: 100%; width: 0; background-color: var(--brand-primary, #97c6b9); transition: width 0.2s; }
+.hl-progress span { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 0.78rem; font-weight: 600; color: #0f172a; }
+.hl-note { margin: 8px 0 0; font-size: 0.82rem; color: var(--text-muted); }
+.hl-note:empty { display: none; }
+
+.app-card[data-org] { position: relative; }
+.hl-toggle { align-self: center; margin-top: 2px; padding: 5px 14px; border-radius: 999px; font-size: 0.78rem; font-weight: 700; line-height: 1.3; cursor: pointer; color: #334155; background-color: rgba(255, 255, 255, 0.85); border: 1px solid rgba(15, 23, 42, 0.18); }
+.hl-toggle:hover { background-color: #ffffff; }
+.hl-toggle[aria-pressed="true"] { color: #ffffff; background-color: #3f7a69; border-color: #3f7a69; }
+.hl-occupe .hl-toggle { pointer-events: none; opacity: 0.8; }
+.hl-hors-ligne .hl-toggle[aria-pressed="false"] { display: none; }
+.app-card.hl-indisponible { opacity: 0.45; filter: grayscale(70%); }
+.app-card.hl-indisponible::after { content: "Non disponible hors ligne"; position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%); padding: 3px 10px; border-radius: 999px; font-size: 0.72rem; font-weight: 700; white-space: nowrap; color: #ffffff; background-color: #475569; }
+.hl-seulement .app-card[data-org]:not(.hl-garde) { display: none !important; }
+
+body.dark-mode .hl-panel { background-color: #1e293b; }
+body.dark-mode .hl-title { color: #f1f5f9; }
+body.dark-mode .hl-btn { color: #e2e8f0; border-color: #64748b; }
+body.dark-mode .hl-btn.hl-primary { color: #0f172a; border-color: var(--brand-primary, #97c6b9); }
+body.dark-mode .hl-btn.hl-danger { color: #fca5a5; border-color: #7f1d1d; }
+body.dark-mode .hl-progress { background-color: #334155; }
+body.dark-mode .hl-toggle { color: #e2e8f0; background-color: rgba(15, 23, 42, 0.75); border-color: rgba(148, 163, 184, 0.4); }
+body.dark-mode .hl-toggle[aria-pressed="true"] { color: #0f172a; background-color: var(--brand-primary, #97c6b9); border-color: var(--brand-primary, #97c6b9); }
+
+/* --- Diagnostic de l'appareil (bouton « Afficher le diagnostic ») --- */
+#diagnostics-panel.hub-diag { max-width: 760px; margin: 14px auto 0; padding: 16px; text-align: left; white-space: normal; border-radius: 10px; background-color: var(--bg-card); color: var(--text-main); border-left: 5px solid var(--brand-primary, #97c6b9); box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08); font-size: 0.9rem; }
+#diagnostics-panel.hub-diag[hidden] { display: none; }
+.hd-wait { margin: 0; color: var(--text-muted); }
+.hd-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 14px; }
+.hd-tile { padding: 10px 12px; border-radius: 8px; background-color: #f1f5f9; border-top: 3px solid #cbd5e1; }
+.hd-tile small { display: block; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-muted); }
+.hd-tile strong { display: block; margin-top: 4px; font-size: 1rem; color: var(--text-main); }
+.hd-tile span { display: block; margin-top: 2px; font-size: 0.78rem; color: var(--text-muted); }
+.hd-tile.hd-ok { border-top-color: #3f7a69; }
+.hd-tile.hd-warn { border-top-color: #d97706; }
+.hd-tile.hd-bad { border-top-color: #dc2626; }
+.hd-alert { margin: 0 0 12px; padding: 8px 12px; border-radius: 8px; font-weight: 600; color: #991b1b; background-color: #fee2e2; }
+.hd-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
+.hd-table th { padding: 6px 8px; text-align: left; font-size: 0.72rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-muted); border-bottom: 2px solid #e2e8f0; }
+.hd-table td { padding: 7px 8px; vertical-align: middle; border-bottom: 1px solid #e2e8f0; color: var(--text-main); }
+.hd-table .hd-num { text-align: right; white-space: nowrap; }
+.hd-table .hd-date { white-space: nowrap; }
+.hd-table small { color: var(--text-muted); }
+.hd-table tr.hd-other td { font-style: italic; }
+.hd-pill { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 0.76rem; font-weight: 700; white-space: nowrap; color: #475569; background-color: #e2e8f0; }
+.hd-pill.hd-ok { color: #ffffff; background-color: #3f7a69; }
+.hd-pill.hd-warn { color: #78350f; background-color: #fde68a; }
+.hd-pill.hd-bad { color: #ffffff; background-color: #dc2626; }
+.hd-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.hd-tech { margin-top: 12px; font-size: 0.8rem; color: var(--text-muted); }
+.hd-tech summary { cursor: pointer; }
+.hd-tech pre { margin: 8px 0 0; padding: 8px 10px; border-radius: 6px; white-space: pre-wrap; word-break: break-word; font-size: 0.75rem; background-color: #f1f5f9; }
+@media (max-width: 520px) {
+    .hd-table .hd-date { display: none; }
+}
+body.dark-mode #diagnostics-panel.hub-diag { background-color: #1e293b; color: #e2e8f0; }
+body.dark-mode .hd-tile, body.dark-mode .hd-tech pre { background-color: #0f172a; }
+body.dark-mode .hd-tile strong, body.dark-mode .hd-table td { color: #f1f5f9; }
+body.dark-mode .hd-table th, body.dark-mode .hd-table td { border-color: #334155; }
+body.dark-mode .hd-pill { color: #e2e8f0; background-color: #334155; }
+body.dark-mode .hd-pill.hd-ok { color: #0f172a; background-color: var(--brand-primary, #97c6b9); }
+body.dark-mode .hd-alert { color: #fecaca; background-color: #450a0a; }
+
+/* --- Mode nuit : petit interrupteur dans l'en-tête du Hub --- */
+.hub-theme-toggle { margin-left: auto; flex-shrink: 0; display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px 6px 7px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.6); background: rgba(15, 23, 42, 0.14); color: #ffffff; font: inherit; font-size: 0.85rem; font-weight: 600; line-height: 1; cursor: pointer; transition: background-color 0.15s; }
+.hub-theme-toggle:hover { background: rgba(15, 23, 42, 0.26); }
+.hub-theme-switch { position: relative; flex-shrink: 0; width: 32px; height: 18px; border-radius: 999px; background-color: rgba(255, 255, 255, 0.45); transition: background-color 0.2s; }
+.hub-theme-switch::after { content: ""; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%; background-color: #ffffff; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); transition: transform 0.2s; }
+body.dark-mode .hub-theme-switch { background-color: #1e293b; }
+body.dark-mode .hub-theme-switch::after { transform: translateX(14px); }
+/* En-tête empilé (≤ 820 px) : coin bas droit, à la hauteur de « Accueil », sans ligne de plus */
+@media (max-width: 820px) {
+    @supports selector(:has(*)) {
+        header:has(> .hub-theme-toggle) { position: relative; }
+        .hub-theme-toggle { position: absolute; right: 12px; bottom: 12px; margin: 0; }
+    }
+}
+@media (max-width: 600px) {
+    .hub-theme-toggle { padding: 6px 7px; }
+    .hub-theme-label { display: none; }
+}
+/* FIN DU BLOC SFGEN : APPS HORS LIGNE DU HUB */
+
+/* ===================================================================== */
+/* PANNEAU DE GESTION DES RAPPORTS (ajouté automatiquement par SFGEN)      */
+/* Boutons du panneau, barre Exportation & Transmission, bascule de mode  */
+/* hybride (Standard / MTQ / HDQ) et champs propres à un organisme.       */
+/* ===================================================================== */
+.report-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.report-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 14px;
+    border: none;
+    border-radius: 6px;
+    background: var(--btn-bg, #334155);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+}
+.report-btn:disabled { cursor: not-allowed; }
+.report-btn.is-locked { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
+/* Version MTQ / HDQ ou LIMS non disponible dans ce formulaire (REPORT_CONFIG.hybridActive) : grisée, non cliquable */
+.report-btn.is-frozen,
+.org-mode-btn.is-frozen,
+.org-mode-switch.is-frozen { opacity: 0.4; filter: grayscale(100%); cursor: not-allowed; pointer-events: none; }
+/* Interrupteur compact « Mode MTQ » (même allure que « Mode nuit » du Hub) : remplace la barre à deux boutons */
+.org-mode-switch-bar { display: flex; justify-content: flex-end; margin: -6px 0 16px; }
+.org-mode-switch { position: relative; display: inline-flex !important; align-items: center; gap: 8px; margin: 0; padding: 6px 12px 6px 7px; border-radius: 999px; border: 1px solid #93c5fd; background: rgba(59, 130, 246, 0.08); color: #1d4ed8; font-size: 0.85rem; font-weight: 700; line-height: 1; cursor: pointer; user-select: none; -webkit-user-select: none; }
+.org-mode-switch input { position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0; pointer-events: none; }
+.org-mode-switch-track { position: relative; flex-shrink: 0; width: 32px; height: 18px; border-radius: 999px; background-color: #cbd5e1; transition: background-color 0.2s; }
+.org-mode-switch-track::after { content: ""; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%; background-color: #ffffff; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); transition: transform 0.2s; }
+.org-mode-switch input:checked + .org-mode-switch-track { background-color: #3b82f6; }
+.org-mode-switch input:checked + .org-mode-switch-track::after { transform: translateX(14px); }
+.org-mode-switch input:focus-visible + .org-mode-switch-track { outline: 2px solid #3b82f6; outline-offset: 2px; }
+body.dark-mode .org-mode-switch { border-color: #3b82f6; background: rgba(59, 130, 246, 0.15); color: #93c5fd !important; }
+/* Champs propres au formulaire MTQ (.mtq-only-field) : cachés hors du mode MTQ, en bleu acier dans le mode MTQ */
+body:not([data-active-org="mtq"]) .mtq-only-field.mtq-only-field.mtq-only-field { display: none !important; }
+.mtq-only-field { border-left: 3px solid #3b82f6; background-color: rgba(59, 130, 246, 0.12); border-radius: 6px; padding: 8px 10px; }
+.mtq-only-field label, .mtq-only-field h3, .mtq-only-field .mtq-group-title, .mtq-only-field th { color: #1d4ed8; }
+.mtq-only-field input:not([type="checkbox"]), .mtq-only-field textarea, .mtq-only-field select { border-color: #60a5fa; }
+.mtq-badge { display: inline-block; margin-left: 6px; padding: 1px 6px; border-radius: 4px; background-color: #3b82f6; color: #ffffff; font-size: 0.7rem; font-weight: 700; vertical-align: middle; }
+body.dark-mode .mtq-only-field { border-left-color: #60a5fa; background-color: rgba(59, 130, 246, 0.12) !important; }
+body.dark-mode .mtq-only-field label, body.dark-mode .mtq-only-field h3, body.dark-mode .mtq-only-field .mtq-group-title,
+body.dark-mode .mtq-only-field th { color: #93c5fd !important; }
+.org-mode-btn:disabled { cursor: not-allowed; }
+.report-btn-main { flex: 1 1 auto; }
+.report-btn-lims { color: #94a3b8; opacity: 0.5; }
+.export-bar {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+    width: 100%;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Bascule de mode : entre le panneau et « Informations générales » */
+.org-mode-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 20px;
+    padding: 4px;
+    border-radius: 8px;
+    background: #1e293b;
+}
+.org-mode-btn {
+    --org-accent: var(--brand-primary, #97c6b9);
+    flex: 1 1 auto;
+    padding: 10px 14px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: #cbd5e1;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+}
+.org-mode-btn[data-org-mode="mtq"] { --org-accent: #6495b8; }
+.org-mode-btn[data-org-mode="hdq"] { --org-accent: #0369a1; }
+.org-mode-btn.active { background: var(--org-accent); color: white; }
+.org-mode-btn[data-org-mode="eng"].active { color: #0f2a24; }
+
+/* Champs propres à un organisme : cachés hors de leur mode, valeurs conservées et sauvegardées */
+body:not([data-active-org="mtq"]) [data-client="mtq"],
+body:not([data-active-org="mtq"]) .field-mtq,
+body:not([data-active-org="hdq"]) [data-client="hdq"],
+body:not([data-active-org="hdq"]) .field-hdq { display: none !important; }
+[data-client="eng"] { --client-color: var(--brand-primary, #97c6b9); --client-tint: color-mix(in srgb, var(--brand-primary, #97c6b9) 8%, transparent); }
+[data-client="mtq"], .field-mtq { --client-color: #6495b8; --client-tint: rgba(100, 149, 184, 0.08); }
+[data-client="hdq"], .field-hdq { --client-color: #0369a1; --client-tint: rgba(3, 105, 161, 0.08); }
+[data-client], .field-mtq, .field-hdq {
+    border-left: 4px solid var(--client-color) !important;
+    padding-left: 8px !important;
+    border-radius: 4px;
+    background: var(--client-tint);
+}
+.variant-badge {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 1px 7px;
+    border-radius: 10px;
+    background: var(--client-color, #6495b8);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    vertical-align: middle;
+}
+
+/* Mode nuit : les couleurs des boutons restent distinctes (priorité sur la règle générale des styles en ligne) */
+body.dark-mode #save-manager .report-btn { background: var(--btn-bg, #334155) !important; color: white !important; border: none !important; }
+body.dark-mode #save-manager .report-btn[style*="185, 28, 28"] { background: #b91c1c !important; }
+body.dark-mode #save-manager .report-btn-lims { color: #94a3b8 !important; }
+body.dark-mode #imported-indicator { background: #0d9488 !important; color: white !important; }
+body.dark-mode #saved-reports-dropdown { color: #f8fafc !important; }
+body.dark-mode .org-mode-bar { background: #0f172a; }
+/* FIN DU BLOC SFGEN : PANNEAU DE GESTION DES RAPPORTS */
+
+/* ===================================================================== */
+/* CROQUIS : PLANCHE À DESSIN ET PIÈCE JOINTE (ajouté par SFGEN)          */
+/* Planche de shared/js/croquis_addon.js (champs Croquis des apps SFGEN   */
+/* et case « Joindre un croquis »). Le papier reste blanc en mode nuit.   */
+/* ===================================================================== */
+.crq-pad { border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; background-color: #ffffff; }
+.crq-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; padding: 8px; background-color: #f1f5f9; border-bottom: 1px solid #cbd5e1; }
+.crq-group { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+.crq-btn { min-width: 40px; height: 40px; padding: 0 8px; display: inline-flex; align-items: center; justify-content: center; gap: 5px; border: 2px solid transparent; border-radius: 8px; background-color: #ffffff; color: #334155; font-size: 0.85rem; font-weight: 600; line-height: 1; cursor: pointer; touch-action: manipulation; box-shadow: 0 1px 2px rgba(15, 23, 42, 0.12); }
+.crq-btn.active { border-color: #0284c7; background-color: #e0f2fe; }
+.crq-btn:disabled { opacity: 0.45; cursor: default; }
+.crq-dot { width: 20px; height: 20px; border-radius: 50%; display: block; }
+.crq-color[data-color="#000000"] .crq-dot { background-color: #000000; }
+.crq-color[data-color="#1d4ed8"] .crq-dot { background-color: #1d4ed8; }
+.crq-color[data-color="#dc2626"] .crq-dot { background-color: #dc2626; }
+.crq-line { width: 18px; border-radius: 3px; display: block; background-color: currentColor; }
+.crq-width[data-width="0.003"] .crq-line { height: 2px; }
+.crq-width[data-width="0.006"] .crq-line { height: 4px; }
+.crq-width[data-width="0.012"] .crq-line { height: 7px; }
+/* Scène : grille en arrière-plan (jamais imprimée), calques d'encre et d'aperçu par-dessus */
+.crq-stage { position: relative; background-color: #ffffff; }
+.crq-stage.crq-grid-on { background-image: linear-gradient(#e2e8f0 1px, transparent 1px), linear-gradient(90deg, #e2e8f0 1px, transparent 1px); background-size: 5% 5%; }
+.crq-stage canvas { display: block; width: 100%; height: auto; touch-action: none; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+.crq-stage canvas.crq-preview { position: absolute; left: 0; top: 0; height: 100%; cursor: crosshair; }
+.crq-modal { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 12px; background-color: rgba(15, 23, 42, 0.35); }
+.crq-modal[hidden] { display: none; }
+.crq-modal-box { width: min(340px, 100%); padding: 14px; border-radius: 10px; background-color: #ffffff; color: #0f172a; box-shadow: 0 10px 30px rgba(15, 23, 42, 0.3); }
+.crq-modal-box label { display: block; margin-bottom: 6px; font-weight: 700; }
+.crq-modal-box input { width: 100%; box-sizing: border-box; font-size: 16px; }
+.crq-modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; }
+.crq-modal-actions .crq-ok { background-color: #0284c7; color: #ffffff; }
+/* Case « Joindre un croquis annexé à ce rapport » (bas du formulaire) */
+.croquis-addon { margin: 20px 0 90px; padding: 14px; /* espace sous la planche : le bouton 💾 flottant ne la cache pas */ border: 1px dashed #94a3b8; border-radius: 8px; background-color: #f8fafc; text-align: left; }
+.croquis-addon.is-attached { border-style: solid; border-color: #0284c7; }
+.crq-attach-toggle { display: flex; align-items: center; gap: 10px; margin: 0; font-weight: 700; cursor: pointer; }
+.crq-attach-toggle input { width: 22px; height: 22px; margin: 0; flex: 0 0 auto; }
+.crq-attach-body { margin-top: 12px; }
+.crq-attach-body[hidden] { display: none; }
+.crq-sync-note { margin: 0 0 10px; font-size: 0.85rem; color: #475569; }
+.crq-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin-bottom: 12px; }
+.crq-field { display: flex; flex-direction: column; gap: 4px; font-size: 0.85rem; font-weight: 600; }
+.crq-field input { width: 100%; box-sizing: border-box; }
+@media (max-width: 520px) {
+    .crq-lbl { display: none; }
+    .crq-btn { min-width: 38px; padding: 0 6px; }
+}
+body.dark-mode .crq-pad { border-color: #475569; }
+body.dark-mode .crq-toolbar { background-color: #334155; border-bottom-color: #475569; }
+body.dark-mode .crq-btn { background-color: #1e293b; color: #f8fafc; }
+body.dark-mode .crq-btn.active { border-color: #38bdf8; background-color: #0c4a6e; }
+body.dark-mode .crq-color[data-color="#000000"] .crq-dot { box-shadow: 0 0 0 2px #94a3b8; }
+body.dark-mode .crq-modal-box { background-color: #1e293b; color: #f8fafc; }
+body.dark-mode .croquis-addon { background-color: #1e293b; border-color: #475569; }
+body.dark-mode .croquis-addon.is-attached { border-color: #38bdf8; }
+body.dark-mode .crq-attach-toggle,
+body.dark-mode .crq-field { color: #f8fafc; }
+body.dark-mode .crq-sync-note { color: #cbd5e1; }
+/* FIN DU BLOC SFGEN : CROQUIS : PLANCHE À DESSIN ET PIÈCE JOINTE */
+
+/* ===================================================================== */
+/* ANNEXE PHOTO : PHOTOS JOINTES AU RAPPORT (ajouté par SFGEN)            */
+/* shared/js/photo_addon.js : bloc dans une section (case « Photos ») ou  */
+/* case « Joindre une annexe photo » en bas du formulaire.                */
+/* ===================================================================== */
+.photo-addon { margin: 20px 0 12px; padding: 14px; border: 1px dashed #94a3b8; border-radius: 8px; background-color: #f8fafc; text-align: left; }
+.photo-addon.is-attached { border-style: solid; border-color: var(--brand-primary-dark, #73968c); }
+.pa-attach-toggle { display: flex; align-items: center; gap: 10px; margin: 0; font-weight: 700; cursor: pointer; }
+.pa-attach-toggle input { width: 22px; height: 22px; margin: 0; flex: 0 0 auto; }
+.pa-attach-body { margin-top: 12px; }
+.pa-attach-body[hidden], .photo-annex-block[hidden] { display: none !important; }
+.photo-annex-block { grid-column: 1 / -1; margin-top: 12px; padding: 12px; border: 1px solid var(--border, #cbd5e1); border-left: 4px solid var(--brand-primary, #97c6b9); border-radius: 8px; background-color: var(--bg-card, #ffffff); }
+.photo-annex-block.is-open { animation: pa-reveal 0.25s ease-out; }
+@keyframes pa-reveal { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+.pa-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 10px; }
+.pa-btn { padding: 9px 14px; border: 1px solid #cbd5e1; border-radius: 6px; background-color: #ffffff; color: #1e293b; font-weight: 700; cursor: pointer; }
+.pa-btn-primary { border-color: var(--brand-primary-dark, #73968c); background-color: var(--brand-primary, #97c6b9); color: #0f172a; }
+.pa-counter { font-size: 0.85rem; color: #475569; }
+.pa-list { display: flex; flex-direction: column; gap: 10px; }
+.pa-item { display: grid; grid-template-columns: 150px minmax(0, 1fr) auto; gap: 10px; align-items: start; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; background-color: #ffffff; }
+.pa-thumb { width: 150px; height: 112px; object-fit: cover; border-radius: 6px; background-color: #e2e8f0; }
+.pa-fields { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.pa-fields input, .pa-fields textarea { width: 100%; min-width: 0; box-sizing: border-box; margin: 0; }
+.pa-row { display: grid; grid-template-columns: auto minmax(0, 1fr) minmax(0, 1.4fr); gap: 6px; align-items: center; }
+.pa-num { font-weight: 700; font-size: 0.85rem; white-space: nowrap; }
+.pa-actions { display: flex; flex-direction: column; gap: 6px; }
+.pa-icon-btn { min-width: 38px; min-height: 34px; border: 1px solid #cbd5e1; border-radius: 6px; background-color: #f1f5f9; cursor: pointer; }
+.pa-icon-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.pa-note { margin: 10px 0 0; font-size: 0.8rem; color: #64748b; }
+@media (max-width: 600px) {
+    .pa-item { grid-template-columns: 96px minmax(0, 1fr); }
+    .pa-thumb { width: 96px; height: 72px; }
+    .pa-row { grid-template-columns: minmax(0, 1fr); }
+    .pa-num { grid-column: 1 / -1; }
+    .pa-actions { grid-column: 1 / -1; flex-direction: row; justify-content: flex-end; }
+}
+body.dark-mode .photo-addon, body.dark-mode .photo-annex-block, body.dark-mode .pa-item { background-color: #1e293b; border-color: #475569; }
+body.dark-mode .pa-attach-toggle, body.dark-mode .pa-num { color: #f8fafc; }
+body.dark-mode .pa-counter, body.dark-mode .pa-note { color: #cbd5e1; }
+body.dark-mode .pa-btn:not(.pa-btn-primary), body.dark-mode .pa-icon-btn { background-color: #334155; border-color: #475569; color: #f8fafc; }
+/* FIN DU BLOC SFGEN : ANNEXE PHOTO : PHOTOS JOINTES AU RAPPORT */
+
+/* ===================================================================== */
+/* IMAGE DE MARQUE DE L'ORGANISATION (ajouté par SFGEN, fenêtre « Image de marque ») */
+/* Couleurs principales des formulaires et du Hub ; logo : shared/img/logo_entete.*   */
+/* ===================================================================== */
+:root {
+    --brand-primary: #97c6b9;
+    --brand-primary-dark: #73968c;
+    --brand-primary-light: #e3efeb;
+    --org-eng: var(--brand-primary);
+}
+header .brand-logo { height: 75px; max-width: 45%; object-fit: contain; padding: 5px; border-radius: 4px; }
+@media (max-width: 600px) { header .brand-logo { height: 52px; } }
+/* FIN DU BLOC SFGEN : IMAGE DE MARQUE DE L'ORGANISATION */

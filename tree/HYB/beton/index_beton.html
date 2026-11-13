@@ -1,0 +1,1552 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- Le titre qui s'affiche dans l'onglet du navigateur -->
+    <title>Bétonnage et Échantillonnage</title>
+    
+    <link rel="stylesheet" href="../../../shared/css/styles.css">
+
+    <!-- === LIGNES POUR L'IPAD === -->
+    <link rel="apple-touch-icon" href="logo_beton.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Le nom qui s'affiche sous l'icône sur l'écran d'accueil de l'iPad -->
+    <meta name="apple-mobile-web-app-title" content="Bétonnage">
+    <!-- ==================================== -->
+
+    <script src="../../../shared/libs/pdf-lib.min.js"></script>
+    <script src="../../../shared/libs/fontkit.umd.min.js"></script>
+
+    <!-- Spécifications en deux cases (± / @) et valeurs hors spécification dans les camions -->
+    <style>
+        .spec-split { display: flex; align-items: center; gap: 8px; }
+        .spec-split input { flex: 1 1 0; min-width: 0; }
+        .spec-symbol { flex: 0 0 auto; font-size: 1.25rem; font-weight: bold; color: var(--text-main); }
+        body.dark-mode .spec-symbol { color: #f8fafc; }
+        input.hors-spec { border-color: #dc2626 !important; background-color: #fee2e2 !important; color: #991b1b !important; box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.25); }
+        body.dark-mode input.hors-spec { border-color: #f87171 !important; background-color: #450a0a !important; color: #fecaca !important; }
+
+        /* En-tête des camions : pastilles compactes qui passent à la ligne (360 px sans débordement) */
+        .truck-header-main { flex: 1; min-width: 0; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 8px; text-align: left; }
+        .truck-header-title { font-weight: bold; font-size: 1.05rem; white-space: nowrap; }
+        .truck-header-summary { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; font-weight: normal; }
+        .truck-pill { font-size: 0.78rem; padding: 2px 6px; border-radius: 4px; white-space: nowrap; background-color: rgba(15, 23, 42, 0.07); border: 1px solid rgba(15, 23, 42, 0.14); color: #334155; }
+        .truck-pill-cum { background-color: #0369a1; border-color: #0369a1; color: #ffffff; font-weight: 600; }
+        .truck-pill-refused { background-color: #b91c1c; border-color: #b91c1c; }
+        body.dark-mode .truck-pill { background-color: rgba(248, 250, 252, 0.1); border-color: rgba(248, 250, 252, 0.2); color: #e2e8f0; }
+        body.dark-mode .truck-pill-cum { background-color: #0284c7; border-color: #0284c7; color: #ffffff; }
+        body.dark-mode .truck-pill-refused { background-color: #b91c1c; border-color: #b91c1c; }
+
+        /* Heures du camion : 4 colonnes, 2 sur téléphone (l'emporte sur la rangée forcée de styles.css) */
+        .truck-card .accordion-content > div.truck-times.truck-times { display: grid !important; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px 10px !important; align-items: end !important; flex-wrap: wrap !important; margin-bottom: 10px; }
+        .truck-time-cell { min-width: 0; }
+        .truck-time-cell label { font-size: 0.85rem; }
+        .truck-time-cell input { width: 100%; min-width: 0; box-sizing: border-box; }
+        .max-time-label { color: #0284c7; font-weight: 600; font-size: 0.8em; white-space: nowrap; }
+        .max-time-label.depasse { color: #ef4444; }
+        body.dark-mode .max-time-label { color: #38bdf8; }
+        body.dark-mode .max-time-label.depasse { color: #ef4444; }
+        input.hors-delai { border: 2px solid #ef4444 !important; background-color: rgba(239, 68, 68, 0.15) !important; color: #b91c1c !important; }
+        body.dark-mode input.hors-delai { color: #fca5a5 !important; }
+        input.retard-illisible { border-color: #f59e0b !important; box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.25); }
+        @media (max-width: 600px) {
+            .truck-card .accordion-content > div.truck-times.truck-times { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+
+        /* Champs MTQ intégrés aux sections Englobe (interrupteur MTQ) : cases « puces », lignes de cases, cellules, tableaux A / B / C */
+        .mtq-only-field.mtq-chip { align-self: flex-start; padding: 3px 10px 3px 8px; border-radius: 4px; }
+        .mtq-only-field.mtq-chip-inline { padding: 2px 8px; margin: 0; font-size: 0.85rem; white-space: nowrap; }
+        .mtq-only-field.mtq-fit { width: fit-content; max-width: 100%; }
+        .mtq-only-field.mtq-cell { padding: 2px 4px; border-left-width: 2px; }
+        .mtq-only-field.mtq-cell input { width: 100%; box-sizing: border-box; }
+        .mtq-line { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; margin: 8px 0; }
+        .mtq-line label, .mtq-inline-checks label { display: inline-flex !important; align-items: center; gap: 6px; margin: 0; font-weight: normal; }
+        .mtq-line input[type="checkbox"], .mtq-inline-checks input[type="checkbox"] { width: auto; margin: 0; }
+        .mtq-line-title { font-weight: 700; font-size: 0.85rem; }
+        .mtq-line-input { flex: 1 1 140px; min-width: 120px; }
+        .mtq-line-field input { width: 120px; }
+        .mtq-inline-checks { display: flex; flex-wrap: wrap; gap: 4px 16px; padding: 4px 0; }
+        .mtq-sig { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0 12px; align-items: end; margin-bottom: 10px; }
+        .mtq-sig .mtq-line-title { grid-column: 1 / -1; margin-top: 6px; }
+        .mtq-ep-block { margin-top: 12px; }
+        .mtq-table-wrap { overflow-x: auto; margin: 12px 0; }
+        .mtq-table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: 0.85rem; }
+        .mtq-table th, .mtq-table td { border: 1px solid rgba(59, 130, 246, 0.35); padding: 4px; text-align: center; }
+        .mtq-table th:first-child { text-align: left; white-space: nowrap; }
+        .mtq-table input:not([type="checkbox"]) { width: 100%; min-width: 72px; box-sizing: border-box; padding: 4px; }
+        .mtq-table.mtq-table-narrow { min-width: 0; }
+        .truck-card .accordion-content > div.mtq-truck-row.mtq-truck-row { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 10px !important; align-items: end !important; flex-wrap: wrap !important; margin-bottom: 10px; padding: 6px 8px; }
+        .mtq-truck-cell { min-width: 0; }
+        .mtq-truck-cell label { display: block; font-size: 0.85rem; line-height: 1.15; margin-bottom: 4px; white-space: normal; overflow-wrap: anywhere; }
+        @media (max-width: 600px) { .mtq-truck-cell label { font-size: 0.8rem; } }
+        .mtq-truck-cell input { width: 100%; min-width: 0; box-sizing: border-box; }
+        body:not([data-active-org="mtq"]) .truck-card .accordion-content > div.mtq-truck-row.mtq-truck-row { display: none !important; }
+    </style>
+</head>
+<body data-org="eng mtq" data-secteur="ici" data-service="mat" data-brand-name="Englobe">
+
+<div id="app-container">
+
+    <!-- === NOUVEL EN-TÊTE OFFICIEL V1.0.0 === -->
+    <header style="display: flex; align-items: center; gap: 15px; background: var(--brand-primary, #97c6b9); color: white; padding: 15px 20px; border-radius: 8px; margin-bottom: 20px; margin-top: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        
+        
+        <img class="brand-logo" src="../../../shared/img/logo_entete.png" alt="Englobe" alt="Logo" style="height: 75px; padding: 5px; border-radius: 4px;"> 
+
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+            <h1 style="margin: 0; font-size: 1.5rem; letter-spacing: 0.5px;">Bétonnage et Échantillonnage</h1>
+            <div>
+            </div>
+        </div>
+
+        <a class="home-button" href="../../../index.html" style="margin-left: auto; background: #1e293b; color: white; text-decoration: none; padding: 10px 15px; border-radius: 6px; font-weight: bold; font-size: 0.9rem; display: flex; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+            🏠 Accueil
+        </a>
+        
+    </header>
+
+    <!-- ========================================== -->
+    <!-- GESTION DES RAPPORTS (SAUVEGARDE)          -->
+    <!-- ========================================== -->
+    <section id="save-manager" style="background: #1e293b; color: white; padding: 15px; margin-bottom: 20px; border-radius: 8px; display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 250px; max-width: 500px;">
+            <label style="display: block; font-size: 0.85rem; margin-bottom: 5px; color: #cbd5e1;">Rapports Sauvegardés (Appareil Local)<span id="imported-indicator" title="Rapport reçu d'un autre appareil" style="display:none; background:#0d9488; color:#fff; border-radius:4px; padding:1px 5px; font-size:0.75rem; margin-left:6px;">📲</span></label>
+            <select id="saved-reports-dropdown" style="width: 100%; padding: 10px; border-radius: 4px; border: none; font-weight: bold; color: #334155;">
+                <option value="">-- Sélectionnez un rapport --</option>
+            </select>
+        </div>
+
+        <div class="report-actions">
+            <button type="button" class="report-btn" onclick="newReportPrompt()" style="--btn-bg: #0284c7;">➕ Nouveau</button>
+            <button type="button" class="report-btn" onclick="loadReport()" style="--btn-bg: #2563eb;">📂 Charger</button>
+            <button type="button" class="report-btn" onclick="triggerJsonImport()" style="--btn-bg: #0d9488;">📥 Importer</button>
+            <button type="button" class="report-btn" onclick="saveReport()" style="--btn-bg: #10b981;">💾 Sauvegarder</button>
+            <button type="button" class="report-btn" onclick="saveReport(true)" style="--btn-bg: #4f46e5;">📑 Dupliquer</button>
+            <button type="button" class="report-btn" onclick="deleteReport()" style="--btn-bg: #ef4444;">🗑️ Supprimer</button>
+            <input type="file" id="json-import-input" accept=".json,application/json,text/plain" style="display:none" onchange="importReportJson(event)">
+        </div>
+
+        <!-- EXPORTATION & TRANSMISSION -->
+        <div class="export-bar">
+            <button type="button" id="btn-export-pdf" class="report-btn report-btn-main" onclick="exportToPDF('eng')" style="--btn-bg: #7c3aed;">📄 PDF</button>
+            <button type="button" id="btn-export-mtq" class="report-btn is-locked" onclick="exportToPDF('mtq')" style="--btn-bg: #6495b8;" title="Activez le mode MTQ ci-dessous pour déverrouiller" disabled>🏛️ MTQ</button>
+            <button type="button" class="report-btn" onclick="shareReportJson()" style="--btn-bg: #0f766e;">📤 PARTAGER</button>
+            <button type="button" id="btn-export-lims" class="report-btn report-btn-lims is-frozen" style="--btn-bg: #334155;" title="Connexion LIMS bientôt disponible" disabled>🔒 LIMS</button>
+        </div>
+    </section>
+
+    <!-- MODE HYBRIDE : affiche les champs data-client="mtq" juste en dessous et déverrouille l'export MTQ -->
+    <!-- MODE MTQ : interrupteur compact (Englobe = formulaire de base). Activé : champs MTQ en bleu visibles et
+         bouton 🏛️ MTQ déverrouillé. gestion_rapports.js le tient à jour (rapport chargé, Nouveau, import). -->
+    <div id="org-mode-bar" class="org-mode-switch-bar">
+        <label class="org-mode-switch" title="Mode MTQ : afficher les champs MTQ (en bleu) et déverrouiller l'export 🏛️ MTQ">
+            <input type="checkbox" data-org-toggle="mtq" onchange="setOrgMode(this.checked ? 'mtq' : 'eng')">
+            <span class="org-mode-switch-track" aria-hidden="true"></span>
+            <span class="org-mode-switch-label">MTQ</span>
+        </label>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- EN-TÊTE GLOBAL (TOUJOURS VISIBLE)          -->
+    <!-- ========================================== -->
+    <section id="global-header" style="background: #e5e7eb; padding: 15px; margin-bottom: 20px; border-radius: 8px;">
+        <h2>Informations Générales du Projet</h2>
+        
+        <div class="input-group">
+            <label>Client</label>
+            <input type="text" id="global-client" placeholder="Ex: Municipalité, Entrepreneur, etc.">
+        </div>
+        
+        <div class="input-group">
+            <label>Réf. client</label>
+            <input type="text" id="global-ref-client">
+        </div>
+        
+        <div class="input-group">
+            <label>Projet</label>
+            <input type="text" id="global-projet" placeholder="Ex: Parc éolien">
+        </div>
+
+        <div class="input-group">
+            <label>Endroit</label>
+            <input type="text" id="global-endroit" placeholder="Ex: Base X, Axe 5 @ 6">
+        </div>
+        
+        <div class="input-group">
+            <label>N° projet</label>
+            <input type="text" id="global-no-projet" placeholder="0260XXXX.00X">
+        </div>
+        
+        <div class="input-group">
+            <label>Date</label>
+            <input type="date" id="global-date">
+        </div>
+        <!-- MTQ : identification au Ministère (en bleu, visibles avec l'interrupteur MTQ) -->
+        <div class="input-group mtq-only-field"><label>Dossier Ministère-Entrepreneur</label><input type="text" id="mtq-dossier-ministere-entrepreneur"></div>
+        <div class="input-group mtq-only-field"><label>Dossier Ministère-Laboratoire</label><input type="text" id="mtq-dossier-ministere-laboratoire"></div>
+        <div class="input-group mtq-only-field"><label>N° du lot</label><input type="text" id="mtq-no-lot"></div>
+        <div class="input-group mtq-only-field"><label>N° de la coulée</label><input type="text" id="mtq-no-coulee"></div>
+        <div class="input-group mtq-only-field"><label>Surveillant</label><div class="mtq-inline-checks"><label><input type="checkbox" id="mtq-surveillant-ministere"> Ministère</label><label><input type="checkbox" id="mtq-surveillant-firme"> Firme</label></div></div>
+        <div id="last-saved-status" style="width: 100%; color: #475569; font-size: 0.85rem; text-align: center;">Dernière sauvegarde : aucune</div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- BARRE DE NAVIGATION (TABS)                 -->
+    <!-- ========================================== -->
+
+    <small id="form-instructions" class="form-instructions" style="color: #242930; font-size: 0.8rem; display: block; margin-top: 3px; margin-bottom: 5px; text-align: center; margin-left: auto; margin-right: auto; max-width: 600px; font-style: italic;">
+        Cliquez sur les onglets pour naviguer entre les sections du formulaire. Les informations sont sauvegardées automatiquement. Vous pouvez passer d'une section à l'autre. Cependant prenez soin de bien sauvegarder votre rapport avant de quitter la page ou de fermer l'application.
+    </small>
+
+    <nav id="form-navigation" style="margin-bottom: 20px;">
+        <button type="button" class="tab-btn active" onclick="showTab('tab-form1')">1. Contrôle de bétonnage</button>
+        <button type="button" class="tab-btn" onclick="showTab('tab-form2')">2. Contrôle du béton de ciment</button>
+        <button type="button" class="tab-btn" onclick="showTab('tab-form3')">3. Conditions initiales de cure</button>
+    </nav>
+
+    <!-- ========================================== -->
+    <!-- ONGLET 1 : FORMULAIRE 1                    -->
+    <!-- ========================================== -->
+    <section id="tab-form1" class="tab-section">
+        <h2>Formulaire 1 : Vérification</h2>
+
+        <!-- Légende des abréviations -->
+        <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px 15px; margin-bottom: 20px; font-size: 0.9rem; color: #334155; display: flex; gap: 20px; flex-wrap: wrap; text-align: right;">
+            <strong style="color: var(--primary);" >Légende :</strong>
+            <span><strong>N/V</strong> : Non vérifié</span>
+            <span><strong>N/O</strong> : Non observé</span>
+            <span><strong>N/A</strong> : Non applicable</span>
+        </div>
+
+        <!-- SECTION 1 : Conditions atmosphériques -->
+        <div class="form-section">
+            <h3>Conditions atmosphériques</h3>
+            <div class="input-group">
+                <label>Température extérieure (°C)</label>
+                <input type="number" id="f1-s1-temp" placeholder="Ex: 20,5" style="width:120px; display: inline-block;" oninput="if(this.value.length > 5) this.value = this.value.slice(0,5);">
+            </div>
+            <div class="input-group mtq-only-field mtq-fit"><label>Température ambiante min. / max. (°C)</label>
+                <div class="spec-split"><input type="number" id="mtq-temp-air-min" step="0.1" inputmode="decimal" placeholder="Min." aria-label="Température ambiante minimale"><span class="spec-symbol">/</span><input type="number" id="mtq-temp-air-max" step="0.1" inputmode="decimal" placeholder="Max." aria-label="Température ambiante maximale"></div>
+            </div>
+            <div class="checkbox-group">
+                <label><input type="checkbox" id="f1-s1-ensoleille"> Ensoleillé</label>
+                <label><input type="checkbox" id="f1-s1-nuageux"> Nuageux</label>
+                <label><input type="checkbox" id="f1-s1-pluie"> Pluie</label>
+                <label><input type="checkbox" id="f1-s1-neige"> Neige</label>
+                <label><input type="checkbox" id="f1-s1-vents"> Vents</label>
+                
+                <label><input type="checkbox" id="f1-s1-remarques-check" class="remarque-trigger" onchange="toggleRemarque('f1-s1-remarques-text', this)"> Voir remarques</label>
+                <textarea id="f1-s1-remarques-text" class="remarque-box" style="display:none; width: 100%; margin-top: 5px;" placeholder="Précisez la remarque..."></textarea>
+            </div>
+        </div>
+
+        <!-- SECTION 2 : Fond d'excavation -->
+        <div class="form-section">
+            <h3>Fond d'excavation</h3>
+            <div class="checkbox-group">
+                <label><input type="checkbox" id="f1-s2-na"> N/A</label>
+                <label><input type="checkbox" id="f1-s2-no"> N/O</label>
+                <label><input type="checkbox" id="f1-s2-nv"> N/V</label>
+                <label><input type="checkbox" id="f1-s2-bien-prepare"> Bien préparé, sol non remanié</label>
+                <label><input type="checkbox" id="f1-s2-sous-leau"> Béton coulé sous l'eau</label>
+                
+                <label class="inline-input">
+                    <input type="checkbox" id="f1-s2-remblai-check"> Remblai compacté à 
+                    <input type="text" id="f1-s2-remblai-val" placeholder="Ex: 95" style="width: 80px; display: inline-block;"> % tel que requis au devis
+                </label>
+                
+                <label><input type="checkbox" id="f1-s2-englobe"> Contrôle de compactage non effectué par Englobe</label>
+                
+                <label><input type="checkbox" id="f1-s2-remarques-check" class="remarque-trigger" onchange="toggleRemarque('f1-s2-remarques-text', this)"> Voir remarques</label>
+                <textarea id="f1-s2-remarques-text" class="remarque-box" style="display:none; width: 100%; margin-top: 5px;" placeholder="Précisez la remarque..."></textarea>
+            </div>
+        </div>
+
+        <!-- SECTION 3 : Coffrages -->
+        <div class="form-section">
+            <h3>Coffrages</h3>
+            <div class="checkbox-group">
+                <label><input type="checkbox" id="f1-s3-na"> N/A</label>
+                <label><input type="checkbox" id="f1-s3-no"> N/O</label>
+                <label><input type="checkbox" id="f1-s3-nv"> N/V</label>
+                <label><input type="checkbox" id="f1-s3-propres"> Propres et exempts de débris de construction</label>
+                <label><input type="checkbox" id="f1-s3-huiles"> Bien huilés</label>
+                <label><input type="checkbox" id="f1-s3-etayes"> Mal étayés</label>
+                
+                <label><input type="checkbox" id="f1-s3-mal-alignes"> Mal alignés</label>
+                <div class="sub-checkboxes" style="margin-left: 20px;">
+                    <label><input type="checkbox" id="f1-s3-align-horiz"> Horizontal</label>
+                    <label><input type="checkbox" id="f1-s3-align-vert"> Vertical</label>
+                </div>
+
+                <label><input type="checkbox" id="f1-s3-remarques-check" class="remarque-trigger" onchange="toggleRemarque('f1-s3-remarques-text', this)"> Voir remarques</label>
+                <textarea id="f1-s3-remarques-text" class="remarque-box" style="display:none; width: 100%; margin-top: 5px;" placeholder="Précisez la remarque..."></textarea>
+            </div>
+        </div>
+
+        <!-- SECTION 4 : Armatures -->
+        <div class="form-section">
+            <h3>Armatures</h3>
+            <div class="checkbox-group">
+                <label><input type="checkbox" id="f1-s4-nv"> N/V</label>
+                <label><input type="checkbox" id="f1-s4-na"> N/A</label>
+                
+                <label class="inline-input">
+                    <input type="checkbox" id="f1-s4-verif-check"> Quantité, dimensions et positions vérifiés par 
+                    <input type="text" id="f1-s4-verif-val" placeholder="Nom/Entité" style="width: 250px; display: inline-block;">
+                </label>
+                
+                <label><input type="checkbox" id="f1-s4-attachees"> Bien attachées</label>
+                <label><input type="checkbox" id="f1-s4-couvertures"> Couvertures respectées</label>
+                
+                <label><input type="checkbox" id="f1-s4-remarques-check" class="remarque-trigger" onchange="toggleRemarque('f1-s4-remarques-text', this)"> Voir remarques</label>
+                <textarea id="f1-s4-remarques-text" class="remarque-box" style="display:none; width: 100%; margin-top: 5px;" placeholder="Précisez la remarque..."></textarea>
+            </div>
+        </div>
+
+        <!-- SECTION 5 : Mise en place -->
+        <div class="form-section">
+            <h3>Mise en place</h3>
+            <div class="checkbox-group">
+                <label><input type="checkbox" id="f1-s5-goulotte"> Goulotte du camion</label>
+                <label><input type="checkbox" id="f1-s5-pompe"> Pompe</label>
+                <label><input type="checkbox" id="f1-s5-tremie"> Trémie</label>
+                <label><input type="checkbox" id="f1-s5-benne"> Benne</label>
+                <label><input type="checkbox" id="f1-s5-brouette"> Brouette</label>
+                <label><input type="checkbox" id="f1-s5-courroie"> Courroie</label>
+                <label class="mtq-only-field mtq-chip"><input type="checkbox" id="mtq-equip-camion-malaxeur"> Camion malaxeur</label>
+                <label class="mtq-only-field mtq-chip"><input type="checkbox" id="mtq-equip-betonniere-mobile"> Bétonnière mobile</label>
+                <label class="mtq-only-field mtq-chip"><input type="checkbox" id="mtq-equip-lance"> Lance</label>
+                <label class="mtq-only-field mtq-chip"><input type="checkbox" id="mtq-equip-godet"> Godet</label>
+                <label class="mtq-only-field mtq-chip"><input type="checkbox" id="mtq-equip-camion-benne"> Camion à benne</label>
+                <label class="mtq-only-field mtq-chip"><input type="checkbox" id="mtq-equip-coffrage-glissant"> Coffrage glissant</label>
+                <label><input type="checkbox" id="f1-s5-aiguille"> Aiguille vibrante</label>
+                <label><input type="checkbox" id="f1-s5-vibre"> Béton bien vibré et consolidé</label>
+                <label><input type="checkbox" id="f1-s5-nv"> N/V</label>
+                
+                <label class="inline-input">
+                    <input type="checkbox" id="f1-s5-hauteur-check"> Hauteur de chute 
+                    <input type="number" id="f1-s5-hauteur-val" placeholder="Ex: 1,5" style="width: 100px; display: inline-block;" oninput="if(this.value.length > 4) this.value = this.value.slice(0,4);"> m
+                </label>
+
+                <label><input type="checkbox" id="f1-s5-remarques-check" class="remarque-trigger" onchange="toggleRemarque('f1-s5-remarques-text', this)"> Voir remarques</label>
+                <textarea id="f1-s5-remarques-text" class="remarque-box" style="display:none; width: 100%; margin-top: 5px;" placeholder="Précisez la remarque..."></textarea>
+            </div>
+        </div>
+
+        <!-- SECTION 6 : Protection et murissement -->
+        <div class="form-section">
+            <h3>Protection et murissement</h3>
+            <div class="checkbox-group">
+
+                <label class="inline-input">
+                    <input type="checkbox" id="f1-s6-surface-check"> Surface de béton recouverte de 
+                    <input type="text" id="f1-s6-surface-val" placeholder="Spécifier" style="width: 500px; display: inline-block;"> (jute humide, polythène, etc.)
+                </label>
+
+                <label class="inline-input">
+                    <input type="checkbox" id="f1-s6-cure"> Cure humide, prévue pendant
+                    <input type="text" id="f1-s6-cure-val" placeholder="Spécifier" style="width: 500px; display: inline-block;"> 
+                </label>
+
+                <label><input type="checkbox" id="f1-s6-aucpro1"> Aucune protection ou cure observée à notre départ du chantier</label>
+                <label><input type="checkbox" id="f1-s6-aucpro2"> Aucune protection ou cure sauf coffrages qui seront laissés en place</label>
+                <label><input type="checkbox" id="f1-s6-signentr"> L'entrepreneur nous a signalé qu'aucune protection ni cure n'étaient prévues</label>
+
+                <label class="inline-input">
+                    <input type="checkbox" id="f1-s6-couv"> Couvertures isolantes d'une épaisseur de
+                    <input type="text" id="f1-s6-couv-val" placeholder="Spécifier" style="width: 500px; display: inline-block;"> 
+                </label>
+
+                <label class="inline-input">
+                    <input type="checkbox" id="f1-s6-prot"> Béton protégé par un isolant de type 
+                    <input type="text" id="f1-s6-prot-val" placeholder="Spécifier" style="width: 500px; display: inline-block;"> 
+                </label>
+
+                <label class="inline-input">
+                    <input type="checkbox" id="f1-s6-abri"> Abri chauffé; température approximative 
+                    <input type="text" id="f1-s6-abri-val" placeholder="Ex: 15" style="width: 75px; display: inline-block;">°C
+                </label>
+
+                <label><input type="checkbox" id="f1-s6-vapo"> Produit de cure vaporisé</label>
+
+                <label><input type="checkbox" id="f1-s6-remarques-check" class="remarque-trigger" onchange="toggleRemarque('f1-s6-remarques-text', this)"> Voir remarques</label>
+                <textarea id="f1-s6-remarques-text" class="remarque-box" style="display:none; width: 100%; margin-top: 5px;" placeholder="Précisez la remarque..."></textarea>
+            </div>
+        </div>
+
+        <!-- SECTION 7 : Éprouvettes prélevées -->
+        <div class="form-section">
+            <h3>Éprouvettes prélevées</h3>
+            <div class="checkbox-group">
+
+                <label class="inline-input">
+                    <input type="checkbox" id="f1-s7-cylnor"> 
+                    <input type="text" id="f1-s7-cylnor1-val" placeholder="3" style="width: 50px; display: inline-block;"> cylindres normalisés (
+                    <input type="text" id="f1-s7-cylnor2-val" placeholder="Ex: 150" style="width: 75px; display: inline-block;"> x 
+                    <input type="text" id="f1-s7-cylnor3-val" placeholder="Ex: 300" style="width: 75px; display: inline-block;"> mm)
+                </label>
+
+                <label class="inline-input">
+                    <input type="checkbox" id="f1-s7-cylmur"> 
+                    <input type="text" id="f1-s7-cylmur1-val" placeholder="3" style="width: 50px; display: inline-block;"> cylindres mûris en conditions de chantier (
+                    <input type="text" id="f1-s7-cylmur2-val" placeholder="Ex: 150" style="width: 75px; display: inline-block;"> x 
+                    <input type="text" id="f1-s7-cylmur3-val" placeholder="Ex: 300" style="width: 75px; display: inline-block;"> mm)
+                </label>
+
+                <label class="inline-input">
+                    <input type="checkbox" id="f1-s7-cylpre"> 
+                    <input type="text" id="f1-s7-cylpre-val" placeholder="3" style="width: 50px; display: inline-block;"> cylindres prélevés dans un chargement non conforme
+                </label>
+
+                <label><input type="checkbox" id="f1-s7-auccyl"> Aucun cylindre n'a été prélevé</label>
+                <label><input type="checkbox" id="f1-s7-parpil"> Par pilonnage</label>
+                <label><input type="checkbox" id="f1-s7-parvib"> Par vibration</label>
+                <label><input type="checkbox" id="f1-s7-parcoup"> Par coup de maillet</label>
+                <label class="mtq-only-field mtq-chip"><input type="checkbox" id="mtq-consolidation-vibr-ext"> Par vibration externe</label>
+                <label class="mtq-only-field mtq-chip"><input type="checkbox" id="mtq-consolidation-vibr-int"> Par vibration interne</label>
+                <label class="mtq-only-field mtq-chip"><input type="checkbox" id="mtq-consolidation-projection"> Par projection</label>
+                <label class="mtq-only-field mtq-chip"><input type="checkbox" id="mtq-consolidation-autre"> Autre consolidation</label>
+                <div class="mtq-only-field mtq-line"><span class="mtq-line-title">Confection des éprouvettes selon</span>
+                    <label><input type="checkbox" id="mtq-confection-a23-3c"> A23.2-3C</label>
+                    <label><input type="checkbox" id="mtq-confection-ccdg"> CCDG</label>
+                    <label><input type="checkbox" id="mtq-confection-devis-case"> Devis :</label>
+                    <input type="text" id="mtq-confection-devis" class="mtq-line-input" aria-label="Devis (confection des éprouvettes)">
+                </div>
+                <label class="mtq-only-field mtq-chip"><input type="checkbox" id="mtq-echantillonnage-csa-1c"> Échantillonnage selon CSA A23.2-1C</label>
+
+
+                <label><input type="checkbox" id="f1-s7-remarques-check" class="remarque-trigger" onchange="toggleRemarque('f1-s7-remarques-text', this)"> Voir remarques</label>
+                <textarea id="f1-s7-remarques-text" class="remarque-box" style="display:none; width: 100%; margin-top: 5px;" placeholder="Précisez la remarque..."></textarea>
+            </div>
+        </div>
+        
+        <!-- SECTION 8 : Procédures -->
+        <div class="form-section">
+            <h3>Procédures</h3>
+            <div class="checkbox-group">
+
+                <label class="inline-input">
+                    <input type="checkbox" id="f1-s8-rapsom"> Rapport sommaire d'essais remis à
+                    <input type="text" id="f1-s8-rapsom-val" placeholder="Spécifier" style="width: 400px; display: inline-block;"> 
+                </label>
+
+                <label class="inline-input">
+                    <input type="checkbox" id="f1-s8-betcoul1"> Béton coulé malgré la non-conformité à la demande de l'entrepreneur
+                    <input type="text" id="f1-s8-betcoul1-val" placeholder="Spécifier" style="width: 400px; display: inline-block;"> 
+                </label>
+
+                <label class="inline-input">
+                    <input type="checkbox" id="f1-s8-betcoul2"> Béton coulé malgré la non-conformité parce que jugé acceptable par le représentant de 
+                    <input type="text" id="f1-s8-betcoul2-val" placeholder="Spécifier" style="width: 400px; display: inline-block;"> 
+                </label>
+
+                <label class="inline-input">
+                    <input type="checkbox" id="f1-s8-memo"> Mémo (s)
+                    <input type="text" id="f1-s8-memo1-val" placeholder="Spécifier" style="width: 100px; display: inline-block;"> remis à 
+                    <input type="text" id="f1-s8-memo2-val" placeholder="Spécifier" style="width: 400px; display: inline-block;">
+                </label>
+
+                <label class="inline-input">
+                    <input type="checkbox" id="f1-s8-ajoutsup"> Ajout de superplastifiant en chantier
+                    <input type="text" id="f1-s8-ajoutsup-val" placeholder="" style="width: 50px; display: inline-block;"> l/m³
+                </label>
+
+                <label class="inline-input">
+                    <input type="checkbox" id="f1-s8-ajoutair"> Ajout d'entraîneur d'air en chantier
+                    <input type="text" id="f1-s8-ajoutair-val" placeholder="" style="width: 50px; display: inline-block;"> l/m³
+                </label>
+
+                <label class="inline-input">
+                    <input type="checkbox" id="f1-s8-chargnum"> Chargement numéro
+                    <input type="text" id="f1-s8-chargnum-val" placeholder="" style="width: 80px; display: inline-block;"> retourné
+                </label>
+
+                <label><input type="checkbox" id="f1-s8-remarques-check" class="remarque-trigger" onchange="toggleRemarque('f1-s8-remarques-text', this)"> Voir remarques</label>
+                <textarea id="f1-s8-remarques-text" class="remarque-box" style="display:none; width: 100%; margin-top: 5px;" placeholder="Précisez la remarque..."></textarea>
+            </div>
+        </div>
+
+        <!-- SECTION 9 : Remarques Globales -->
+        <div class="form-section">
+            <h3>Remarques</h3>
+            <p style="font-size: 0.85rem; color: #242930; font-style: italic; margin-bottom: 15px;">
+                (Les remarques ajoutées ci-dessus s'ajouteront automatiquement. Vous pouvez également saisir des commentaires supplémentaires.)
+            </p>
+            <textarea id="f1-s9-remarques-compilation" rows="4" style="width: 100%;" maxlength="500"></textarea>
+        </div>
+
+        <!-- SIGNATURE TECHNICIEN -->
+        <div class="form-section" style="border-top: 2px solid #ccc; padding-top: 15px; margin-top: 20px;">
+            <h3>Préparé par </h3>
+            <div class="input-group">
+                <label>Nom du technicien</label>
+                <input type="text" id="f1-tech-name" placeholder="Ex: Jean Tremblay" style="width: 250px; display: inline-block;" placeholder="Jean Tremblay">
+            </div>
+            <div class="input-group">
+                <label>Date</label>
+                <input type="date" id="f1-verif-date" style="width: 200px; display: inline-block;">
+            </div>
+        </div>
+
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="javascript:void(0);" onclick="scrollToSection('form-instructions')" style="color: var(--primary); font-weight: bold; text-decoration: none; font-size: 1rem; padding: 10px 20px; background: #e2e8f0; border-radius: 6px; display: inline-block;">
+                ⬆️ Retour aux sections du formulaire
+            </a>
+        </div>
+
+    </section>
+
+    <!-- ========================================== -->
+    <!-- ONGLET 2 : FORMULAIRE 2                    -->
+    <!-- ========================================== -->
+    <section id="tab-form2" class="tab-section" style="display: none;">
+        <h2>Formulaire 2 : Suivi de coulée</h2>
+
+        <!-- SECTION : Intervenants & Produit -->
+        <div class="form-section">
+            <h3>Intervenants et Produit</h3>
+            <div class="input-group"><label>Entrepreneur</label><input type="text" id="f2-entrepreneur" placeholder="Ex: Construction Inc."></div>
+            <div class="input-group mtq-only-field"><label>Sous-traitant</label><input type="text" id="mtq-sous-traitant"></div>
+            <div class="input-group"><label>Fournisseur</label><input type="text" id="f2-fournisseur" placeholder="Ex: Béton Provincial Ltée"></div>
+            <div class="input-group"><label>Usine</label><input type="text" id="f2-usine" placeholder="Ex: Usine de Montréal"></div>
+            <div class="input-group mtq-only-field"><label>Distance de transport usine-chantier (km)</label><input type="number" id="mtq-distance-transport" step="any" inputmode="decimal"></div>
+            <div class="input-group"><label>Formule du Mélange</label><input type="text" id="f2-melange" placeholder="Ex: 35820PPAW"></div>
+            <div class="input-group mtq-only-field"><label>Laboratoire du Ministère</label><input type="text" id="mtq-laboratoire-ministere"></div>
+            <div class="input-group mtq-only-field"><label>Laboratoire de l&#x27;entrepreneur</label><input type="text" id="mtq-laboratoire-entrepreneur"></div>
+            <div class="input-group mtq-only-field"><label>Essais par</label><div class="mtq-inline-checks"><label><input type="checkbox" id="mtq-essais-par-labo-ministere"> Laboratoire du Ministère</label><label><input type="checkbox" id="mtq-essais-par-fournisseur"> Fournisseur</label><label><input type="checkbox" id="mtq-essais-par-entrepreneur"> Entrepreneur</label></div></div>
+        </div>
+
+
+        <!-- SECTION : Spécifications (Informatives) -->
+        <div class="form-section">
+            <h3>Spécifications au devis</h3>
+            <div class="input-group"><label>Spécification (n°)</label><input type="text" id="f2-spec-no" placeholder="Ex: 5"></div>
+            <div class="input-group mtq-only-field"><label>Type de béton</label><input type="text" id="mtq-type-beton"></div>
+            <div class="input-group mtq-only-field"><label>Type de liant</label><input type="text" id="mtq-type-liant"></div>
+            <div class="input-group"><label>Affaissement</label>
+                <div class="spec-split">
+                    <input type="number" id="f2-spec-affaissement-nominal" step="any" inputmode="decimal" placeholder="Ex: 80" aria-label="Affaissement visé">
+                    <span class="spec-symbol">±</span>
+                    <input type="number" id="f2-spec-affaissement-tolerance" step="any" inputmode="decimal" placeholder="Ex: 30" aria-label="Tolérance">
+                </div>
+                <input type="hidden" id="f2-spec-affaissement">
+            </div>
+            <div class="input-group"><label>Teneur en air</label>
+                <div class="spec-split">
+                    <input type="number" id="f2-spec-air-min" step="any" inputmode="decimal" placeholder="Ex: 5" aria-label="Teneur en air minimale">
+                    <span class="spec-symbol">@</span>
+                    <input type="number" id="f2-spec-air-max" step="any" inputmode="decimal" placeholder="Ex: 8" aria-label="Teneur en air maximale">
+                </div>
+                <input type="hidden" id="f2-spec-air">
+            </div>
+            <div class="input-group mtq-only-field"><label>Perte d&#x27;air mesurée (essai de convenance)</label><input type="text" id="mtq-perte-air-mesuree"></div>
+            <div class="input-group mtq-only-field"><label>Perte d&#x27;air appliquée</label><input type="text" id="mtq-perte-air-appliquee"></div>
+            <div class="input-group"><label>Résistance</label><input type="text" id="f2-spec-resistance" placeholder="Ex: 35 MPa"></div>
+            <div class="input-group"><label>Granulats</label><input type="text" id="f2-spec-granulat" placeholder="Ex: 5-20"></div>
+            <div class="input-group mtq-only-field"><label>Température du béton min. / max. (°C)</label>
+                <div class="spec-split"><input type="number" id="mtq-temp-beton-min" step="0.1" inputmode="decimal" placeholder="Min." aria-label="Température du béton minimale"><span class="spec-symbol">/</span><input type="number" id="mtq-temp-beton-max" step="0.1" inputmode="decimal" placeholder="Max." aria-label="Température du béton maximale"></div>
+            </div>
+        </div>
+
+        <!-- SECTION : Localisation de l'ouvrage -->
+        <div class="form-section">
+            <h3>Localisation</h3>
+            <div class="input-group"><label>Partie bétonnée</label><input type="text" id="f2-partie-betonnee" placeholder="Ex: Mur de fondation"></div>
+            <div class="input-group"><label>Localisation du prélèvement</label><input type="text" id="f2-loc-prelevement" placeholder="Ex : Entre axe A et B"></div>
+            <div class="input-group mtq-only-field"><label>Localisation du prélèvement (2e échantillon)</label><input type="text" id="mtq-loc-prelevement-2"></div>
+        </div>
+
+        <!-- SECTION : Équipements utilisés -->
+        <div class="form-section">
+            <h3>Équipements (N°)</h3>
+            <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center;">
+                
+                <div style="display: flex; align-items: center; gap: 5px;">
+                    <label style="margin: 0;">Thermomètre</label>
+                    <input type="number" id="f2-equip-thermo" style="width: 150px;" placeholder="Ex: 123456" inputmode="numeric" oninput="if(this.value.length > 6) this.value = this.value.slice(0,6);">
+                </div>
+                
+                <div style="display: flex; align-items: center; gap: 5px;">
+                    <label style="margin: 0;">Airmètre</label>
+                    <input type="number" id="f2-equip-airmetre" style="width: 150px;" placeholder="Ex: 789012" inputmode="numeric" oninput="if(this.value.length > 6) this.value = this.value.slice(0,6);">
+                </div>
+                
+                <div style="display: flex; align-items: center; gap: 5px;">
+                    <label style="margin: 0;">Cône d'affaissement</label>
+                    <input type="number" id="f2-equip-cone" style="width: 150px;" placeholder="Ex: 345678" inputmode="numeric" oninput="if(this.value.length > 6) this.value = this.value.slice(0,6);">
+                </div>
+                
+                <div style="display: flex; align-items: center; gap: 5px;">
+                    <label style="margin: 0;">Bourroir (16 mm)</label>
+                    <label class="mtq-only-field mtq-chip mtq-chip-inline" title="Case « 16 mm » du formulaire MTQ"><input type="checkbox" id="mtq-bourroir-16"> utilisé</label>
+                    <input type="number" id="f2-equip-bourroir16" style="width: 150px;" placeholder="Ex: 901234" inputmode="numeric" oninput="if(this.value.length > 6) this.value = this.value.slice(0,6);">
+                </div>
+                
+                <div style="display: flex; align-items: center; gap: 5px;">
+                    <label style="margin: 0;">Bourroir (10 mm)</label>
+                    <label class="mtq-only-field mtq-chip mtq-chip-inline" title="Case « 10 mm » du formulaire MTQ"><input type="checkbox" id="mtq-bourroir-10"> utilisé</label>
+                    <input type="number" id="f2-equip-bourroir10" style="width: 150px;" placeholder="Ex: 567890" inputmode="numeric" oninput="if(this.value.length > 6) this.value = this.value.slice(0,6);">
+                </div>
+
+                <div class="mtq-only-field mtq-chip-inline" style="display: flex; align-items: center; gap: 5px;">
+                    <label style="margin: 0;">Moules (identification)</label>
+                    <input type="text" id="mtq-id-moules" style="width: 150px;">
+                </div>
+
+            </div>
+        </div>
+
+        <!-- SECTION : GRILLE DES CAMIONS (Dynamique) -->
+        <div class="form-section">
+            <h3>Registre des Camions</h3>
+            <p class="truck-legend" style="font-size: 0.9rem; color: #475569; margin-bottom: 15px; font-style: italic;">* Les camions testés apparaîtront en <span style="color: #0284ca; font-weight: bold;">bleu</span>, les camions échantillonnés en <span style="color: #16a34a; font-weight: bold;">vert</span> et les camions refusés en <span style="color: #dc2626; font-weight: bold;">rouge</span>.</p>
+
+            <div class="mtq-only-field mtq-line"><span class="mtq-line-title">Méthodes d'essai</span>
+                <label><input type="checkbox" id="mtq-methode-air-4c"> Air A23.2-4C</label>
+                <label><input type="checkbox" id="mtq-methode-aff-5c"> Aff./Étal. A23.2-5C/19C</label>
+                <label><input type="checkbox" id="mtq-methode-temp-17c"> Temp. A23.2-17C</label>
+            </div>
+
+            <!-- CONTRÔLES DE PAGINATION -->
+            <div id="truck-pagination-controls" style="display: none; justify-content: space-between; align-items: center; background: #e2e8f0; padding: 10px; border-radius: 6px; margin-bottom: 15px;">
+                <button type="button" onclick="changeTruckPage(-1)" id="btn-prev-page" style="padding: 8px 15px; background: #94a3b8; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">◀ Précédent</button>
+                
+                <span class="page-numbering" style="font-weight: bold; color: #334155; font-size: 1.1rem;">Page <span id="current-page-display">1</span> de <span id="total-pages-display">1</span></span>
+                
+                <button type="button" onclick="changeTruckPage(1)" id="btn-next-page" style="padding: 8px 15px; background: #0284c7; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">Suivant ▶</button>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
+                <button type="button" class="collapse-trucks-button" onclick="collapseAllTrucks()" style="background: #475569; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">Tout réduire</button>
+            </div>
+
+            <div id="trucks-container">
+                <!-- Les camions s'ajouteront ici -->
+            </div>
+            <button type="button" class="tab-btn" onclick="addTruck()" style="margin-top: 10px; background-color: #0284c7; color: white;">➕ Ajouter un camion</button>
+        </div>
+
+        <!-- SECTION : Totaux (Calculés automatiquement plus tard) -->
+        <!--
+        <div class="form-section">
+            <h3>Quantités</h3>
+            <div class="input-group"><label>Total coulée</label><input type="number" id="f2-total-coulee" readonly style="background: #f3f4f6; width: 100px; display: inline-block;"> (m³)</div>
+            <div class="input-group"><label>Total refusé</label><input type="number" id="f2-total-refuse" readonly style="background: #f3f4f6; width: 100px; display: inline-block;"> (m³)</div>
+            <div class="input-group"><label>Total vérifié</label><input type="number" id="f2-total-verifie" readonly style="background: #f3f4f6; width: 100px; display: inline-block;"> (m³)</div>
+        </div> -->
+
+        <!-- SECTION : Totaux (Calculés automatiquement) -->
+        <div class="form-section">
+            <h3>Quantités</h3>
+            <p style="font-size: 0.85rem; color: #242930; margin-bottom: 15px; font-style: italic;">
+                * Ces quantités sont calculées et affichées automatiquement en fonction du registre des camions. Cette zone n'est pas modifiable.
+            </p>
+            
+            <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-end;">
+                <div class="input-group" style="flex: 1; min-width: 120px; margin-bottom: 0;">
+                    <label>Total coulée (m³)</label>
+                    <input type="text" id="f2-total-coulee" readonly style="background: #e2e8f0; font-weight: bold; color: #334155; cursor: not-allowed; text-align: center;" placeholder="-">
+                </div>
+                <div class="input-group" style="flex: 1; min-width: 120px; margin-bottom: 0;">
+                    <label>Total refusé (m³)</label>
+                    <input type="text" id="f2-total-refuse" readonly style="background: #e2e8f0; font-weight: bold; color: #dc2626; cursor: not-allowed; text-align: center;" placeholder="-">
+                </div>
+                <div class="input-group" style="flex: 1; min-width: 120px; margin-bottom: 0;">
+                    <label>Total vérifié (m³)</label>
+                    <input type="text" id="f2-total-verifie" readonly style="background: #e2e8f0; font-weight: bold; color: #16a34a; cursor: not-allowed; text-align: center;" placeholder="-">
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION : Remarques Générales Formulaire 2 -->
+        <div class="form-section">
+            <h3>Remarques</h3>
+            <p style="font-size: 0.85rem; color: #242930; font-style: italic; margin-bottom: 15px;">
+                (Les remarques ajoutées ci-dessus s'ajouteront automatiquement. Vous pouvez également saisir des commentaires supplémentaires.)
+            </p>
+            <textarea id="f2-remarques-globales" rows="3" style="width: 100%;" maxlength="200" placeholder="Notes additionnelles..."></textarea>
+            <button type="button" onclick="editGlobalRemarkPrompt()" style="margin-top: 10px; background: #f59e0b; color: white; border: none; padding: 8px 12px; border-radius: 4px; font-weight: bold; cursor: pointer;">✏️ Modifier un commentaire existant</button>
+        </div>
+
+        <!-- SIGNATURE TECHNICIEN -->
+        <div class="form-section" style="border-top: 2px solid #ccc; padding-top: 15px;">
+            <h3>Vérification</h3>
+            <div class="input-group"><label>Nom du technicien</label><input type="text" id="f2-tech-name" style="width: 250px; display: inline-block;" placeholder="Jean Tremblay"></div>
+            <div class="input-group mtq-only-field mtq-fit"><label>Organisme</label><input type="text" id="mtq-p1-organisme" style="width: 250px; display: inline-block;"></div>
+            <div class="input-group"><label>Date</label><input type="date" id="f2-verif-date" style="width: 200px; display: inline-block;"></div>
+            <div class="input-group mtq-only-field"><label>Technicien certifié ACI</label><div class="mtq-inline-checks"><label><input type="checkbox" id="mtq-aci-exige"> Exigé</label><label><input type="checkbox" id="mtq-aci-non-exige"> Non exigé</label><label><input type="checkbox" id="mtq-aci-carte-conforme"> Carte conforme</label><label><input type="checkbox" id="mtq-aci-carte-non-conforme"> Carte non conforme</label></div></div>
+        </div>
+
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="javascript:void(0);" onclick="scrollToSection('form-instructions')" style="color: var(--primary); font-weight: bold; text-decoration: none; font-size: 1rem; padding: 10px 20px; background: #e2e8f0; border-radius: 6px; display: inline-block;">
+                ⬆️ Retour aux sections du formulaire
+            </a>
+        </div>
+
+    </section>
+
+
+        <!-- TEMPLATE INVISIBLE POUR LES CAMIONS -->
+        <!-- Suggestions du champ « Temps de retardant » de chaque camion (saisie libre conservée) -->
+        <datalist id="retardant-suggestions">
+            <option value="0"></option>
+            <option value="30 min"></option>
+            <option value="45 min"></option>
+            <option value="1h00"></option>
+            <option value="1h30"></option>
+            <option value="2h00"></option>
+        </datalist>
+
+        <template id="truck-template">
+            <div class="truck-card" style="border: 1px solid #0284c7; border-radius: 6px; margin-bottom: 15px; background: #f8fafc; overflow: hidden;">
+                
+                <!-- EN-TÊTE RÉTRACTABLE (ACCORDÉON) -->
+                <div class="accordion-header" onclick="toggleAccordion(this)" style="background-color: #97c6b980; padding-top: 10px; padding-bottom: 10px;">
+                    <span class="chevron" style="margin-left: 0px; margin-right: 10px;">▼</span>
+                    <!-- Ligne + pastilles Camion / Bordereau / Éch. / Cum (passent à la ligne sur téléphone, jamais de débordement) -->
+                    <div class="truck-header-main">
+                        <div class="truck-header-title">Ligne #<span class="truck-number-display"></span></div>
+                        <div class="truck-header-summary"></div>
+                    </div>
+                    
+                    <button type="button" onclick="deleteTruckCard(this, event)" style="background: none; border: none; color: #ef4444; font-weight: bold; font-size: 1.2rem; cursor: pointer; padding: 0 5px; margin-left: 10px;">✖</button>
+                </div>
+                
+                <!-- CONTENU DU FORMULAIRE -->
+                <div class="accordion-content active">
+                    <!-- Identifiants et Quantité -->
+                    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                        <div style="flex: 1;"><label>Camion n°</label><input type="text" class="truck-id" oninput="updateTruckHeader(this)"></div>
+                        <div style="flex: 2;"><label>Bordereau n°</label><input type="text" class="truck-bordereau" oninput="updateTruckHeader(this)"></div>
+                        <div style="flex: 1;"><label>Volume (m³)</label><input type="number" class="truck-volume" step="0.1"></div>
+                    </div>
+                    
+                    <!-- Heures : chargement, retardant du camion, début et fin du déchargement (2 colonnes sur téléphone).
+                         Heure max fin = chargement + 2h00 + retardant, affichée dans le libellé de la fin (rouge si dépassée). -->
+                    <div class="truck-times">
+                        <div class="truck-time-cell">
+                            <label>Chargement</label>
+                            <input type="time" class="truck-time-mix">
+                        </div>
+                        <div class="truck-time-cell">
+                            <label>Temps de retardant</label>
+                            <input type="text" class="truck-retarder" list="retardant-suggestions" placeholder="ex. 30 min, 1h00" autocomplete="off">
+                        </div>
+                        <div class="truck-time-cell">
+                            <label>Début</label>
+                            <input type="time" class="truck-time-start">
+                        </div>
+                        <div class="truck-time-cell">
+                            <label>Heure fin déchargement <span class="max-time-label"></span></label>
+                            <input type="time" class="truck-time-end">
+                        </div>
+                    </div>
+
+                    <!-- Ajouts -->
+                    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                        <div style="flex: 1;"><label>Eau ajoutée (l/m³)</label><input type="number" class="truck-water" placeholder="Qté"></div>
+                        <div style="flex: 1;"><label>Superplastifiant (l/m³)</label><input type="number" class="truck-plast" placeholder="Qté"></div>
+                    </div>
+
+                    <small style="color: #242930; font-size: 0.8rem; display: block; margin-top: 3px; margin-bottom: 5px; text-align: center; margin-left: auto; margin-right: auto; max-width: 600px;">                          
+                        Notez le deuxième test si le premier est non-conforme pour la teneur en air et l'affaissement.
+                    </small>
+
+                    <!-- Teneur en air et Température -->
+                    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                        <div style="flex: 1;"><label>Teneur Air 1 (%)</label><input type="number" class="truck-air1" step="0.1"></div>
+                        <div style="flex: 1;"><label>Teneur Air 2 (%)</label><input type="number" class="truck-air2" step="0.1"></div>
+                        <div style="flex: 1;"><label>Temp. (°C)</label><input type="number" class="truck-temp" step="0.1"></div>
+                    </div>
+
+                    <!-- MTQ : mesures après la pompe (colonnes « Après le pompage » du formulaire MTQ) -->
+                    <div class="mtq-only-field mtq-truck-row">
+                        <div class="mtq-truck-cell"><label>Air après pompe (%)</label><input type="number" class="truck-mtq-air-pompage" step="0.1" inputmode="decimal"></div>
+                        <div class="mtq-truck-cell"><label>Aff. après pompe (mm)</label><input type="number" class="truck-mtq-aff-pompage" step="any" inputmode="decimal"></div>
+                    </div>
+
+                    <!-- Affaissement avec cases à cocher SP -->
+                    <div style="display: flex; gap: 10px; margin-bottom: 10px; background: #fff; padding: 8px; border-radius: 4px; border: 1px solid #d1d5db;">
+                        <div style="flex: 1;">
+                            <label>Affaissement 1 (mm)</label>
+                            <div style="display: flex; align-items: center; gap: 5px;">
+                                <input type="number" class="truck-slump1" style="flex: 1;" placeholder="">
+                                <label style="font-size: 0.85rem; margin: 0; display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="truck-slump1-sp"> √ SP</label>
+                            </div>
+                        </div>
+                        <div style="flex: 1;">
+                            <label>Affaissement 2 (mm)</label>
+                            <div style="display: flex; align-items: center; gap: 5px;">
+                                <input type="number" class="truck-slump2" style="flex: 1;" placeholder="">
+                                <label style="font-size: 0.85rem; margin: 0; display: flex; align-items: center; gap: 2px;"><input type="checkbox" class="truck-slump2-sp"> √ SP</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Toggles : Refusé & Échantillon -->
+                    <div class="truck-toggles-container" style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #ccc;">
+                        <label style="color: #dc2626;"><input type="checkbox" class="truck-refuse" onchange="toggleRefuse(this)"> Camion refusé</label>
+                        
+                        <label style="margin-top: 5px;"><input type="checkbox" class="truck-sample-check" onchange="toggleSampleFields(this)"> Échantillon prélevé</label>
+                        
+                        <div class="truck-sample-fields" style="display: none; background: #e0f2fe; padding: 10px; margin-top: 8px; border-radius: 4px;">
+                            <div style="display: flex; gap: 10px; width: 100%;">
+                                <div style="flex: 1; min-width: 0;"><label>Numéro de l'échantillon</label><input type="text" class="truck-sample-num" style="width: 100%; box-sizing: border-box;"></div>
+                                <div style="flex: 1; min-width: 0;"><label>Heure du prélèvement</label><input type="time" class="truck-sample-time" style="width: 100%; min-width: 0; box-sizing: border-box;"></div>
+                            </div>
+                        </div>
+
+                        <!-- Système de remarques Multiples -->
+                        <span style="font-size: 0.85rem; color: #64748b; margin-top: 15px; margin-bottom: -5px; display: block;">Insérer une remarque pour ce camion ci-dessous :</span>
+                        <div class="input-group" style="margin-top: 10px;">
+                            <label>Remarques attachées</label>
+                            <div class="truck-remarks-controls" style="display: flex; gap: 5px;">
+                                <input type="text" class="truck-remarques-list" readonly placeholder="Aucune" style="flex: 1; background: #f3f4f6; font-weight: bold; color: var(--primary);">
+                                <button type="button" onclick="createNewRemark(this)" style="background: #0284c7; color: white; border: none; border-radius: 4px; padding: 0 10px; font-weight: bold; cursor: pointer;">+ Ajouter</button>
+                                <button type="button" onclick="clearTruckRemarks(this)" style="background: #ef4444; color: white; border: none; border-radius: 4px; padding: 0 10px; font-weight: bold; cursor: pointer;">Effacer</button>
+                            </div>
+                            <div class="truck-remarks-preview" style="margin-top: 8px; font-size: 0.85rem; color: #475569; line-height: 1.4;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+        
+        
+
+    <!-- ========================================== -->
+    <!-- ONGLET 3 : FORMULAIRE 3                    -->
+    <!-- ========================================== -->
+    <section id="tab-form3" class="tab-section" style="display: none;">
+        <h2>Formulaire 3 : Échantillons de béton</h2>
+        
+        <p style="color: gray; font-size: 0.9rem; font-style: italic; margin-bottom: 15px;">
+            * Les fiches d'échantillons apparaîtront ici automatiquement lorsque la case "Échantillon prélevé" sera cochée pour un camion dans le registre des camions.
+        </p>
+
+        <!-- BOUTONS DE CRÉATION MANUELLE -->
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <button type="button" onclick="addManualSample()" style="padding: 10px; background: #0284c7; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">➕ Ajouter Échantillon Manuel</button>
+            <button type="button" onclick="addTemoinOnly()" style="padding: 10px; background: #8b5cf6; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">➕ Ajouter TÉMOIN (Seul)</button>
+        </div>
+
+        <div class="mtq-only-field mtq-line"><span class="mtq-line-title">Cure en chantier et transport selon</span>
+            <label><input type="checkbox" id="mtq-p2-cure-a23-3c"> A23.2-3C</label>
+            <label><input type="checkbox" id="mtq-p2-cure-ccdg"> CCDG</label>
+            <label><input type="checkbox" id="mtq-p2-cure-devis-case"> Devis :</label>
+            <input type="text" id="mtq-p2-devis" class="mtq-line-input" aria-label="Devis (cure en chantier)">
+        </div>
+
+        <!-- Conteneur où les fiches d'échantillons seront générées -->
+        <div id="samples-container">
+            <!-- Les fiches d'échantillons s'ajouteront ici dynamiquement -->
+        </div>
+
+        <!-- MTQ : parties 2 (cure et transport) et 3 (laboratoire) du formulaire MTQ, communes à tous les échantillons -->
+        <div class="form-section mtq-only-field">
+            <h3>Laboratoire et signatures (formulaire MTQ)</h3>
+            <div class="mtq-line"><span class="mtq-line-title">Cure au laboratoire</span>
+                <label><input type="checkbox" id="mtq-cure-labo-temp-ambiante"> Température ambiante</label>
+                <label><input type="checkbox" id="mtq-cure-labo-chambre-humide"> Chambre humide</label>
+                <label><input type="checkbox" id="mtq-cure-labo-eau-chaux"> Eau saturée de chaux</label>
+            </div>
+            <div class="mtq-line"><span class="mtq-line-title">Méthodes d'essai au laboratoire</span>
+                <label><input type="checkbox" id="mtq-methode-compression-9c"> Compression A23.2-9C</label>
+                <label><input type="checkbox" id="mtq-methode-carotte-14c"> Carottes A23.2-14C</label>
+                <label><input type="checkbox" id="mtq-methode-flexion-8c"> Flexion A23.2-8C</label>
+            </div>
+            <div class="input-group"><label>Remarques – cure en chantier et transport (partie 2)</label><textarea id="mtq-p2-remarques" rows="2" style="width: 100%;"></textarea></div>
+            <div class="mtq-sig"><span class="mtq-line-title">Partie 2 remplie par</span><div class="input-group"><label>Nom</label><input type="text" id="mtq-p2-nom"></div><div class="input-group"><label>Organisme</label><input type="text" id="mtq-p2-organisme"></div><div class="input-group"><label>Date</label><input type="date" id="mtq-p2-date"></div></div>
+            <div class="input-group"><label>Remarques – laboratoire (partie 3)</label><textarea id="mtq-p3-remarques" rows="2" style="width: 100%;"></textarea></div>
+            <div class="mtq-sig"><span class="mtq-line-title">Partie 3 remplie par</span><div class="input-group"><label>Nom</label><input type="text" id="mtq-p3-nom"></div><div class="input-group"><label>Organisme</label><input type="text" id="mtq-p3-organisme"></div><div class="input-group"><label>Date</label><input type="date" id="mtq-p3-date"></div></div>
+            <div class="mtq-sig"><span class="mtq-line-title">Formulaire approuvé par</span><div class="input-group"><label>Nom</label><input type="text" id="mtq-approuve-nom"></div><div class="input-group"><label>Organisme</label><input type="text" id="mtq-approuve-organisme"></div><div class="input-group"><label>Date</label><input type="date" id="mtq-approuve-date"></div></div>
+        </div>
+
+
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="javascript:void(0);" onclick="scrollToSection('form-instructions')" style="color: var(--primary); font-weight: bold; text-decoration: none; font-size: 1rem; padding: 10px 20px; background: #e2e8f0; border-radius: 6px; display: inline-block;">
+                ⬆️ Retour aux sections du formulaire
+            </a>
+        </div>
+
+    </section>
+
+    <!-- TEMPLATE INVISIBLE POUR LES FICHES D'ÉCHANTILLONS (FORM 3) -->
+    <template id="sample-template">
+        <div class="sample-card" style="border: 2px solid #16a34a; border-radius: 8px; margin-bottom: 20px; background: #f0fdf4; overflow: hidden;">
+            
+            <!-- EN-TÊTE ACCORDÉON (CLIQUABLE) -->
+            <div class="accordion-header" onclick="toggleAccordion(this)" style="background-color: #dcfce7; padding: 15px;">
+                <div style="font-weight: bold; font-size: 1.2rem; color: #16a34a;">
+                    Échantillon n° <span class="sample-number-display"></span> 
+                    <span style="font-size: 0.9rem; color: #475569; font-weight: normal;">(Lié au Camion #<span class="sample-truck-linked"></span>)</span>
+                </div>
+                <span class="chevron" style="color: #16a34a;">▼</span>
+            </div>
+            
+            <!-- DÉBUT DU CONTENU CACHABLE -->
+            <div class="accordion-content active" style="padding: 15px;">
+
+                <!-- SPÉCIFICATIONS DES MOULES -->
+                <div class="form-section" style="background: white;">
+                    <h3>Spécifications des moules</h3>
+                    <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                        <div class="checkbox-group">
+                            <label style="font-weight:bold;">Moules</label>
+                            <label><input type="checkbox" class="sample-moule-cpv"> CPV</label>
+                            <label><input type="checkbox" class="sample-moule-carton"> Carton</label>
+                            <label><input type="checkbox" class="sample-moule-acier"> Acier</label>
+                            <label class="mtq-only-field mtq-chip"><input type="checkbox" class="sample-moule-polyurethane"> Polyuréthane</label>
+                            <label class="mtq-only-field mtq-chip"><input type="checkbox" class="sample-moule-bois"> Bois</label>
+                            <label class="mtq-only-field mtq-chip"><input type="checkbox" class="sample-moule-autre"> Autre</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <label style="font-weight:bold;">Dimensions (mm)</label>
+                            <label><input type="checkbox" class="sample-dim-100"> 100 x 200</label>
+                            <label><input type="checkbox" class="sample-dim-150"> 150 x 300</label>
+                            <label><input type="checkbox" class="sample-dim-poutre"> Poutre</label>
+                            <label><input type="checkbox" class="sample-dim-cube"> Cube</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <label style="font-weight:bold;">Méthode / Cure</label>
+                            <label><input type="checkbox" class="sample-meth-csa"> CSA-A23.2-9C</label>
+                            <label><input type="checkbox" class="sample-meth-chantier"> Mûris en conditions de chantier</label>
+                            <label><input type="checkbox" class="sample-meth-labo"> Moulés au laboratoire</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CONDITIONS INITIALES DE CURE ET D'ENTREPOSAGE -->
+                <div class="form-section" style="background: white;">
+                    <h3>Conditions initiales de cure et d'entreposage (CSA-A23.2-3C)</h3>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div>
+                            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 5px; font-size: 0.85rem; font-weight: bold; text-align: center; margin-bottom: 5px;">
+                                <div style="text-align: left;">Étape</div><div>Date</div><div>Heure</div><div>Par</div>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 5px; margin-bottom: 5px;">
+                                <label>Prélèvement</label>
+                                <input type="date" class="sample-prelev-date" style="padding: 2px;  max-width: 100%;">
+                                <input type="time" class="sample-prelev-time" style="padding: 2px;  max-width: 100%;">
+                                <input type="text" class="sample-prelev-tech" style="padding: 2px;  max-width: 100%;">
+                            </div>
+                            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 5px; margin-bottom: 5px;">
+                                <label>Récupération</label>
+                                <input type="date" class="sample-recup-date" style="padding: 2px;  max-width: 100%;">
+                                <input type="time" class="sample-recup-time" style="padding: 2px;  max-width: 100%;">
+                                <input type="text" class="sample-recup-tech" style="padding: 2px;  max-width: 100%;">
+                            </div>
+                            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 5px;">
+                                <label>Chambre humide</label>
+                                <input type="date" class="sample-lab-date" style="padding: 2px;  max-width: 100%;">
+                                <input type="time" class="sample-lab-time" style="padding: 2px;  max-width: 100%;">
+                                <input type="text" class="sample-lab-tech" style="padding: 2px;  max-width: 100%;">
+                            </div>
+                        </div>
+
+                        <div>
+                            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 5px; margin-bottom: 5px; align-items: center;">
+                                <label>Début d'entreposage</label>
+                                <div><input type="number" class="sample-temp-init" step="0.1" style="width:100%;"> °C</div>
+                                <div style="text-align:center; font-size:0.85rem;">min. (°C)</div>
+                                <div style="text-align:center; font-size:0.85rem;">max. (°C)</div>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 5px; margin-bottom: 5px; align-items: center;">
+                                <label>Fin d'entreposage</label>
+                                <div><input type="number" class="sample-temp-recup" step="0.1" style="width:100%;"> °C</div>
+                                <div><input type="number" class="sample-temp-min" step="0.1" style="width:100%;"></div>
+                                <div><input type="number" class="sample-temp-max" step="0.1" style="width:100%;"></div>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 5px; align-items: center;">
+                                <label>Pendant le transport</label>
+                                <div><input type="number" class="sample-temp-transp" step="0.1" style="width:100%;"> °C</div>
+                                <div class="mtq-only-field mtq-cell"><input type="number" class="sample-mtq-transp-min" step="0.1" aria-label="Transport : température minimale (°C)"></div>
+                                <div class="mtq-only-field mtq-cell"><input type="number" class="sample-mtq-transp-max" step="0.1" aria-label="Transport : température maximale (°C)"></div>
+                            </div>
+                            <div class="mtq-only-field mtq-line">
+                                <label class="mtq-line-field">Départ du chantier <input type="time" class="sample-mtq-heure-depart"></label>
+                                <label class="mtq-line-field">Temps de transport <input type="text" class="sample-mtq-temps-transport" placeholder="HH:MM" inputmode="numeric"></label>
+                            </div>
+                            <div style="margin-top: 10px; display: flex; align-items: center; gap: 10px;">
+                                <label style="white-space: nowrap;">Thermomètre min/max n°</label>
+                                <input type="text" class="sample-thermo-num" style="flex:1;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PROTECTION ET MÛRISSEMENT -->
+                <div class="form-section" style="background: white;">
+                    <h3>Protection et mûrissement des éprouvettes au chantier</h3>
+                    <div class="grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div>
+                            <h4 style="margin: 0 0 10px 0; border-bottom: 1px solid #ccc;">Intérieur</h4>
+                            <div style="display: flex; gap: 20px;">
+                                <div class="checkbox-group">
+                                    <label><input type="checkbox" class="sample-cure-int-roulotte"> Roulotte</label>
+                                    <label><input type="checkbox" class="sample-cure-int-local"> Local</label>
+                                    <label><input type="checkbox" class="sample-cure-int-abri"> Abri temporaire</label>
+                                </div>
+                                <div class="checkbox-group">
+                                    <label><input type="checkbox" class="sample-cure-int-chauffe"> Chauffé (e)</label>
+                                    <label><input type="checkbox" class="sample-cure-int-nonchauffe"> Non chauffé (e)</label>
+                                    <div style="margin-top: 5px;"></div>
+                                    <label><input type="checkbox" class="sample-cure-int-clim"> Climatisé (e)</label>
+                                    <label><input type="checkbox" class="sample-cure-int-nonclim"> Non climatisé (e)</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 style="margin: 0 0 10px 0; border-bottom: 1px solid #ccc;">Extérieur</h4>
+                            <div style="display: flex; gap: 20px;">
+                                <div class="checkbox-group">
+                                    <label><input type="checkbox" class="sample-cure-ext-ombre"> À l'ombre</label>
+                                    <label><input type="checkbox" class="sample-cure-ext-soleil"> Au soleil</label>
+                                    <div style="margin-top: 5px;"></div>
+                                    <label><input type="checkbox" class="sample-cure-ext-prot"> Protégées contre l'évaporation</label>
+                                    <label><input type="checkbox" class="sample-cure-ext-nonprot"> Non protégées contre l'évaporation</label>
+                                </div>
+                                <div class="checkbox-group">
+                                    <label><input type="checkbox" class="sample-cure-ext-boite-iso"> Boîte de cure isolée</label>
+                                    <label><input type="checkbox" class="sample-cure-ext-boite-noniso"> Boîte de cure non isolée</label>
+                                    <label><input type="checkbox" class="sample-cure-ext-boite-chauff"> Boîte de cure chauffée</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mtq-only-field mtq-line" style="margin-top: 12px;"><span class="mtq-line-title">Conditions de cure en chantier</span>
+                        <label><input type="checkbox" class="sample-mtq-cure-1"> Contenant isolé</label>
+                        <label><input type="checkbox" class="sample-mtq-cure-2"> Dans l&#x27;eau</label>
+                        <label><input type="checkbox" class="sample-mtq-cure-3"> Température ambiante contrôlée</label>
+                        <label><input type="checkbox" class="sample-mtq-cure-4"> Intérieur</label>
+                        <label><input type="checkbox" class="sample-mtq-cure-5"> Abris</label>
+                        <label><input type="checkbox" class="sample-mtq-cure-6"> Particularités</label>
+                    </div>
+                </div>
+
+                <!-- OBSERVATIONS -->
+                <div class="form-section" style="background: white;">
+                    <h3>Observations</h3>
+                    <div class="grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="checkbox-group">
+                            <h4 style="margin: 0 0 10px 0; border-bottom: 1px solid #ccc;">À la récupération</h4>
+                            <label><input type="checkbox" class="sample-obs-recup-finition"> Mauvaise finition</label>
+                            <label><input type="checkbox" class="sample-obs-recup-deplaces"> Cylindres déplacés</label>
+                            <label><input type="checkbox" class="sample-obs-recup-endom"> Cylindres possiblement endommagés</label>
+                            <label><input type="checkbox" class="sample-obs-recup-niveau"> Cylindres pas de niveau</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <h4 style="margin: 0 0 10px 0; border-bottom: 1px solid #ccc;">À l'échantillonnage</h4>
+                            <label><input type="checkbox" class="sample-obs-ech-autre"> Échantillonnage par autre partie</label>
+                            <label><input type="checkbox" class="sample-obs-ech-conjoint"> Échantillonnage conjoint</label>
+                            <div style="display: flex; gap: 10px; margin-left: 20px;">
+                                <label><input type="checkbox" class="sample-obs-ech-fournisseur"> Fournisseur</label>
+                                <label><input type="checkbox" class="sample-obs-ech-entrepreneur"> Entrepreneur</label>
+                            </div>
+                            <label><input type="checkbox" class="sample-obs-ech-meme"> Échantillonnage même camion qu'Englobe</label>
+                            <label><input type="checkbox" class="sample-obs-ech-cond"> Conditions de cure des cylindres de l'autre partie</label>
+                        </div>
+                    </div>
+                    <div class="mtq-only-field mtq-ep-block"><span class="mtq-line-title">Éprouvettes (identification et récupération)</span><div class="mtq-table-wrap"><table class="mtq-table mtq-table-narrow"><tr><th></th><th>A</th><th>B</th><th>C</th></tr><tr><th>Identification</th><td><input type="text" class="sample-mtq-epa-id" aria-label="Identification A"></td><td><input type="text" class="sample-mtq-epb-id" aria-label="Identification B"></td><td><input type="text" class="sample-mtq-epc-id" aria-label="Identification C"></td></tr><tr><th>Témoin (mêmes conditions que l&#x27;ouvrage)</th><td><input type="checkbox" class="sample-mtq-epa-temoin" aria-label="Témoin (mêmes conditions que l&#x27;ouvrage) A"></td><td><input type="checkbox" class="sample-mtq-epb-temoin" aria-label="Témoin (mêmes conditions que l&#x27;ouvrage) B"></td><td><input type="checkbox" class="sample-mtq-epc-temoin" aria-label="Témoin (mêmes conditions que l&#x27;ouvrage) C"></td></tr><tr><th>Déplacée</th><td><input type="checkbox" class="sample-mtq-epa-deplacee" aria-label="Déplacée A"></td><td><input type="checkbox" class="sample-mtq-epb-deplacee" aria-label="Déplacée B"></td><td><input type="checkbox" class="sample-mtq-epc-deplacee" aria-label="Déplacée C"></td></tr><tr><th>Semble endommagée</th><td><input type="checkbox" class="sample-mtq-epa-endommagee" aria-label="Semble endommagée A"></td><td><input type="checkbox" class="sample-mtq-epb-endommagee" aria-label="Semble endommagée B"></td><td><input type="checkbox" class="sample-mtq-epc-endommagee" aria-label="Semble endommagée C"></td></tr></table></div></div>
+                </div>
+
+                <!-- MTQ : laboratoire (partie 3 du formulaire MTQ), éprouvettes A / B / C de cet échantillon -->
+                <div class="form-section mtq-only-field" style="background: white;">
+                    <h3>Laboratoire</h3>
+                    <div class="mtq-only-field mtq-ep-block"><span class="mtq-line-title">Démoulage et résultats</span><div class="mtq-table-wrap"><table class="mtq-table mtq-table-narrow"><tr><th></th><th>A</th><th>B</th><th>C</th></tr><tr><th>Identification (labo)</th><td><input type="text" class="sample-mtq-epa-labo-id" aria-label="Identification (labo) A"></td><td><input type="text" class="sample-mtq-epb-labo-id" aria-label="Identification (labo) B"></td><td><input type="text" class="sample-mtq-epc-labo-id" aria-label="Identification (labo) C"></td></tr><tr><th>Démoulage – date</th><td><input type="date" class="sample-mtq-epa-demoulage-date" aria-label="Démoulage – date A"></td><td><input type="date" class="sample-mtq-epb-demoulage-date" aria-label="Démoulage – date B"></td><td><input type="date" class="sample-mtq-epc-demoulage-date" aria-label="Démoulage – date C"></td></tr><tr><th>Démoulage – heure</th><td><input type="time" class="sample-mtq-epa-demoulage-heure" aria-label="Démoulage – heure A"></td><td><input type="time" class="sample-mtq-epb-demoulage-heure" aria-label="Démoulage – heure B"></td><td><input type="time" class="sample-mtq-epc-demoulage-heure" aria-label="Démoulage – heure C"></td></tr><tr><th>Identification (résultats)</th><td><input type="text" class="sample-mtq-epa-resultat-id" aria-label="Identification (résultats) A"></td><td><input type="text" class="sample-mtq-epb-resultat-id" aria-label="Identification (résultats) B"></td><td><input type="text" class="sample-mtq-epc-resultat-id" aria-label="Identification (résultats) C"></td></tr><tr><th>Âge (jours)</th><td><input type="number" class="sample-mtq-epa-age" step="any" inputmode="decimal" aria-label="Âge (jours) A"></td><td><input type="number" class="sample-mtq-epb-age" step="any" inputmode="decimal" aria-label="Âge (jours) B"></td><td><input type="number" class="sample-mtq-epc-age" step="any" inputmode="decimal" aria-label="Âge (jours) C"></td></tr><tr><th>Compression (MPa)</th><td><input type="number" class="sample-mtq-epa-compression" step="any" inputmode="decimal" aria-label="Compression (MPa) A"></td><td><input type="number" class="sample-mtq-epb-compression" step="any" inputmode="decimal" aria-label="Compression (MPa) B"></td><td><input type="number" class="sample-mtq-epc-compression" step="any" inputmode="decimal" aria-label="Compression (MPa) C"></td></tr><tr><th>Carottes, béton projeté (MPa)</th><td><input type="number" class="sample-mtq-epa-carotte" step="any" inputmode="decimal" aria-label="Carottes, béton projeté (MPa) A"></td><td><input type="number" class="sample-mtq-epb-carotte" step="any" inputmode="decimal" aria-label="Carottes, béton projeté (MPa) B"></td><td><input type="number" class="sample-mtq-epc-carotte" step="any" inputmode="decimal" aria-label="Carottes, béton projeté (MPa) C"></td></tr><tr><th>Flexion (MPa)</th><td><input type="number" class="sample-mtq-epa-flexion" step="any" inputmode="decimal" aria-label="Flexion (MPa) A"></td><td><input type="number" class="sample-mtq-epb-flexion" step="any" inputmode="decimal" aria-label="Flexion (MPa) B"></td><td><input type="number" class="sample-mtq-epc-flexion" step="any" inputmode="decimal" aria-label="Flexion (MPa) C"></td></tr></table></div></div>
+                </div>
+
+                <!-- MASSE DES CYLINDRES (Optionnel, non mappé) -->
+                <div class="form-section" style="background: white; display: none;"></div>
+
+                <!-- CROQUIS ET REMARQUES GLOBALES (Échantillon) -->
+                <div class="form-section" style="background: white;">
+                    <h3>Croquis de localisation et remarques</h3>
+                    <textarea class="sample-croquis-remarques" rows="4" style="width: 100%;"></textarea>
+                </div>
+
+                <!-- TÉMOINS (CACHÉ PAR DÉFAUT) -->
+                <div class="form-section" style="background: white; border-top: 2px dashed #0284c7; padding-top: 15px;">
+                    <label style="font-weight: bold; color: #0284c7; font-size: 1.1rem; cursor: pointer;">
+                        <input type="checkbox" class="sample-temoin-check" onchange="toggleTemoinSection(this)"> Activer la fiche TÉMOIN
+                    </label>
+                    
+                    <div class="temoin-container" style="display: none; margin-top: 15px; border: 1px solid #0284c7; padding: 15px; background: #f8fafc; border-radius: 4px;">
+                        <h2 style="text-align: center; letter-spacing: 2px; margin-bottom: 20px;">TÉMOIN</h2>
+                        
+                        <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #cbd5e1;">
+                            <div class="checkbox-group" style="flex: 1; display: flex; gap: 10px;">
+                                <label style="font-weight:bold;">Moules:</label>
+                                <label><input type="checkbox" class="temoin-moule-cpv"> CPV</label>
+                                <label><input type="checkbox" class="temoin-moule-carton"> Carton</label>
+                                <label><input type="checkbox" class="temoin-moule-acier"> Acier</label>
+                            </div>
+                            <div class="checkbox-group" style="flex: 2; display: flex; gap: 10px;">
+                                <label style="font-weight:bold;">Dimensions (mm):</label>
+                                <label><input type="checkbox" class="temoin-dim-100"> 100 x 200</label>
+                                <label><input type="checkbox" class="temoin-dim-150"> 150 x 300</label>
+                                <label><input type="checkbox" class="temoin-dim-poutre"> Poutre</label>
+                                <label><input type="checkbox" class="temoin-dim-cube"> Cube</label>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 15px;">
+                            <h4 style="text-align: center; background: #e2e8f0; padding: 5px; margin: 0 0 10px 0;">Conditions initiales de cure et d'entreposage</h4>
+                            <div class="prelev-row">
+                                <label class="prelev-title">Prélèvement</label>
+                                <div><label>date</label><input type="date" class="temoin-prelev-date"></div>
+                                <div><label>heure</label><input type="time" class="temoin-prelev-time"></div>
+                                <div><label>par</label><input type="text" class="temoin-prelev-tech"></div>
+                            </div>
+
+                            <!-- ACCORDION ROWS POUR MOBILE ET BUREAU -->
+                            <div style="display: flex; flex-direction: column; gap: 8px;">
+                                <!-- Ligne a -->
+                                <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
+                                    <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne a</summary>
+                                    <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                        <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-a-num"></div>
+                                        <div class="input-group"><label>N° éch.</label><input type="text" value="a" readonly style="background:#f3f4f6; text-align:center;"></div>
+                                        <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-a-bris"></div>
+                                        <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-a-temp-debut" step="0.1"></div>
+                                        <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-a-temp-fin" step="0.1"></div>
+                                        <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-a-recup-date"></div>
+                                        <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-a-recup-heure"></div>
+                                        <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-a-recup-par"></div>
+                                    </div>
+                                </details>
+                                <!-- Ligne b -->
+                                <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
+                                    <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne b</summary>
+                                    <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                        <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-b-num"></div>
+                                        <div class="input-group"><label>N° éch.</label><input type="text" value="b" readonly style="background:#f3f4f6; text-align:center;"></div>
+                                        <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-b-bris"></div>
+                                        <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-b-temp-debut" step="0.1"></div>
+                                        <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-b-temp-fin" step="0.1"></div>
+                                        <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-b-recup-date"></div>
+                                        <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-b-recup-heure"></div>
+                                        <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-b-recup-par"></div>
+                                    </div>
+                                </details>
+                                <!-- Ligne c -->
+                                <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
+                                    <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne c</summary>
+                                    <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                        <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-c-num"></div>
+                                        <div class="input-group"><label>N° éch.</label><input type="text" value="c" readonly style="background:#f3f4f6; text-align:center;"></div>
+                                        <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-c-bris"></div>
+                                        <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-c-temp-debut" step="0.1"></div>
+                                        <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-c-temp-fin" step="0.1"></div>
+                                        <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-c-recup-date"></div>
+                                        <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-c-recup-heure"></div>
+                                        <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-c-recup-par"></div>
+                                    </div>
+                                </details>
+                                <!-- Ligne d -->
+                                <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
+                                    <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne d</summary>
+                                    <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                        <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-d-num"></div>
+                                        <div class="input-group"><label>N° éch.</label><input type="text" value="d" readonly style="background:#f3f4f6; text-align:center;"></div>
+                                        <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-d-bris"></div>
+                                        <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-d-temp-debut" step="0.1"></div>
+                                        <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-d-temp-fin" step="0.1"></div>
+                                        <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-d-recup-date"></div>
+                                        <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-d-recup-heure"></div>
+                                        <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-d-recup-par"></div>
+                                    </div>
+                                </details>
+                                <!-- Ligne e -->
+                                <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
+                                    <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne e</summary>
+                                    <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                        <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-e-num"></div>
+                                        <div class="input-group"><label>N° éch.</label><input type="text" value="e" readonly style="background:#f3f4f6; text-align:center;"></div>
+                                        <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-e-bris"></div>
+                                        <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-e-temp-debut" step="0.1"></div>
+                                        <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-e-temp-fin" step="0.1"></div>
+                                        <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-e-recup-date"></div>
+                                        <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-e-recup-heure"></div>
+                                        <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-e-recup-par"></div>
+                                    </div>
+                                </details>
+                                <!-- Ligne f -->
+                                <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
+                                    <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne f</summary>
+                                    <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                        <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-f-num"></div>
+                                        <div class="input-group"><label>N° éch.</label><input type="text" value="f" readonly style="background:#f3f4f6; text-align:center;"></div>
+                                        <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-f-bris"></div>
+                                        <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-f-temp-debut" step="0.1"></div>
+                                        <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-f-temp-fin" step="0.1"></div>
+                                        <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-f-recup-date"></div>
+                                        <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-f-recup-heure"></div>
+                                        <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-f-recup-par"></div>
+                                    </div>
+                                </details>
+                                <!-- Ligne g -->
+                                <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
+                                    <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne g</summary>
+                                    <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                        <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-g-num"></div>
+                                        <div class="input-group"><label>N° éch.</label><input type="text" value="g" readonly style="background:#f3f4f6; text-align:center;"></div>
+                                        <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-g-bris"></div>
+                                        <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-g-temp-debut" step="0.1"></div>
+                                        <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-g-temp-fin" step="0.1"></div>
+                                        <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-g-recup-date"></div>
+                                        <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-g-recup-heure"></div>
+                                        <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-g-recup-par"></div>
+                                    </div>
+                                </details>
+                                <!-- Ligne h -->
+                                <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
+                                    <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne h</summary>
+                                    <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                        <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-h-num"></div>
+                                        <div class="input-group"><label>N° éch.</label><input type="text" value="h" readonly style="background:#f3f4f6; text-align:center;"></div>
+                                        <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-h-bris"></div>
+                                        <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-h-temp-debut" step="0.1"></div>
+                                        <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-h-temp-fin" step="0.1"></div>
+                                        <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-h-recup-date"></div>
+                                        <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-h-recup-heure"></div>
+                                        <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-h-recup-par"></div>
+                                    </div>
+                                </details>
+                                <!-- Ligne i -->
+                                <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
+                                    <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne i</summary>
+                                    <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                        <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-i-num"></div>
+                                        <div class="input-group"><label>N° éch.</label><input type="text" value="i" readonly style="background:#f3f4f6; text-align:center;"></div>
+                                        <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-i-bris"></div>
+                                        <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-i-temp-debut" step="0.1"></div>
+                                        <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-i-temp-fin" step="0.1"></div>
+                                        <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-i-recup-date"></div>
+                                        <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-i-recup-heure"></div>
+                                        <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-i-recup-par"></div>
+                                    </div>
+                                </details>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 15px;">
+                            <h4 style="text-align: center; background: #e2e8f0; padding: 5px; margin: 0 0 10px 0;">Protection et mûrissement des éprouvettes au chantier</h4>
+                            <div style="text-align: center; font-weight: bold; margin-bottom: 5px;">Extérieur</div>
+                            <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
+                                <div class="checkbox-group">
+                                    <label><input type="checkbox" class="temoin-cure-prot"> Protégées contre l'évaporation</label>
+                                    <label><input type="checkbox" class="temoin-cure-nonprot"> Non protégées contre l'évaporation</label>
+                                    <label><input type="checkbox" class="temoin-cure-meme"> même condition que l'ouvrage</label>
+                                    <div style="margin-top: 5px; display: flex; align-items: center; gap: 5px;">
+                                        <label>Thermocouple n°</label>
+                                        <input type="text" class="temoin-thermo-num" style="width: 100px;">
+                                    </div>
+                                </div>
+                                <div class="checkbox-group">
+                                    <label><input type="checkbox" class="temoin-cure-ombre"> À l'ombre</label>
+                                    <label><input type="checkbox" class="temoin-cure-soleil"> Au soleil</label>
+                                    <div style="display: flex; gap: 10px; align-items: center; margin-top: 5px;">
+                                        <label><input type="checkbox" class="temoin-cure-abris"> Abris</label>
+                                        <label><input type="checkbox" class="temoin-cure-chauffe"> chauffé</label>
+                                        <label><input type="checkbox" class="temoin-cure-nonchauffe"> non chauffé</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 15px;">
+                            <h4 style="text-align: center; background: #e2e8f0; padding: 5px; margin: 0 0 10px 0;">Observations</h4>
+                            <div class="grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                                <div class="checkbox-group">
+                                    <div style="text-align: center; font-weight: bold; margin-bottom: 5px; border-bottom: 1px solid #ccc;">À la récupération</div>
+                                    <label><input type="checkbox" class="temoin-obs-finition"> Mauvaise finition</label>
+                                    <label><input type="checkbox" class="temoin-obs-deplaces"> Cylindres déplacés</label>
+                                    <label><input type="checkbox" class="temoin-obs-endom"> Cylindres possiblement endommagés</label>
+                                    <label><input type="checkbox" class="temoin-obs-niveau"> Cylindres pas de niveau</label>
+                                </div>
+                                <div class="checkbox-group">
+                                    <div style="text-align: center; font-weight: bold; margin-bottom: 5px; border-bottom: 1px solid #ccc;">À l'échantillonnage</div>
+                                    <label><input type="checkbox" class="temoin-obs-autre"> Échantillonnage par autre partie</label>
+                                    <label><input type="checkbox" class="temoin-obs-conjoint"> Échantillonnage conjoint</label>
+                                    <div style="display: flex; gap: 10px; margin-left: 20px;">
+                                        <label><input type="checkbox" class="temoin-obs-fournisseur"> Fournisseur</label>
+                                        <label><input type="checkbox" class="temoin-obs-entrepreneur"> Entrepreneur</label>
+                                    </div>
+                                    <label><input type="checkbox" class="temoin-obs-meme"> Échantillonnage même camion qu'Englobe</label>
+                                    <label><input type="checkbox" class="temoin-obs-cond"> Conditions de cure des cylindres de l'autre partie</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 style="text-align: center; background: #e2e8f0; padding: 5px; margin: 0 0 10px 0;">Croquis de localisation et remarques</h4>
+                            <textarea class="temoin-croquis" rows="4" style="width: 100%; border: 1px solid #ccc; border-radius: 4px; padding: 5px;"></textarea>
+                        </div>
+                    </div> 
+                </div> 
+            </div> 
+        </div> 
+    </template>
+
+    <!-- TEMPLATE INVISIBLE POUR FICHE TÉMOIN SEULE -->
+<template id="temoin-only-template">
+    <div class="sample-card temoin-only-card" style="border: 2px solid #8b5cf6; border-radius: 8px; margin-bottom: 20px; background: #faf5ff; overflow: hidden;">
+        
+        <!-- EN-TÊTE ACCORDÉON (CLIQUABLE) -->
+        <div class="accordion-header" onclick="toggleAccordion(this)" style="background-color: #f3e8ff; padding: 15px;">
+            <div style="font-weight: bold; font-size: 1.2rem; color: #8b5cf6; letter-spacing: 2px;">
+                Fiche TÉMOIN Indépendante n° <span class="temoin-number-display"></span>
+            </div>
+            <span class="chevron" style="color: #8b5cf6;">▼</span>
+        </div>
+        
+        <!-- DÉBUT DU CONTENU CACHABLE -->
+        <div class="accordion-content active" style="padding: 15px;">
+
+            <div style="background: white; border: 1px solid #8b5cf6; padding: 15px; border-radius: 4px;">
+                <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #cbd5e1;">
+                    <div class="checkbox-group" style="flex: 1; display: flex; gap: 10px;">
+                        <label style="font-weight:bold;">Moules:</label>
+                        <label><input type="checkbox" class="temoin-moule-cpv"> CPV</label>
+                        <label><input type="checkbox" class="temoin-moule-carton"> Carton</label>
+                        <label><input type="checkbox" class="temoin-moule-acier"> Acier</label>
+                    </div>
+                    <div class="checkbox-group" style="flex: 2; display: flex; gap: 10px;">
+                        <label style="font-weight:bold;">Dimensions (mm):</label>
+                        <label><input type="checkbox" class="temoin-dim-100"> 100 x 200</label>
+                        <label><input type="checkbox" class="temoin-dim-150"> 150 x 300</label>
+                        <label><input type="checkbox" class="temoin-dim-poutre"> Poutre</label>
+                        <label><input type="checkbox" class="temoin-dim-cube"> Cube</label>
+                    </div>
+                </div>
+
+                    <div style="margin-bottom: 15px;">
+                        <h4 style="text-align: center; background: #e2e8f0; padding: 5px; margin: 0 0 10px 0;">Conditions initiales de cure et d'entreposage</h4>
+                        <div class="prelev-row">
+                            <label class="prelev-title">Prélèvement</label>
+                            <div><label>date</label><input type="date" class="temoin-prelev-date"></div>
+                            <div><label>heure</label><input type="time" class="temoin-prelev-time"></div>
+                            <div><label>par</label><input type="text" class="temoin-prelev-tech"></div>
+                        </div>
+
+                        <!-- ACCORDION ROWS POUR MOBILE ET BUREAU -->
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <!-- Ligne a -->
+                            <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
+                                <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne a</summary>
+                                <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                    <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-a-num"></div>
+                                    <div class="input-group"><label>N° éch.</label><input type="text" value="a" readonly style="background:#f3f4f6; text-align:center;"></div>
+                                    <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-a-bris"></div>
+                                    <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-a-temp-debut" step="0.1"></div>
+                                    <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-a-temp-fin" step="0.1"></div>
+                                    <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-a-recup-date"></div>
+                                    <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-a-recup-heure"></div>
+                                    <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-a-recup-par"></div>
+                                </div>
+                            </details>
+                            <!-- Ligne b -->
+                            <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
+                                <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne b</summary>
+                                <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                    <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-b-num"></div>
+                                    <div class="input-group"><label>N° éch.</label><input type="text" value="b" readonly style="background:#f3f4f6; text-align:center;"></div>
+                                    <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-b-bris"></div>
+                                    <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-b-temp-debut" step="0.1"></div>
+                                    <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-b-temp-fin" step="0.1"></div>
+                                    <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-b-recup-date"></div>
+                                    <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-b-recup-heure"></div>
+                                    <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-b-recup-par"></div>
+                                </div>
+                            </details>
+                            <!-- Ligne c -->
+                            <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
+                                <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne c</summary>
+                                <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                    <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-c-num"></div>
+                                    <div class="input-group"><label>N° éch.</label><input type="text" value="c" readonly style="background:#f3f4f6; text-align:center;"></div>
+                                    <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-c-bris"></div>
+                                    <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-c-temp-debut" step="0.1"></div>
+                                    <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-c-temp-fin" step="0.1"></div>
+                                    <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-c-recup-date"></div>
+                                    <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-c-recup-heure"></div>
+                                    <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-c-recup-par"></div>
+                                </div>
+                            </details>
+                            <!-- Ligne d -->
+                            <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
+                                <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne d</summary>
+                                <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                    <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-d-num"></div>
+                                    <div class="input-group"><label>N° éch.</label><input type="text" value="d" readonly style="background:#f3f4f6; text-align:center;"></div>
+                                    <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-d-bris"></div>
+                                    <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-d-temp-debut" step="0.1"></div>
+                                    <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-d-temp-fin" step="0.1"></div>
+                                    <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-d-recup-date"></div>
+                                    <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-d-recup-heure"></div>
+                                    <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-d-recup-par"></div>
+                                </div>
+                            </details>
+                            <!-- Ligne e -->
+                            <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
+                                <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne e</summary>
+                                <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                    <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-e-num"></div>
+                                    <div class="input-group"><label>N° éch.</label><input type="text" value="e" readonly style="background:#f3f4f6; text-align:center;"></div>
+                                    <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-e-bris"></div>
+                                    <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-e-temp-debut" step="0.1"></div>
+                                    <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-e-temp-fin" step="0.1"></div>
+                                    <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-e-recup-date"></div>
+                                    <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-e-recup-heure"></div>
+                                    <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-e-recup-par"></div>
+                                </div>
+                            </details>
+                            <!-- Ligne f -->
+                            <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
+                                <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne f</summary>
+                                <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                    <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-f-num"></div>
+                                    <div class="input-group"><label>N° éch.</label><input type="text" value="f" readonly style="background:#f3f4f6; text-align:center;"></div>
+                                    <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-f-bris"></div>
+                                    <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-f-temp-debut" step="0.1"></div>
+                                    <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-f-temp-fin" step="0.1"></div>
+                                    <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-f-recup-date"></div>
+                                    <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-f-recup-heure"></div>
+                                    <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-f-recup-par"></div>
+                                </div>
+                            </details>
+                            <!-- Ligne g -->
+                            <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
+                                <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne g</summary>
+                                <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                    <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-g-num"></div>
+                                    <div class="input-group"><label>N° éch.</label><input type="text" value="g" readonly style="background:#f3f4f6; text-align:center;"></div>
+                                    <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-g-bris"></div>
+                                    <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-g-temp-debut" step="0.1"></div>
+                                    <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-g-temp-fin" step="0.1"></div>
+                                    <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-g-recup-date"></div>
+                                    <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-g-recup-heure"></div>
+                                    <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-g-recup-par"></div>
+                                </div>
+                            </details>
+                            <!-- Ligne h -->
+                            <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
+                                <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne h</summary>
+                                <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                    <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-h-num"></div>
+                                    <div class="input-group"><label>N° éch.</label><input type="text" value="h" readonly style="background:#f3f4f6; text-align:center;"></div>
+                                    <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-h-bris"></div>
+                                    <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-h-temp-debut" step="0.1"></div>
+                                    <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-h-temp-fin" step="0.1"></div>
+                                    <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-h-recup-date"></div>
+                                    <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-h-recup-heure"></div>
+                                    <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-h-recup-par"></div>
+                                </div>
+                            </details>
+                            <!-- Ligne i -->
+                            <details style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
+                                <summary style="font-weight: bold; cursor: pointer; color: #0284c7;">Témoin - Ligne i</summary>
+                                <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                    <div class="input-group"><label>Témoin n°</label><input type="text" class="temoin-i-num"></div>
+                                    <div class="input-group"><label>N° éch.</label><input type="text" value="i" readonly style="background:#f3f4f6; text-align:center;"></div>
+                                    <div class="input-group"><label>Bris prévue (jours)</label><input type="number" class="temoin-i-bris"></div>
+                                    <div class="input-group"><label>Température début (°C)</label><input type="number" class="temoin-i-temp-debut" step="0.1"></div>
+                                    <div class="input-group"><label>Température fin (°C)</label><input type="number" class="temoin-i-temp-fin" step="0.1"></div>
+                                    <div class="input-group"><label>Récupération date</label><input type="date" class="temoin-i-recup-date"></div>
+                                    <div class="input-group"><label>Récupération heure</label><input type="time" class="temoin-i-recup-heure"></div>
+                                    <div class="input-group" style="grid-column: span 2;"><label>Récupération par</label><input type="text" class="temoin-i-recup-par"></div>
+                                </div>
+                            </details>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 15px;">
+                        <h4 style="text-align: center; background: #e2e8f0; padding: 5px; margin: 0 0 10px 0;">Protection et mûrissement des éprouvettes au chantier</h4>
+                        <div style="text-align: center; font-weight: bold; margin-bottom: 5px;">Extérieur</div>
+                        <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
+                            <div class="checkbox-group">
+                                <label><input type="checkbox" class="temoin-cure-prot"> Protégées contre l'évaporation</label>
+                                <label><input type="checkbox" class="temoin-cure-nonprot"> Non protégées contre l'évaporation</label>
+                                <label><input type="checkbox" class="temoin-cure-meme"> même condition que l'ouvrage</label>
+                                <div style="margin-top: 5px; display: flex; align-items: center; gap: 5px;">
+                                    <label>Thermocouple n°</label>
+                                    <input type="text" class="temoin-thermo-num" style="width: 100px;">
+                                </div>
+                            </div>
+                            <div class="checkbox-group">
+                                <label><input type="checkbox" class="temoin-cure-ombre"> À l'ombre</label>
+                                <label><input type="checkbox" class="temoin-cure-soleil"> Au soleil</label>
+                                <div style="display: flex; gap: 10px; align-items: center; margin-top: 5px;">
+                                    <label><input type="checkbox" class="temoin-cure-abris"> Abris</label>
+                                    <label><input type="checkbox" class="temoin-cure-chauffe"> chauffé</label>
+                                    <label><input type="checkbox" class="temoin-cure-nonchauffe"> non chauffé</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 15px;">
+                        <h4 style="text-align: center; background: #e2e8f0; padding: 5px; margin: 0 0 10px 0;">Observations</h4>
+                        <div class="grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div class="checkbox-group">
+                                <div style="text-align: center; font-weight: bold; margin-bottom: 5px; border-bottom: 1px solid #ccc;">À la récupération</div>
+                                <label><input type="checkbox" class="temoin-obs-finition"> Mauvaise finition</label>
+                                <label><input type="checkbox" class="temoin-obs-deplaces"> Cylindres déplacés</label>
+                                <label><input type="checkbox" class="temoin-obs-endom"> Cylindres possiblement endommagés</label>
+                                <label><input type="checkbox" class="temoin-obs-niveau"> Cylindres pas de niveau</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <div style="text-align: center; font-weight: bold; margin-bottom: 5px; border-bottom: 1px solid #ccc;">À l'échantillonnage</div>
+                                <label><input type="checkbox" class="temoin-obs-autre"> Échantillonnage par autre partie</label>
+                                <label><input type="checkbox" class="temoin-obs-conjoint"> Échantillonnage conjoint</label>
+                                <div style="display: flex; gap: 10px; margin-left: 20px;">
+                                    <label><input type="checkbox" class="temoin-obs-fournisseur"> Fournisseur</label>
+                                    <label><input type="checkbox" class="temoin-obs-entrepreneur"> Entrepreneur</label>
+                                </div>
+                                <label><input type="checkbox" class="temoin-obs-meme"> Échantillonnage même camion qu'Englobe</label>
+                                <label><input type="checkbox" class="temoin-obs-cond"> Conditions de cure des cylindres de l'autre partie</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 style="text-align: center; background: #e2e8f0; padding: 5px; margin: 0 0 10px 0;">Croquis de localisation et remarques</h4>
+                        <textarea class="temoin-croquis" rows="4" style="width: 100%; border: 1px solid #ccc; border-radius: 4px; padding: 5px;"></textarea>
+                    </div>
+                </div>
+            </div> 
+        </div>
+    </template>
+
+</div>
+
+<!-- ========================================== -->
+<!-- LE CERVEAU (JAVASCRIPT)                    -->
+<!-- ========================================== -->
+<script src="../../../shared/fonts/tahoma.js"></script>
+<script src="tpl_beton.js"></script>
+<script src="app_beton.js"></script>
+<script>window.REPORT_CONFIG = { slug: 'beton', keyPrefix: 'ID_', namePrefix: 'englobe_', orgs: ['eng', 'mtq'], pdfReady: ['eng', 'mtq'], hybridActive: ['mtq'], croquis: true, photos: true };</script>
+<script src="../../../shared/js/gestion_rapports.js"></script>
+<script src="../../../shared/js/photo_addon.js"></script>
+<script src="../../../shared/js/croquis_addon.js"></script>
+
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('../../../sw.js')
+                .then(reg => console.log('Service Worker bétonnage actif !', reg))
+                .catch(err => console.log('Échec Service Worker :', err));
+        });
+    }
+</script>
+
+<button type="button" onclick="saveReport()" style="position: fixed; bottom: 15px; right: 15px; z-index: 9999; background: #10b981; color: white; border: none; width: 60px; height: 60px; border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.3); font-size: 1.5rem; cursor: pointer; display: flex; justify-content: center; align-items: center;">💾</button>
+
+</body>
+</html>

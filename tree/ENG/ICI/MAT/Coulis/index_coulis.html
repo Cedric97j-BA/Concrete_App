@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Essais sur coulis</title>
+
+    <link rel="stylesheet" href="../../../../../shared/css/styles.css">
+
+    <!-- === LIGNES POUR L'IPAD === -->
+    <link rel="apple-touch-icon" href="logo_coulis.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Coulis">
+
+    <script src="../../../../../shared/libs/pdf-lib.min.js"></script>
+    <script src="../../../../../shared/libs/fontkit.umd.min.js"></script>
+
+</head>
+<body data-org="eng" data-secteur="ici" data-service="mat" data-brand-name="Englobe">
+
+    <div id="app-container">
+        <!-- === EN-TÊTE === -->
+        <header style="display: flex; align-items: center; gap: 15px; background: var(--brand-primary, #97c6b9); color: white; padding: 15px 20px; border-radius: 8px; margin-bottom: 20px; margin-top: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+
+            <img class="brand-logo" src="../../../../../shared/img/logo_entete.png" alt="Englobe" alt="Logo" style="height: 75px; padding: 5px; border-radius: 4px;"> 
+           
+            <div style="display: flex; flex-direction: column; gap: 5px;">
+                <h1 style="margin: 0; font-size: 1.5rem; letter-spacing: 0.5px;">Essais sur coulis prémélangé</h1>
+            </div>
+            <a class="home-button" href="../../../../../index.html" style="margin-left: auto; background: #1e293b; color: white; text-decoration: none; padding: 10px 15px; border-radius: 6px; font-weight: bold; font-size: 0.9rem; display: flex; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                🏠 Accueil
+            </a>
+        </header>
+
+        <!-- === GESTION DES RAPPORTS === -->
+        <section id="save-manager" style="background: #1e293b; color: white; padding: 15px; margin-bottom: 20px; border-radius: 8px; display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 250px; max-width: 500px;">
+                <label style="display: block; font-size: 0.85rem; margin-bottom: 5px; color: #cbd5e1;">Rapports Sauvegardés (Appareil Local)<span id="imported-indicator" title="Rapport reçu d'un autre appareil" style="display:none; background:#0d9488; color:#fff; border-radius:4px; padding:1px 5px; font-size:0.75rem; margin-left:6px;">📲</span></label>
+                <select id="saved-reports-dropdown" style="width: 100%; padding: 10px; border-radius: 4px; border: none; font-weight: bold; color: #334155;">
+                    <option value="">-- Sélectionnez un rapport --</option>
+                </select>
+            </div>
+
+            <div class="report-actions">
+                <button type="button" class="report-btn" onclick="newReportPrompt()" style="--btn-bg: #0284c7;">➕ Nouveau</button>
+                <button type="button" class="report-btn" onclick="loadReport()" style="--btn-bg: #2563eb;">📂 Charger</button>
+                <button type="button" class="report-btn" onclick="triggerJsonImport()" style="--btn-bg: #0d9488;">📥 Importer</button>
+                <button type="button" class="report-btn" onclick="saveReport()" style="--btn-bg: #10b981;">💾 Sauvegarder</button>
+                <button type="button" class="report-btn" onclick="saveReport(true)" style="--btn-bg: #4f46e5;">📑 Dupliquer</button>
+                <button type="button" class="report-btn" onclick="deleteReport()" style="--btn-bg: #ef4444;">🗑️ Supprimer</button>
+                <input type="file" id="json-import-input" accept=".json,application/json,text/plain" style="display:none" onchange="importReportJson(event)">
+            </div>
+
+            <!-- EXPORTATION & TRANSMISSION -->
+            <div class="export-bar">
+                <button type="button" id="btn-export-pdf" class="report-btn report-btn-main" onclick="exportToPDF('eng')" style="--btn-bg: #7c3aed;">📄 PDF</button>
+                <button type="button" class="report-btn" onclick="shareReportJson()" style="--btn-bg: #0f766e;">📤 PARTAGER</button>
+                <button type="button" id="btn-export-lims" class="report-btn report-btn-lims is-frozen" style="--btn-bg: #334155;" title="Connexion LIMS bientôt disponible" disabled>🔒 LIMS</button>
+            </div>
+        </section>
+
+        <!-- === INFORMATIONS GÉNÉRALES === -->
+        <section id="global-header" class="form-section" style="background: #e5e7eb; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+            <h2>Informations Générales</h2>
+            <div class="grid-2">
+                <div class="input-group">
+                    <label>Client</label>
+                    <input type="text" id="global-client" placeholder="Ex: Municipalité, Entrepreneur, etc.">
+                </div>
+                <div class="input-group">
+                    <label>Réf. Client</label>
+                    <input type="text" id="global-ref-client">
+                </div>
+            </div>
+            <div style="margin-top: 15px;">
+                <div class="input-group">
+                    <label>Projet</label>
+                    <input type="text" id="global-projet" maxlength="100"  placeholder="Ex: Réfection 4e rang">
+                </div>
+            </div>
+            <div class="grid-2">
+                <div class="input-group">
+                    <label>Endroit</label>
+                    <input type="text" id="global-endroit" placeholder="Ex: Colonne axe C5">
+                </div>
+                <div class="input-group">
+                    <label>Date</label>
+                    <input type="date" id="global-date">
+                </div>
+            </div>
+            <div class="grid-2">
+                <div class="input-group">
+                    <label>N° Projet</label>
+                    <input type="text" id="global-no-projet" placeholder="0260XXXX.00X">
+                </div>
+                <div class="input-group">
+                    <label>Numéro du/des échantillon(s)</label>
+                    <input type="text" id="global-no-ech" readonly style="background: #cbd5e1; color: #334155; font-weight: bold; cursor: not-allowed; text-align: center;" placeholder="-">
+                </div>
+                <div class="input-group">
+                    <label>N° rapport</label>
+                    <input type="text" id="global-no-rapport" maxlength="12" placeholder="Ex: 001">
+                </div>
+            </div>
+            <div class="grid-2">
+                <div class="input-group">
+                    <label>Entrepreneur</label>
+                    <input type="text" id="global-entrepreneur" placeholder="Ex: Excavations Léon Chouinard Inc.">
+                </div>
+                <div class="input-group">
+                    <label>Sous-traitant</label>
+                    <input type="text" id="global-soustraitant" placeholder="Ex: SDB">
+                </div>
+            </div>
+            <div class="input-group" style="margin-top: 10px; border-top: 1px solid #cbd5e1; padding-top: 10px;">
+                <label>Nom du technicien</label>
+                <input type="text" id="sig-prep-nom" style="width: 100%; max-width: 300px;" placeholder="Ex: Jean Tremblay">
+            </div>
+
+            <div id="last-saved-status" style="width: 100%; color: #475569; font-size: 0.85rem; text-align: center;">Dernière sauvegarde : aucune</div>
+        </section>
+
+        <small id="form-instructions" class="form-instructions" style="color: #242930; font-size: 0.8rem; display: block; margin-top: 3px; margin-bottom: 5px; text-align: center; margin-left: auto; margin-right: auto; max-width: 600px; font-style: italic;">
+            Cliquez sur les onglets pour naviguer entre les sections du formulaire. Les informations sont sauvegardées automatiquement. Vous pouvez passer d'une section à l'autre. Cependant prenez soin de bien sauvegarder votre rapport avant de quitter la page ou de fermer l'application.
+        </small>
+
+        <!-- === NAVIGATION === -->
+        <nav id="form-navigation" style="margin-bottom: 20px;">
+            <button type="button" class="tab-btn active" onclick="showTab('tab-details', event)">Détails techniques</button>
+            <button type="button" class="tab-btn" onclick="showTab('tab-essais', event)">Essais et Exigences</button>
+        </nav>
+
+        <!-- === ONGLET 1 : DÉTAILS TECHNIQUES === -->
+        <main id="tab-details" class="tab-section active">
+
+            <!-- SPÉCIFICATIONS -->
+            <section id="specifications-section" class="form-section">
+                <h2>Spécifications</h2>
+                <div class="grid-2">
+                    <div class="input-group">
+                        <label>Résistance et Âge (MPa à Jours)</label>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <input type="number" step="1" id="spec-res-mpa" inputmode="numeric" placeholder="Ex: 35" oninput="if(this.value.length > 4) this.value = this.value.slice(0,4);" style="flex: 1;">
+                            <span style="font-weight: bold; color: #475569;">à</span>
+                            <input type="number" step="1" id="spec-res-jour" inputmode="numeric" placeholder="Ex: 28" oninput="if(this.value.length > 3) this.value = this.value.slice(0,3);" style="flex: 1;">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>Pourcentage d'expansion et Exsudation (%)</label>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <input type="number" step="0.1" id="spec-exptotate" inputmode="decimal" placeholder="Exp. | Ex: 10,5" oninput="if(this.value.length > 4) this.value = this.value.slice(0,4);" style="flex: 1;">
+                            <span style="font-weight: bold; color: #475569;">|</span>
+                            <input type="number" step="0.1" id="spec-exsudation" inputmode="decimal" placeholder="Exsud. | Ex: 2,3" oninput="if(this.value.length > 4) this.value = this.value.slice(0,4);" style="flex: 1;">
+                        </div>
+                    </div>
+                </div>
+                <div class="grid-2">
+                    <div class="input-group">
+                        <label>Temps de malaxage (min)</label>
+                        <input type="number" step="1" id="spec-tempsmalax" inputmode="numeric" placeholder="Ex: 10" oninput="if(this.value.length > 3) this.value = this.value.slice(0,3);">
+                    </div>
+                    <div class="input-group">
+                        <label>Rapport eau/produit spécifié</label>
+                        <input type="number" step="0.001" id="spec-ep" inputmode="decimal" placeholder="Ex: 0.555" oninput="if(this.value.length > 5) this.value = this.value.slice(0,5);">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Température limite (°C)</label>
+                    <input type="number" step="0.1" id="spec-temper" inputmode="decimal" style="max-width: 200px;" placeholder="Ex: 20,5" oninput="if(this.value.length > 4) this.value = this.value.slice(0,4);">
+                </div>
+            </section>
+
+            <!-- FORMULE DE MÉLANGE -->
+            <section id="formule-section" class="form-section">
+                <h2>Formule de mélange</h2>
+                <div class="grid-2">
+                    <div class="input-group">
+                        <label>Nom du produit</label>
+                        <input type="text" id="formule-prod" placeholder="Ex: Mapefill 130 WT">
+                    </div>
+                    <div class="input-group">
+                        <label>Nom de l'adjuvant</label>
+                        <input type="text" id="formule-adjuvant" placeholder="Ex: Adjuvant A">
+                    </div>
+                </div>
+                <div class="grid-2">
+                    <div class="input-group">
+                        <label>Quantité d'eau et Rapport eau/produit observé</label>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <input type="text" step="0.1" id="formule-eau" placeholder="Eau | Ex: 20 L"  style="flex: 1;">
+                            <span style="font-weight: bold; color: #475569;">|</span>
+                            <input type="number" step="0.001" id="formule-ep" inputmode="decimal" placeholder="E/P | Ex: 0.555" oninput="if(this.value.length > 5) this.value = this.value.slice(0,5);" style="flex: 1;">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>Nom de l'agent expansif</label>
+                        <input type="text" id="formule-agent" placeholder="Ex: Agent Expansif A" style="width: 100%;">
+                    </div>
+                </div>
+            </section>
+
+            <!-- REMARQUES -->
+            <section id="remarques-section" class="form-section">
+                <h2>Remarques sur l'équipement</h2>
+                <div class="grid-2">
+                    <div class="input-group">
+                        <label>Type de malaxeur</label>
+                        <input type="text" id="rem-malax" placeholder="Ex: Malaxeur à double arbre">
+                    </div>
+                    <div class="input-group">
+                        <label>Type de pompe</label>
+                        <input type="text" id="rem-pompe" placeholder="Ex: Pompe à vis">
+                    </div>
+                </div>
+                <div class="input-group" style="margin-bottom: 15px;">
+                    <label>Numéro de série des moules</label>
+                    <input type="text" id="rem-no-moules" placeholder="Ex: 123456; 123456; 123456; 123456" style="width: 100%;">
+                </div>
+                <div class="grid-2">
+                    <div class="input-group">
+                        <label>Numéro de série du pilon et du cône</label>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <input type="number" step="1" id="rem-no-pilon" inputmode="numeric" placeholder="123456" oninput="if(this.value.length > 7) this.value = this.value.slice(0,7);" style="flex: 1;">
+                            <span style="font-weight: bold; color: #475569;">|</span>
+                            <input type="number" step="1" id="rem-no-cone" inputmode="numeric" placeholder="123456" oninput="if(this.value.length > 7) this.value = this.value.slice(0,7);" style="flex: 1;">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+            <section class="form-section">
+                <h2>Genre et lieu des travaux</h2>
+                <div class="input-group">
+                    <label>Description lieu et conditions des travaux (Max 440 caractères)</label>
+                    <textarea id="lieu-travaux" rows="5" maxlength="440" placeholder="Décrire le genre, le lieu et les conditions des travaux..."></textarea>
+                </div>
+            </section> 
+            
+
+        </main>
+
+        <!-- === ONGLET 2 : ESSAIS ET EXIGENCES === -->
+        <main id="tab-essais" class="tab-section" style="display: none;">
+
+            <section id="exigences-section" class="form-section" style="background-color: #f1f5f9; border: 1px solid #cbd5e1;">
+                <h2 style="text-align: center; margin-top: 0;">Exigences</h2>
+                <div style="display: flex; flex-direction: row !important; flex-wrap: nowrap !important; justify-content: center; align-items: center; gap: 30px; font-size: 1.1rem; font-weight: bold;">
+                    <label style="display: flex; align-items: center; white-space: nowrap; cursor: pointer;">
+                        <input type="checkbox" id="exi-astm" style="transform: scale(1.3); margin-right: 8px;"> ASTM C 9.9
+                    </label>
+                    <label style="display: flex; align-items: center; white-space: nowrap; cursor: pointer;">
+                        <input type="checkbox" id="exi-csa" style="transform: scale(1.3); margin-right: 8px;"> CSA-A23.2-1B
+                    </label>
+                </div>
+            </section>
+
+            <section class="form-section">
+                <h2>Tableau des essais</h2>
+                <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 15px; text-align: center; font-style: italic;">
+                    * 3 fiches d'essais sont disponibles par défaut. Remplissez celles nécessaires ou utilisez le bouton au bas pour en ajouter d'autres.
+                </p>
+
+                <div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
+                    <button type="button" onclick="collapseAllEssais()" style="background: #475569; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">Tout réduire</button>
+                </div>
+
+                <div id="essais-container">
+                    <!-- Les cartes d'essais seront générées ici par JavaScript au chargement -->
+                </div>
+                <button type="button" onclick="addEssai()" style="margin-top: 15px; padding: 10px 15px; background: #0284c7; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; width: 100%;">➕ Ajouter un essai supplémentaire</button>
+            </section>
+
+            <small id="form-instructions2" style="color: #242930; font-size: 0.8rem; display: block; margin-top: 3px; margin-bottom: 5px; text-align: center; margin-left: auto; margin-right: auto; max-width: 600px; font-style: italic;">
+                Veuillez exporter le formulaire en PDF pour le soumettre et/ou le sauvegarder avant de fermer la page/l'application. Les données sont sauvegardées localement, mais l'exportation en PDF est nécessaire pour la soumission officielle.
+            </small>
+
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="javascript:void(0);" onclick="scrollToSection('form-instructions')" style="color: var(--primary); font-weight: bold; text-decoration: none; font-size: 1rem; padding: 10px 20px; background: #e2e8f0; border-radius: 6px; display: inline-block;">
+                    ⬆️ Retour aux sections du formulaire
+                </a>
+            </div>
+        </main>
+    </div>
+
+    <!-- === GABARIT DYNAMIQUE POUR LES CARTES D'ESSAIS === -->
+    <template id="template-essai">
+        <div class="sample-card" style="border: 1px solid #94a3b8; border-radius: 6px; margin-bottom: 15px; background: #f8fafc; overflow: hidden;">
+            <div class="accordion-header" onclick="toggleAccordion(this)" style="background-color: #e2e8f0; padding: 12px 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+                <span class="chevron" style="color: #334155; font-weight: bold; margin-right: 10px;">▼</span>
+                <div style="font-weight: bold; font-size: 1.1rem; color: #334155;">Essai #<span class="card-index-label"></span></div>
+                <div>
+                    <button type="button" onclick="deleteEssai(this, event)" class="delete-btn" style="background: none; border: none; color: #ef4444; font-weight: bold; font-size: 1.2rem; cursor: pointer; padding: 0 5px; border-left: 1px solid #cbd5e1;">✖</button>
+                </div>
+            </div>
+            <div class="accordion-content active" style="padding: 15px;">
+                <div class="input-group">
+                    <label>Numéro d'échantillon</label>
+                    <input type="text" class="essais-no-ech" placeholder="Ex: 1" oninput="updateGlobalEchNumbers()">
+                </div>
+                <div class="grid-2">
+                    <div class="input-group"><label>Date de prélèvement</label><input type="date" class="essais-prelev-date"></div>
+                    <div class="input-group"><label>Heure de prélèvement</label><input type="time" class="essais-prelev-heure"></div>
+                    <div class="input-group"><label>Exsudation observé (%)</label><input type="number" step="0.1" class="essais-exsudation" inputmode="decimal" placeholder="Exsud. | Ex: 2,5" oninput="if(this.value.length > 4) this.value = this.value.slice(0,4);"></div>
+                    <div class="input-group"><label>Expansion observé (%)</label><input type="number" step="0.1" class="essais-expansion" inputmode="decimal" placeholder="Exp. | Ex: 10,5" oninput="if(this.value.length > 4) this.value = this.value.slice(0,4);"></div>
+                    <div class="input-group"><label>Fluidité malaxeur (s)</label><input type="number" step="1" class="essais-fluidite-malax" inputmode="numeric" placeholder="Ex: 80,5" oninput="if(this.value.length > 6) this.value = this.value.slice(0,6);"></div>
+                    <div class="input-group"><label>Fluidité sortie (s)</label><input type="number" step="1" class="essais-fluidite-sortie" inputmode="numeric" placeholder="Ex: 30,7" oninput="if(this.value.length > 6) this.value = this.value.slice(0,6);"></div>
+                </div>
+
+                <div style="margin: 15px 0 8px 0; font-weight: bold; color: var(--primary); border-bottom: 1px solid #cbd5e1;">Températures</div>
+                <div class="grid-2">
+                    <div class="input-group">
+                        <label>Temp. eau (°C)</label>
+                        <input type="number" step="0.1" class="essais-temp-eau" inputmode="decimal" placeholder="Ex: 10,5" oninput="if(this.value.length > 4) this.value = this.value.slice(0,4);">
+                    </div>
+                    <div class="input-group">
+                        <label>Temp. produit (°C)</label>
+                        <input type="number" step="0.1" class="essais-temp-prod" inputmode="decimal" placeholder="Ex: 10,5" oninput="if(this.value.length > 4) this.value = this.value.slice(0,4);">
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: center; margin-top: 10px;">
+                    <div class="input-group" style="width: 100%; max-width: 200px; align-items: center; text-align: center;">
+                        <label>Temp. coulis (°C)</label>
+                        <input type="number" step="0.1" class="essais-temp-coulis" inputmode="decimal" style="text-align: center;" placeholder="Ex: 10,5" oninput="if(this.value.length > 4) this.value = this.value.slice(0,4);">
+                    </div>
+                </div>
+
+                <div style="margin: 15px 0 8px 0; font-weight: bold; color: var(--primary); border-bottom: 1px solid #cbd5e1;">Injection & Pression</div>
+                <div class="grid-2">
+                    <div class="input-group"><label>Début injection</label><input type="time" step="1" class="essais-inj-deb"></div>
+                    <div class="input-group"><label>Fin injection</label><input type="time" step="1" class="essais-inj-fin"></div>
+                    <div class="input-group"><label>Pression injection (kPa)</label><input type="number" step="1" class="essais-pressi-inj" inputmode="numeric" placeholder="Ex: 100"></div>
+                    <div class="input-group"><label>Pression maintenue (kPa)</label><input type="number" step="1" class="essais-press-maint" inputmode="numeric" placeholder="Ex: 100"></div>
+                </div>
+
+                <div style="margin: 15px 0 8px 0; font-weight: bold; color: var(--primary); border-bottom: 1px solid #cbd5e1;">Cubes & Sacs</div>
+                <div class="grid-2">
+                    <div class="input-group"><label>Cubes à 3j</label><input type="number" step="1" class="essais-3j" inputmode="numeric" placeholder="Ex: 3"></div>
+                    <div class="input-group"><label>Cubes à 7j</label><input type="number" step="1" class="essais-7j" inputmode="numeric" placeholder="Ex: 3"></div>
+                    <div class="input-group"><label>Cubes à 28j</label><input type="number" step="1" class="essais-28j" inputmode="numeric" placeholder="Ex: 3"></div>
+                    <div class="input-group"><label>Cubes à xj</label><input type="number" step="1" class="essais-xj" inputmode="numeric" placeholder="Ex: 3"></div>
+                    <div class="input-group"><label>Cubes mûrissement norm.</label><input type="number" step="1" class="essais-nb-norm" inputmode="numeric" placeholder="Ex: 12"></div>
+                    <div class="input-group"><label>Cubes témoins</label><input type="number" step="1" class="essais-nb-tem" inputmode="numeric" placeholder="Ex: 0"></div>
+                    <div class="input-group"><label>Sac(s) injecté(s)</label><input type="number" step="1" class="essais-sac-1" inputmode="numeric" placeholder="Ex: 10"></div>
+                    <div class="input-group"><label>Sac(s) refusé(s)</label><input type="number" step="1" class="essais-sac-2" inputmode="numeric" placeholder="Ex: 0"></div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+
+    <script src="../../../../../shared/fonts/tahoma.js"></script>
+    <script src="tpl_coulis.js?v=coulis"></script>
+    <script src="app_coulis.js"></script>
+    <script>window.REPORT_CONFIG = { slug: 'coulis', keyPrefix: 'COULIS_', namePrefix: 'englobe_', orgs: ['eng'], croquis: true, photos: true };</script>
+    <script src="../../../../../shared/js/gestion_rapports.js"></script>
+    <script src="../../../../../shared/js/photo_addon.js"></script>
+    <script src="../../../../../shared/js/croquis_addon.js"></script>
+    
+    <button type="button" onclick="saveReport()" style="position: fixed; bottom: 15px; right: 15px; z-index: 9999; background: #10b981; color: white; border: none; width: 60px; height: 60px; border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.3); font-size: 1.5rem; cursor: pointer; display: flex; justify-content: center; align-items: center;">💾</button>
+
+</body>
+</html>

@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Journal de Chantier</title>
+    
+    <link rel="stylesheet" href="../../../shared/css/styles.css">
+
+    <!-- === LIGNES POUR L'IPAD === -->
+    <link rel="apple-touch-icon" href="logo_journal.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Journal">
+
+    <script src="../../../shared/libs/pdf-lib.min.js"></script>
+    <script src="../../../shared/libs/fontkit.umd.min.js"></script>
+</head>
+<body data-org="eng mtq" data-secteur="gen" data-service="gen" data-brand-name="Englobe">
+
+<div id="app-container">
+
+    <!-- EN-TÊTE -->
+    <header style="display: flex; align-items: center; gap: 15px; background: var(--brand-primary, #97c6b9); color: white; padding: 15px 20px; border-radius: 8px; margin-bottom: 20px; margin-top: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+
+        <img class="brand-logo" src="../../../shared/img/logo_entete.png" alt="Englobe" alt="Logo" style="height: 75px; padding: 5px; border-radius: 4px;"> 
+       
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+            <h1 style="margin: 0; font-size: 1.5rem; letter-spacing: 0.5px;">Journal de chantier</h1><br>
+            <h1 style="margin-top: 0; font-size: 1rem; color:rgb(241, 240, 240)"> (Nouveau) </h1>
+        </div>
+        <a class="home-button" href="../../../index.html" style="margin-left: auto; background: #1e293b; color: white; text-decoration: none; padding: 10px 15px; border-radius: 6px; font-weight: bold; font-size: 0.9rem; display: flex; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+            🏠 Accueil
+        </a>
+    </header>
+
+    <!-- GESTION DES RAPPORTS -->
+    <section id="save-manager" style="background: #1e293b; color: white; padding: 15px; margin-bottom: 20px; border-radius: 8px; display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 250px; max-width: 500px;">
+            <label style="display: block; font-size: 0.85rem; margin-bottom: 5px; color: #cbd5e1;">Rapports Sauvegardés (Appareil Local)<span id="imported-indicator" title="Rapport reçu d'un autre appareil" style="display:none; background:#0d9488; color:#fff; border-radius:4px; padding:1px 5px; font-size:0.75rem; margin-left:6px;">📲</span></label>
+            <select id="saved-reports-dropdown" style="width: 100%; padding: 10px; border-radius: 4px; border: none; font-weight: bold; color: #334155;">
+                <option value="">-- Sélectionnez un rapport --</option>
+            </select>
+        </div>
+
+        <div class="report-actions">
+            <button type="button" class="report-btn" onclick="newReportPrompt()" style="--btn-bg: #0284c7;">➕ Nouveau</button>
+            <button type="button" class="report-btn" onclick="loadReport()" style="--btn-bg: #2563eb;">📂 Charger</button>
+            <button type="button" class="report-btn" onclick="triggerJsonImport()" style="--btn-bg: #0d9488;">📥 Importer</button>
+            <button type="button" class="report-btn" onclick="saveReport()" style="--btn-bg: #10b981;">💾 Sauvegarder</button>
+            <button type="button" class="report-btn" onclick="saveReport(true)" style="--btn-bg: #4f46e5;">📑 Dupliquer</button>
+            <button type="button" class="report-btn" onclick="deleteReport()" style="--btn-bg: #ef4444;">🗑️ Supprimer</button>
+            <input type="file" id="json-import-input" accept=".json,application/json,text/plain" style="display:none" onchange="importReportJson(event)">
+        </div>
+
+        <!-- EXPORTATION & TRANSMISSION -->
+        <div class="export-bar">
+            <button type="button" id="btn-export-pdf" class="report-btn report-btn-main" onclick="exportToPDF('eng')" style="--btn-bg: #7c3aed;">📄 PDF</button>
+            <button type="button" class="report-btn" onclick="shareReportJson()" style="--btn-bg: #0f766e;">📤 PARTAGER</button>
+            <button type="button" id="btn-export-lims" class="report-btn report-btn-lims is-frozen" style="--btn-bg: #334155;" title="Connexion LIMS bientôt disponible" disabled>🔒 LIMS</button>
+        </div>
+    </section>
+
+    <!-- INFORMATIONS GÉNÉRALES (HORS ONGLETS, VISIBLES PARTOUT) -->
+    <section id="global-header" style="background: #e5e7eb; padding: 15px; margin-bottom: 20px; border-radius: 8px;">
+        <h2>Informations Générales du Projet</h2>
+
+        <div class="input-group">
+            <label>Client</label>
+            <input type="text" id="global-client" placeholder="Ex: Municipalité, Entrepreneur, etc.">
+        </div>
+
+        <div class="input-group">
+            <label>Réf. client</label>
+            <input type="text" id="global-ref-client">
+        </div>
+
+        <div class="input-group">
+            <label>Projet</label>
+            <input type="text" id="global-projet" placeholder="Ex: Réfection 4e rang">
+        </div>
+
+        <div class="input-group">
+            <label>Endroit</label>
+            <input type="text" id="global-endroit" placeholder="Ex: Site A">
+        </div>
+
+        <div class="input-group">
+            <label>N° projet</label>
+            <input type="text" id="global-no-projet" placeholder="0260XXXX.00X">
+        </div>
+
+        <div class="input-group">
+            <label>Date</label>
+            <input type="date" id="global-date">
+        </div>
+        <div id="last-saved-status" style="width: 100%; color: #475569; font-size: 0.85rem; text-align: center;">Dernière sauvegarde : aucune</div>
+    </section>
+
+    <small id="form-instructions" class="form-instructions" style="color: #242930; font-size: 0.8rem; display: block; margin-top: 3px; margin-bottom: 5px; text-align: center; margin-left: auto; margin-right: auto; max-width: 600px; font-style: italic;">
+        Cliquez sur les onglets pour naviguer entre les sections du formulaire. Les informations sont sauvegardées automatiquement. Vous pouvez passer d'une section à l'autre. Cependant prenez soin de bien sauvegarder votre rapport avant de quitter la page ou de fermer l'application.
+    </small>
+
+    <!-- BARRE DE NAVIGATION (TABS) -->
+    <nav id="form-navigation" style="margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 5px;">
+        <button type="button" class="tab-btn active" onclick="showTab('tab-form1', event)">1. Infos et Ressources</button>
+        <button type="button" class="tab-btn" onclick="showTab('tab-form2', event)">2. Tâches</button>
+        <button type="button" class="tab-btn" onclick="showTab('tab-form3', event)">3. Photos</button>
+    </nav>
+
+    <!-- ONGLET 1 : INFOS ET RESSOURCES -->
+    <section id="tab-form1" class="tab-section">
+        <h2>1. Informations et Ressources</h2>
+        
+        <!-- Informations du chantier -->
+        <div class="form-section">
+            <h3>Informations du chantier</h3>
+            <div class="input-group"><label>Entrepreneur</label><input type="text" id="info-entrepreneur" placeholder="Ex: Excavations Léon Chouinard Inc."></div>
+            <div class="input-group"><label>Type d'ouvrage</label><input type="text" id="info-type-ouvrage" placeholder="Ex: Bâtiment commercial"></div>
+            <div class="input-group"><label>Type de travaux</label><input type="text" id="info-type-travaux" placeholder="Ex: Travaux de fondation"></div>
+        </div>
+
+        <!-- Échantillons -->
+        <div class="form-section">
+            <h3>Échantillons</h3>
+            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                <div style="flex: 1;"><label>Échantillon 1</label><input type="text" id="ech-num-1" maxlength="5" placeholder="Numéro"></div>
+                <div style="flex: 2;"><label>Localisation</label><input type="text" id="ech-loc-1" maxlength="40" placeholder="Localisation"></div>
+            </div>
+            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                <div style="flex: 1;"><label>Échantillon 2</label><input type="text" id="ech-num-2" maxlength="5"placeholder="Numéro"></div>
+                <div style="flex: 2;"><label>Localisation</label><input type="text" id="ech-loc-2" maxlength="40" placeholder="Localisation"></div>
+            </div>
+            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                <div style="flex: 1;"><label>Échantillon 3</label><input type="text" id="ech-num-3" maxlength="5" placeholder="Numéro"></div>
+                <div style="flex: 2;"><label>Localisation</label><input type="text" id="ech-loc-3" maxlength="40" placeholder="Localisation"></div>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <div style="flex: 1;"><label>Échantillon 4</label><input type="text" id="ech-num-4" maxlength="5" placeholder="Numéro"></div>
+                <div style="flex: 2;"><label>Localisation</label><input type="text" id="ech-loc-4" maxlength="40" placeholder="Localisation"></div>
+            </div>
+        </div>
+
+        <!-- Mémos -->
+        <div class="form-section">
+            <h3>Mémos</h3>
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <div style="flex: 1;"><label>Mémo 1</label><input type="text" id="memo_num_1" maxlength="5"placeholder="Numéro"></div>
+                <div style="flex: 3;"><label>Description</label><input type="text" id="memo_text_1" maxlength="40" style="width: 100%;"></div>
+            </div>
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <div style="flex: 1;"><label>Mémo 2</label><input type="text" id="memo_num_2" maxlength="5" placeholder="Numéro"></div>
+                <div style="flex: 3;"><label>Description</label><input type="text" id="memo_text_2" maxlength="40" style="width: 100%;"></div>
+            </div>
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <div style="flex: 1;"><label>Mémo 3</label><input type="text" id="memo_num_3" maxlength="5" placeholder="Numéro"></div>
+                <div style="flex: 3;"><label>Description</label><input type="text" id="memo_text_3" maxlength="40" style="width: 100%;"></div>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <div style="flex: 1;"><label>Mémo 4</label><input type="text" id="memo_num_4" maxlength="5" placeholder="Numéro"></div>
+                <div style="flex: 3;"><label>Description</label><input type="text" id="memo_text_4" maxlength="40" style="width: 100%;"></div>
+            </div>
+        </div>
+
+        <!-- Équipements -->
+        <div class="form-section">
+            <h3>Équipements</h3>
+            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                <div style="flex: 1;"><label>Équipement 1</label><input type="text" id="equip_1" maxlength="30"></div>
+                <div style="flex: 1;"><label>Modèle</label><input type="text" id="model_1" maxlength="15"></div>
+            </div>
+            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                <div style="flex: 1;"><label>Équipement 2</label><input type="text" id="equip_2" maxlength="30"></div>
+                <div style="flex: 1;"><label>Modèle</label><input type="text" id="model_2" maxlength="15"></div>
+            </div>
+            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                <div style="flex: 1;"><label>Équipement 3</label><input type="text" id="equip_3" maxlength="30"></div>
+                <div style="flex: 1;"><label>Modèle</label><input type="text" id="model_3" maxlength="15"></div>
+            </div>
+            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                <div style="flex: 1;"><label>Équipement 4</label><input type="text" id="equip_4" maxlength="30"></div>
+                <div style="flex: 1;"><label>Modèle</label><input type="text" id="model_4" maxlength="15"></div>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <div style="flex: 1;"><label>Équipement 5</label><input type="text" id="equip_5" maxlength="30"></div>
+                <div style="flex: 1;"><label>Modèle</label><input type="text" id="model_5" maxlength="15"></div>
+            </div>
+        </div>
+
+        <!-- Personnel -->
+        <div class="form-section">
+            <h3>Personnel</h3>
+            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                <div style="flex: 1;"><label>Nom</label><input type="text" id="pers_nom_1" maxlength="25"></div>
+                <div style="flex: 1;"><label>Rôle</label><input type="text" id="pers_role_1" maxlength="16"></div>
+                <div style="flex: 1;"><label>Organisation</label><input type="text" id="pers_org_1" maxlength="14"></div>
+            </div>
+            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                <div style="flex: 1;"><label>Nom</label><input type="text" id="pers_nom_2" maxlength="25"></div>
+                <div style="flex: 1;"><label>Rôle</label><input type="text" id="pers_role_2" maxlength="16"></div>
+                <div style="flex: 1;"><label>Organisation</label><input type="text" id="pers_org_2" maxlength="14"></div>
+            </div>
+            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                <div style="flex: 1;"><label>Nom</label><input type="text" id="pers_nom_3" maxlength="25"></div>
+                <div style="flex: 1;"><label>Rôle</label><input type="text" id="pers_role_3" maxlength="16"></div>
+                <div style="flex: 1;"><label>Organisation</label><input type="text" id="pers_org_3" maxlength="14"></div>
+            </div>
+            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                <div style="flex: 1;"><label>Nom</label><input type="text" id="pers_nom_4" maxlength="25"></div>
+                <div style="flex: 1;"><label>Rôle</label><input type="text" id="pers_role_4" maxlength="16"></div>
+                <div style="flex: 1;"><label>Organisation</label><input type="text" id="pers_org_4" maxlength="14"></div>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <div style="flex: 1;"><label>Nom</label><input type="text" id="pers_nom_5" maxlength="25"></div>
+                <div style="flex: 1;"><label>Rôle</label><input type="text" id="pers_role_5" maxlength="16"></div>
+                <div style="flex: 1;"><label>Organisation</label><input type="text" id="pers_org_5" maxlength="14"></div>
+            </div>
+        </div>
+
+        <!-- Validation / Signature -->
+        <div class="form-section" style="border-top: 2px solid #ccc; padding-top: 15px;">
+            <h3>Préparé par</h3>
+            <div class="input-group"><label>Nom du technicien</label><input type="text" id="sig-prep-nom" style="width: 250px;" placeholder="Ex: Jean Tremblay"></div>
+        </div>
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="javascript:void(0);" onclick="document.getElementById('form-instructions').scrollIntoView({ behavior: 'smooth', block: 'start' });" style="color: var(--primary); font-weight: bold; text-decoration: none; font-size: 1rem; padding: 10px 20px; background: #e2e8f0; border-radius: 6px; display: inline-block;">
+                ⬆️ Retour aux sections du formulaire
+            </a>
+        </div>
+
+    </section>
+
+    <!-- ONGLET 2 : TÂCHES -->
+    <section id="tab-form2" class="tab-section" style="display: none;">
+        <h2>2. Tâches de la journée</h2>
+        <div class="form-section">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+                <h3 style="margin: 0;">Registre des activités</h3>
+                <div style="background: #e2e8f0; padding: 5px 15px; border-radius: 6px; font-weight: bold;">
+                    Total des heures : <span id="total-heures-display" style="color: #0284c7; font-size: 1.2rem;">0.00</span> h
+                    <!-- ID conservé pour la sauvegarde invisible -->
+                    <input type="hidden" id="total-heures" value="0"> 
+                </div>
+            </div>
+            
+            <div id="tasks-container">
+                <!-- Les cartes de tâches seront injectées ici par le JS -->
+            </div>
+            
+            <button type="button" onclick="addTask()" style="margin-top: 10px; padding: 12px; background: #0284c7; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; font-size: 1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">➕ Ajouter une tâche</button>
+        </div>
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="javascript:void(0);" onclick="document.getElementById('form-instructions').scrollIntoView({ behavior: 'smooth', block: 'start' });" style="color: var(--primary); font-weight: bold; text-decoration: none; font-size: 1rem; padding: 10px 20px; background: #e2e8f0; border-radius: 6px; display: inline-block;">
+                ⬆️ Retour aux sections du formulaire
+            </a>
+        </div>
+
+    </section>
+
+    <!-- ONGLET 3 : PHOTOS -->
+    <section id="tab-form3" class="tab-section" style="display: none;">
+        <h2>3. Photos</h2>
+        
+        <div class="form-section">
+            <h3>Description des travaux</h3>
+            
+            <div style="margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px dashed #ccc;">
+                <label>Description de l'image 1</label>
+                <textarea id="desc-text-01" maxlength="95" style="width: 100%; margin-bottom: 5px;"></textarea>
+                <input type="file" id="desc-img-01" accept="image/*" onchange="encodeImage(this, '01')" style="font-size: 0.85rem; margin-bottom: 10px;">
+                <input type="hidden" id="desc-img-01-base64">
+                <div>
+                    <img id="desc-img-01-preview" src="" style="display: none; max-width: 100%; max-height: 250px; border: 1px solid #cbd5e1; border-radius: 4px; margin-bottom: 5px;">
+                    <br>
+                    <button type="button" id="desc-img-01-clear" onclick="clearImage('01')" style="display: none; background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">🗑️ Retirer l'image</button>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px dashed #ccc;">
+                <label>Description de l'image 2</label>
+                <textarea id="desc-text-02" maxlength="95" style="width: 100%; margin-bottom: 5px;"></textarea>
+                <input type="file" id="desc-img-02" accept="image/*" onchange="encodeImage(this, '02')" style="font-size: 0.85rem; margin-bottom: 10px;">
+                <input type="hidden" id="desc-img-02-base64">
+                <div>
+                    <img id="desc-img-02-preview" src="" style="display: none; max-width: 100%; max-height: 250px; border: 1px solid #cbd5e1; border-radius: 4px; margin-bottom: 5px;">
+                    <br>
+                    <button type="button" id="desc-img-02-clear" onclick="clearImage('02')" style="display: none; background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">🗑️ Retirer l'image</button>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px dashed #ccc;">
+                <label>Description de l'image 3</label>
+                <textarea id="desc-text-03" maxlength="95" style="width: 100%; margin-bottom: 5px;"></textarea>
+                <input type="file" id="desc-img-03" accept="image/*" onchange="encodeImage(this, '03')" style="font-size: 0.85rem; margin-bottom: 10px;">
+                <input type="hidden" id="desc-img-03-base64">
+                <div>
+                    <img id="desc-img-03-preview" src="" style="display: none; max-width: 100%; max-height: 250px; border: 1px solid #cbd5e1; border-radius: 4px; margin-bottom: 5px;">
+                    <br>
+                    <button type="button" id="desc-img-03-clear" onclick="clearImage('03')" style="display: none; background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">🗑️ Retirer l'image</button>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label>Description de l'image 4</label>
+                <textarea id="desc-text-04" maxlength="95" style="width: 100%; margin-bottom: 5px;"></textarea>
+                <input type="file" id="desc-img-04" accept="image/*" onchange="encodeImage(this, '04')" style="font-size: 0.85rem; margin-bottom: 10px;">
+                <input type="hidden" id="desc-img-04-base64">
+                <div>
+                    <img id="desc-img-04-preview" src="" style="display: none; max-width: 100%; max-height: 250px; border: 1px solid #cbd5e1; border-radius: 4px; margin-bottom: 5px;">
+                    <br>
+                    <button type="button" id="desc-img-04-clear" onclick="clearImage('04')" style="display: none; background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">🗑️ Retirer l'image</button>
+                </div>
+            </div>
+        </div>
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="javascript:void(0);" onclick="document.getElementById('form-instructions').scrollIntoView({ behavior: 'smooth', block: 'start' });" style="color: var(--primary); font-weight: bold; text-decoration: none; font-size: 1rem; padding: 10px 20px; background: #e2e8f0; border-radius: 6px; display: inline-block;">
+                ⬆️ Retour aux sections du formulaire
+            </a>
+        </div>
+
+    </section>
+
+    <!-- TEMPLATE INVISIBLE POUR LES CARTES DE TÂCHES (Accordéon) -->
+    <template id="task-template">
+        <div class="task-card" style="border: 1px solid #0284c7; border-radius: 6px; margin-bottom: 15px; background: #f8fafc; overflow: hidden;">
+            
+            <!-- EN-TÊTE ACCORDÉON -->
+            <div class="task-header" onclick="toggleTask(this)" style="background-color: #97c6b980; padding: 10px 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+                <div style="font-weight: bold; color: #334155; display: flex; align-items: center; gap: 10px;">
+                    <span class="accordion-icon" style="transition: transform 0.2s;">▼</span>
+                    <span>Activité #<span class="task-number"></span></span>
+                    <span class="task-summary" style="font-weight: normal; font-size: 0.85rem; color: #475569;"></span>
+                </div>
+                <button type="button" onclick="removeTask(this, event)" style="background: none; border: none; color: #ef4444; font-weight: bold; font-size: 1.2rem; cursor: pointer; padding: 0 5px; margin-left: 10px;">✖</button>
+            </div>
+            
+            <!-- CORPS DE LA TÂCHE -->
+            <div class="task-body" style="padding: 15px; display: block;">
+                <div style="display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap;">
+                    <div class="input-group" style="flex: 1; min-width: 100px;"><label>Début</label><input type="time" class="task-start" onchange="calculateTotalHours(); updateTaskSummary(this);"></div>
+                    <div class="input-group" style="flex: 1; min-width: 100px;"><label>Fin</label><input type="time" class="task-end" onchange="calculateTotalHours(); updateTaskSummary(this);"></div>
+                    <div class="input-group" style="width: 80px;"><label>Durée</label><input type="text" class="task-duration" readonly style="background: #e2e8f0; font-weight: bold; text-align: center; color: #334155;"></div>
+                </div>
+                
+                <div class="input-group">
+                    <label>Description de l'activité</label>
+                    <textarea class="task-desc" rows="3" style="width: 100%;" placeholder="Détaillez la tâche effectuée..."></textarea>
+                </div>
+            </div>
+        </div>
+    </template>
+
+</div>
+
+<script src="../../../shared/fonts/tahoma.js"></script>
+<script src="tpl_journal.js"></script>
+<script src="app_journal.js"></script>
+<script>window.REPORT_CONFIG = { slug: 'journal', keyPrefix: 'JRNL_', namePrefix: 'englobe_', orgs: ['eng'], croquis: true };</script>
+<script src="../../../shared/js/gestion_rapports.js"></script>
+<script src="../../../shared/js/croquis_addon.js"></script>
+<button type="button" onclick="saveReport()" style="position: fixed; bottom: 15px; right: 15px; z-index: 9999; background: #10b981; color: white; border: none; width: 60px; height: 60px; border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.3); font-size: 1.5rem; cursor: pointer; display: flex; justify-content: center; align-items: center;">💾</button>
+
+</body>
+</html>

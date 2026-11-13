@@ -4,107 +4,161 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Historique des mises à jour - Hub Inspection</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="shared/css/styles.css">
     <style>
-        .changelog-container {
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 20px;
-            line-height: 1.6;
+        /* Historique : chronologie verticale, une carte par version. Aucune image ni police externe. */
+        .cl-wrap { max-width: 860px; margin: 0 auto; }
+        .cl-header h1 { margin: 0; font-size: 1.5rem; letter-spacing: 0.5px; }
+        .cl-header p { margin: 4px 0 0; font-size: 0.95rem; opacity: 0.95; }
+        .cl-timeline { position: relative; margin: 10px 0 40px; padding-left: 34px; }
+        .cl-timeline::before { content: ""; position: absolute; left: 11px; top: 8px; bottom: 8px; width: 3px; border-radius: 3px; background: linear-gradient(var(--brand-primary, #97c6b9), color-mix(in srgb, var(--brand-primary, #97c6b9) 25%, transparent)); }
+        .cl-version { position: relative; margin-bottom: 22px; padding: 18px 20px 14px; border-radius: 12px; background-color: var(--bg-card); border: 1px solid color-mix(in srgb, var(--brand-primary, #97c6b9) 35%, var(--border)); box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06); }
+        .cl-version::before { content: ""; position: absolute; left: -30px; top: 22px; width: 15px; height: 15px; border-radius: 50%; background-color: #ffffff; border: 3px solid var(--brand-primary, #97c6b9); }
+        .cl-version.cl-latest { border-color: var(--brand-primary, #97c6b9); box-shadow: 0 6px 18px color-mix(in srgb, var(--brand-primary, #97c6b9) 35%, transparent); }
+        .cl-version.cl-latest::before { background-color: var(--brand-primary, #97c6b9); box-shadow: 0 0 0 4px color-mix(in srgb, var(--brand-primary, #97c6b9) 30%, transparent); }
+        .cl-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-bottom: 12px; }
+        .cl-num { display: inline-block; padding: 3px 12px; border-radius: 999px; font-weight: 700; font-size: 0.9rem; color: #1e293b; background-color: color-mix(in srgb, var(--brand-primary, #97c6b9) 55%, #ffffff); }
+        .cl-title { margin: 0; padding: 0; background: none; border: none; font-size: 1.1rem; color: var(--text-main); }
+        .cl-new-badge { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #3f7a69; }
+        .cl-list { list-style: none; margin: 0; padding: 0; }
+        .cl-list li { display: flex; gap: 10px; align-items: baseline; padding: 7px 0; border-top: 1px dashed color-mix(in srgb, var(--border) 70%, transparent); line-height: 1.5; }
+        .cl-list li:first-child { border-top: none; }
+        .cl-tag { flex: 0 0 auto; min-width: 104px; text-align: center; padding: 2px 10px; border-radius: 999px; font-size: 0.78rem; font-weight: 700; }
+        .tag-nouveau { color: #166534; background-color: #dcfce7; }
+        .tag-correction { color: #9a3412; background-color: #ffedd5; }
+        .tag-amelioration { color: #1e40af; background-color: #dbeafe; }
+
+        body.dark-mode .cl-version { background-color: #1e293b; border-color: #334155; box-shadow: none; }
+        body.dark-mode .cl-version.cl-latest { border-color: var(--brand-primary, #97c6b9); }
+        body.dark-mode .cl-version::before { background-color: #0f172a; }
+        body.dark-mode .cl-version.cl-latest::before { background-color: var(--brand-primary, #97c6b9); }
+        body.dark-mode .cl-num { color: #0f172a; background-color: var(--brand-primary, #97c6b9); }
+        body.dark-mode .cl-title { color: #f1f5f9; background: none; }
+        body.dark-mode .cl-new-badge { color: #a8d4c7; }
+        body.dark-mode .cl-list li { border-top-color: #334155; color: #e2e8f0; }
+        body.dark-mode .tag-nouveau { color: #bbf7d0; background-color: #14532d; }
+        body.dark-mode .tag-correction { color: #fed7aa; background-color: #7c2d12; }
+        body.dark-mode .tag-amelioration { color: #bfdbfe; background-color: #1e3a8a; }
+
+        @media (max-width: 600px) {
+            .cl-timeline { padding-left: 24px; }
+            .cl-timeline::before { left: 6px; }
+            .cl-version { padding: 14px 14px 10px; }
+            .cl-version::before { left: -24px; }
+            .cl-list li { flex-direction: column; gap: 4px; }
+            .cl-tag { min-width: 0; }
         }
-        .version-title {
-            border-bottom: 1px solid #94a3b8;
-            padding-bottom: 5px;
-            margin-top: 40px;
-            color: #0f172a;
-        }
-        body.dark-mode .version-title {
-            color: #f1f5f9;
-            border-bottom: 1px solid #475569;
-        }
-        .changelog-list li {
-            margin-bottom: 10px;
-        }
-        .tag-nouveau { color: #16a34a; font-weight: bold; }
-        .tag-correction { color: #ea580c; font-weight: bold; }
-        .tag-amelioration { color: #2563eb; font-weight: bold; }
-        
-        body.dark-mode .tag-nouveau { color: #4ade80; }
-        body.dark-mode .tag-correction { color: #fb923c; }
-        body.dark-mode .tag-amelioration { color: #60a5fa; }
     </style>
 </head>
 <body>
-    <div class="changelog-container">
-        
-        <a class="home-button" href="index.html" style="text-align: center; margin-left: auto; background: #1e293b; color: white; text-decoration: none; padding: 10px 15px; border-radius: 6px; font-weight: bold; font-size: 0.9rem; display: flex; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
-            🏠 Accueil
-        </a>
-        
-        <h1 style="margin-bottom: 10px;">Historique des mises à jour</h1>
+<div id="app-container" class="cl-wrap">
 
-        <!-- v0.4.0.0 -->
-        <h2 class="version-title">v0.4.0.0 — Application Android et Nouveaux Formulaires</h2>
-        <ul class="changelog-list">
-            <li><span class="tag-nouveau">Nouveau :</span> Déploiement de l'outil sous forme d'application native Android.</li>
-            <li><span class="tag-nouveau">Nouveau :</span> Ajout des applications "Essai de concordance" et "Coulis".</li>
-            <li><span class="tag-correction">Correction :</span> Divers correctifs majeurs et ajustements généraux pour optimiser la stabilité et l'interface de l'application.</li>
-            <li><span class="tag-correction">Correction :</span> Synchronisation des calculs et blocage strict des caractères non numériques.</li>
-            <li><span class="tag-amelioration">Amélioration :</span> Ajout d'exemples pour aider au remplissage des formulaires</li>       
-            <li><span class="tag-amelioration">Amélioration :</span> Restriction des options de sélection pour améliorer l'expérience utilisateur</li>       
-            <li><span class="tag-amelioration">Amélioration :</span> Uniformisation de l'interface entre les différentes applications</li>    
-            <li><span class="tag-amelioration">Amélioration :</span> Ajout d'avertissements visuels dynamiques pour les champs obligatoires (ex. masse volumique sèche max, exigence de compacité).</li>       
-            <li><span class="tag-amelioration">Amélioration :</span> Harmonisation des accordons (fiches ouvertes par défaut) avec l'ajout de bouton « Tout réduire ».</li>                                                             
-        </ul>
+    <header class="cl-header" style="display: flex; align-items: center; gap: 15px; background: var(--brand-primary, #97c6b9); color: white; padding: 15px 20px; border-radius: 8px; margin-bottom: 20px; margin-top: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <div>
+            <h1>Historique des mises à jour</h1>
+            <p>Nouveautés, corrections et améliorations du Hub et des formulaires</p>
+        </div>
+        <a class="home-button" href="index.html" style="margin-left: auto; background: #1e293b; color: white; text-decoration: none; padding: 10px 15px; border-radius: 6px; font-weight: bold; font-size: 0.9rem; display: flex; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">🏠 Accueil</a>
+    </header>
 
-        <!-- v0.3.0.0 -->
-        <h2 class="version-title">v0.3.0.0 — Lancement du journal de chantier (Standard) et du journal photo</h2>
-        <ul class="changelog-list">
-            <li><span class="tag-nouveau">Nouveau :</span> Ajout de l'application "Journal photo" pour la documentation photographique isolée.</li>
-            <li><span class="tag-nouveau">Nouveau :</span> Ajout de l'application "Journal de chantier (Ancien)" pour assurer la rétrocompatibilité avec le format de rapport EQ-09-IM-143.</li>
-            <li><span class="tag-amelioration">Amélioration :</span> Le système de sauvegarde mémorise désormais les noms personnalisés lors des modifications et duplique intelligemment les rapports avec le suffixe "_copie".</li>                                                                         
-        </ul>
-        
-        <!-- v0.2.0.0 -->
-        <h2 class="version-title">v0.2.0.0 — Lancement du nouveau journal de Chantier et Corrections Visuelles</h2>
-        <ul class="changelog-list">
-            <li><span class="tag-nouveau">Nouveau :</span> Ajout de l’application : "Journal de Chantier" permettant la saisie des tâches, des heures et l'intégration directe de photos de chantier dans les rapports PDF.</li>
-            <li><span class="tag-correction">Correction (Mode Nuit) :</span> Les couleurs d'état des camions dans l'application Béton (échantillonné en vert, refusé en rouge, testé en bleu) s'affichent désormais correctement lorsque le mode nuit est activé.</li>
-            <li><span class="tag-correction">Correction (Mode Nuit) :</span> Les bordures des boutons d'action sont maintenant bien visibles sur fond sombre pour faciliter la navigation.</li>
-            <li><span class="tag-correction">Correction (Interface) :</span> Les horloges de sélection d'heure sur iPad ont retrouvé une taille normale et ne chevauchent plus l'écran. L'alignement des mémos sur les téléphones a également été ajusté.</li>
-            <li><span class="tag-amelioration">Amélioration :</span> Le bouton de mise à jour de l'application est plus intelligent : il ne fige plus l'écran et vous avertit clairement si vous possédez déjà la dernière version.</li>
-        </ul>
-                                                                                    
-        <!-- v0.1.0.7e -->
-        <h2 class="version-title">v0.1.0.7e — Mode Nuit</h2>
-        <ul class="changelog-list">
-            <li><span class="tag-nouveau">Nouveau :</span> Introduction du "Mode Nuit" global pour réduire la fatigue visuelle lors des travaux en soirée ou tôt le matin.</li>
-            <li><span class="tag-amelioration">Amélioration :</span> Le module "Planche de Référence" intègre désormais directement le graphique des résultats dans le fichier PDF final.</li>
-        </ul>
-        
-        <!-- v0.1.0.0 -->
-        <h2 class="version-title">v0.1.0.0 — Nouveaux Outils et Autonomie Hors-Ligne</h2>
-        <ul class="changelog-list">
-            <li><span class="tag-nouveau">Nouveau :</span> Ajout des applications : "Échantillonnage Sols et Granulats" et "Rapport de compactage".</li>
-            <li><span class="tag-amelioration">Amélioration :</span> Renforcement du mode hors-ligne. Les formulaires et les modèles PDF se chargent désormais instantanément même lors d'une perte totale de réseau cellulaire (ex: dans les tranchées ou régions éloignées).</li>
-            <li><span class="tag-correction">Correction :</span> Amélioration de la sauvegarde automatique locale pour éviter la perte de données en cas de fermeture accidentelle de la page.</li>
-        </ul>
-        
-        <!-- v0.0.0.0 -->
-        <h2 class="version-title">v0.0.0.0 — Lancement Initial</h2>
-        <ul class="changelog-list">
-            <li><span class="tag-nouveau">Nouveau :</span> Lancement du "Portail des formulaires de chantier", un portail unique regroupant toutes les applications : "Rapport de béton" et "Planche de référence".</li>
-            <li><span class="tag-nouveau">Nouveau :</span> Déploiement des deux premières applications de terrain.</li>
-            <li><span class="tag-nouveau">Nouveau :</span> Saisie numérique complète remplaçant les formulaires papier.</li>
-            <li><span class="tag-nouveau">Nouveau :</span> Système de génération instantanée des rapports de chantiers PDF.</li>
-        </ul>
+    <div class="cl-timeline">
+
+        <section class="cl-version cl-latest">
+            <div class="cl-head"><span class="cl-num">v0.5.0.0</span><h2 class="cl-title">Nouveaux formulaires, croquis et photos annexés, Béton MTQ et Hub hors ligne</h2><span class="cl-new-badge">Dernière version</span></div>
+            <ul class="cl-list">
+                <li><span class="cl-tag tag-nouveau">Nouveau</span><span><strong>Nouveaux formulaires :</strong> <strong>Fond d'excavation</strong> (description des matériaux, conditions d'eau, comparaison avec l'étude géotechnique, état du fond et des parois, actions à prendre, échantillons et photos) et <strong>Croquis</strong>, une application autonome de dessin technique qui produit une page de croquis officielle en PDF.</span></li>
+                <li><span class="cl-tag tag-nouveau">Nouveau</span><span><strong>Croquis annexé :</strong> planche à dessin pour iOS, Android et Windows (doigt, stylet ou souris, paume ignorée) avec Crayon, Ligne droite, Flèche, Texte / Cotes, Grille, Efface et annulation. La case « ✏️ Joindre un croquis annexé à ce rapport » ajoute une page de croquis à la fin du PDF, avec la date, le client, le projet et le technicien repris du formulaire. Offert dans : Fond d'excavation, Rapport de béton, Rapport de compactage, Rapport de coulis, Échantillonnage sols et granulats, Enrobé bitumineux, Planche de référence, Journal de chantier, Journal de chantier (Nouveau) et Journal photo.</span></li>
+                <li><span class="cl-tag tag-nouveau">Nouveau</span><span><strong>Annexe photo :</strong> photos prises ou choisies directement dans le rapport, avec numéro, date, chaînage, identification et légende (ordre modifiable). Dans Fond d'excavation, l'outil apparaît dans la section Photos dès que « Oui » est coché ; ailleurs, case « 📷 Joindre une annexe photo à ce rapport ». Les pages « Document photographique » (2 photos par page, n° de projet, client et technicien en en-tête) sont ajoutées à la fin du PDF, y compris du PDF MTQ.</span></li>
+                <li><span class="cl-tag tag-nouveau">Nouveau</span><span><strong>Apps hors ligne au choix :</strong> bouton « Garder hors ligne » sur chaque carte, « Garder hors ligne les apps affichées » (selon les filtres) et « Seulement les apps gardées ». Une mise à jour ne retélécharge que les fichiers modifiés ; une app non gardée affiche une explication claire hors connexion ; le stockage de l'appareil est protégé quand le navigateur le permet.</span></li>
+                <li><span class="cl-tag tag-nouveau">Nouveau</span><span><strong>Partage des rapports :</strong> bouton « 📤 PARTAGER » (feuille de partage du téléphone, de la tablette ou de l'application Android) et « 📥 Importer » pour ouvrir un rapport reçu, avec vérification du formulaire, choix entre écraser ou garder une copie, et repère 📲 sur les rapports reçus. Le croquis et les photos voyagent avec le rapport.</span></li>
+                <li><span class="cl-tag tag-nouveau">Nouveau</span><span><strong>Diagnostic de l'appareil :</strong> état réel de la connexion (Wi-Fi de chantier sans Internet détecté), mode hors ligne, rapports sauvegardés par formulaire avec leur taille, espace utilisé et bouton « Copier le diagnostic » pour le soutien technique.</span></li>
+                <li><span class="cl-tag tag-nouveau">Nouveau</span><span><strong>Béton :</strong> volume cumulatif calculé en temps réel et affiché dans l'en-tête de chaque camion (« Cum : X-Y m³ »).</span></li>
+                <li><span class="cl-tag tag-nouveau">Nouveau</span><span><strong>Béton :</strong> temps de retardant par camion et heure maximale de fin de déchargement calculée automatiquement (2 h 00 + retardant).</span></li>
+                <li><span class="cl-tag tag-amelioration">Amélioration</span><span><strong>Béton :</strong> alertes en rouge lorsque l'affaissement ou la teneur en air sortent des exigences du devis (le √ SP retire l'alerte d'affaissement) ou que le délai maximal de déchargement est dépassé ; exigences saisies en deux cases (ex. « 80 ± 30 », « 5 @ 8 »).</span></li>
+                <li><span class="cl-tag tag-nouveau">Nouveau</span><span><strong>Béton – Mode MTQ :</strong> commutateur compact « MTQ ». Les champs du formulaire du Ministère apparaissent en bleu acier à côté de leurs équivalents (en-tête, conditions atmosphériques, mise en place, équipements, cartes camion avec air et affaissement après pompe, fiches d'échantillons, laboratoire) et l'export PDF MTQ répète la page des camions par blocs de 10 et la page des échantillons par paires.</span></li>
+                <li><span class="cl-tag tag-amelioration">Amélioration</span><span><strong>Photos plus légères et stockage sans limite de 5 Mo :</strong> chaque photo est réduite automatiquement sur l'appareil (1200 px, JPEG) et enregistrée dans la base IndexedDB du navigateur ; elle se sauvegarde, se recharge, se supprime et se partage avec son rapport. Le Journal photo et le Journal de chantier (Nouveau) en profitent aussi.</span></li>
+                <li><span class="cl-tag tag-amelioration">Amélioration</span><span><strong>Panneau des rapports uniformisé</strong> dans tous les formulaires (Nouveau, Charger, Importer, Sauvegarder, Dupliquer, Supprimer) et barre « Exportation et transmission » commune.</span></li>
+                <li><span class="cl-tag tag-amelioration">Amélioration</span><span><strong>Apparence :</strong> l'en-tête de chaque formulaire prend la couleur de sa carte du Hub (vert, bleu, diagonale pour les formulaires hybrides), cartes du Hub plus contrastées, logo et couleurs de l'organisation communs à toutes les pages (pages plus légères à garder hors ligne) et Mode nuit en interrupteur compact dans l'en-tête.</span></li>
+                <li><span class="cl-tag tag-amelioration">Amélioration</span><span><strong>Lisibilité des formulaires :</strong> sous-sections mieux espacées, cases à cocher de sous-éléments regroupées côte à côte, libellés vides retirés et titre « Remarques » affiché une seule fois.</span></li>
+                <li><span class="cl-tag tag-amelioration">Amélioration</span><span>Les textes longs (client, projet, remarques) sont répartis automatiquement sur les lignes prévues du PDF.</span></li>
+                <li><span class="cl-tag tag-amelioration">Amélioration</span><span>Carte « Enrobé bitumineux » : l'essai de concordance est maintenant offert.</span></li>
+                <li><span class="cl-tag tag-amelioration">Amélioration</span><span>Nouvelle présentation de l'historique des mises à jour (chronologie, une carte par version).</span></li>
+                <li><span class="cl-tag tag-correction">Correction</span><span><strong>Coulis :</strong> « Genre et lieu des travaux », l'expansion totale, la pression d'injection et le nombre de sacs sont maintenant imprimés dans le PDF ; ajout du champ « N° rapport ».</span></li>
+                <li><span class="cl-tag tag-correction">Correction</span><span>Champs de date lisibles et alignés sur iPad, en paysage comme en portrait (tous les formulaires).</span></li>
+                <li><span class="cl-tag tag-correction">Correction</span><span>Chaque formulaire charge ses modèles PDF, sa police et ses bibliothèques depuis le Hub, à la bonne profondeur de dossier : export PDF vérifié dans tous les formulaires, en ligne comme hors ligne.</span></li>
+            </ul>
+        </section>
+
+        <section class="cl-version">
+            <div class="cl-head"><span class="cl-num">v0.4.0.0</span><h2 class="cl-title">Application Android et Nouveaux Formulaires</h2></div>
+            <ul class="cl-list">
+                <li><span class="cl-tag tag-nouveau">Nouveau</span><span>Déploiement de l'outil sous forme d'application native Android.</span></li>
+                <li><span class="cl-tag tag-nouveau">Nouveau</span><span>Ajout des applications "Essai de concordance" et "Coulis".</span></li>
+                <li><span class="cl-tag tag-correction">Correction</span><span>Divers correctifs majeurs et ajustements généraux pour optimiser la stabilité et l'interface de l'application.</span></li>
+                <li><span class="cl-tag tag-correction">Correction</span><span>Synchronisation des calculs et blocage strict des caractères non numériques.</span></li>
+                <li><span class="cl-tag tag-amelioration">Amélioration</span><span>Ajout d'exemples pour aider au remplissage des formulaires</span></li>
+                <li><span class="cl-tag tag-amelioration">Amélioration</span><span>Restriction des options de sélection pour améliorer l'expérience utilisateur</span></li>
+                <li><span class="cl-tag tag-amelioration">Amélioration</span><span>Uniformisation de l'interface entre les différentes applications</span></li>
+                <li><span class="cl-tag tag-amelioration">Amélioration</span><span>Ajout d'avertissements visuels dynamiques pour les champs obligatoires (ex. masse volumique sèche max, exigence de compacité).</span></li>
+                <li><span class="cl-tag tag-amelioration">Amélioration</span><span>Harmonisation des accordons (fiches ouvertes par défaut) avec l'ajout de bouton « Tout réduire ».</span></li>
+            </ul>
+        </section>
+
+        <section class="cl-version">
+            <div class="cl-head"><span class="cl-num">v0.3.0.0</span><h2 class="cl-title">Lancement du journal de chantier (Standard) et du journal photo</h2></div>
+            <ul class="cl-list">
+                <li><span class="cl-tag tag-nouveau">Nouveau</span><span>Ajout de l'application "Journal photo" pour la documentation photographique isolée.</span></li>
+                <li><span class="cl-tag tag-nouveau">Nouveau</span><span>Ajout de l'application "Journal de chantier (Ancien)" pour assurer la rétrocompatibilité avec le format de rapport EQ-09-IM-143.</span></li>
+                <li><span class="cl-tag tag-amelioration">Amélioration</span><span>Le système de sauvegarde mémorise désormais les noms personnalisés lors des modifications et duplique intelligemment les rapports avec le suffixe "_copie".</span></li>
+            </ul>
+        </section>
+
+        <section class="cl-version">
+            <div class="cl-head"><span class="cl-num">v0.2.0.0</span><h2 class="cl-title">Lancement du nouveau journal de Chantier et Corrections Visuelles</h2></div>
+            <ul class="cl-list">
+                <li><span class="cl-tag tag-nouveau">Nouveau</span><span>Ajout de l’application : "Journal de Chantier" permettant la saisie des tâches, des heures et l'intégration directe de photos de chantier dans les rapports PDF.</span></li>
+                <li><span class="cl-tag tag-correction">Mode Nuit</span><span>Les couleurs d'état des camions dans l'application Béton (échantillonné en vert, refusé en rouge, testé en bleu) s'affichent désormais correctement lorsque le mode nuit est activé.</span></li>
+                <li><span class="cl-tag tag-correction">Mode Nuit</span><span>Les bordures des boutons d'action sont maintenant bien visibles sur fond sombre pour faciliter la navigation.</span></li>
+                <li><span class="cl-tag tag-correction">Interface</span><span>Les horloges de sélection d'heure sur iPad ont retrouvé une taille normale et ne chevauchent plus l'écran. L'alignement des mémos sur les téléphones a également été ajusté.</span></li>
+                <li><span class="cl-tag tag-amelioration">Amélioration</span><span>Le bouton de mise à jour de l'application est plus intelligent : il ne fige plus l'écran et vous avertit clairement si vous possédez déjà la dernière version.</span></li>
+            </ul>
+        </section>
+
+        <section class="cl-version">
+            <div class="cl-head"><span class="cl-num">v0.1.0.7e</span><h2 class="cl-title">Mode Nuit</h2></div>
+            <ul class="cl-list">
+                <li><span class="cl-tag tag-nouveau">Nouveau</span><span>Introduction du "Mode Nuit" global pour réduire la fatigue visuelle lors des travaux en soirée ou tôt le matin.</span></li>
+                <li><span class="cl-tag tag-amelioration">Amélioration</span><span>Le module "Planche de Référence" intègre désormais directement le graphique des résultats dans le fichier PDF final.</span></li>
+            </ul>
+        </section>
+
+        <section class="cl-version">
+            <div class="cl-head"><span class="cl-num">v0.1.0.0</span><h2 class="cl-title">Nouveaux Outils et Autonomie Hors-Ligne</h2></div>
+            <ul class="cl-list">
+                <li><span class="cl-tag tag-nouveau">Nouveau</span><span>Ajout des applications : "Échantillonnage Sols et Granulats" et "Rapport de compactage".</span></li>
+                <li><span class="cl-tag tag-amelioration">Amélioration</span><span>Renforcement du mode hors-ligne. Les formulaires et les modèles PDF se chargent désormais instantanément même lors d'une perte totale de réseau cellulaire (ex: dans les tranchées ou régions éloignées).</span></li>
+                <li><span class="cl-tag tag-correction">Correction</span><span>Amélioration de la sauvegarde automatique locale pour éviter la perte de données en cas de fermeture accidentelle de la page.</span></li>
+            </ul>
+        </section>
+
+        <section class="cl-version">
+            <div class="cl-head"><span class="cl-num">v0.0.0.0</span><h2 class="cl-title">Lancement Initial</h2></div>
+            <ul class="cl-list">
+                <li><span class="cl-tag tag-nouveau">Nouveau</span><span>Lancement du "Portail des formulaires de chantier", un portail unique regroupant toutes les applications : "Rapport de béton" et "Planche de référence".</span></li>
+                <li><span class="cl-tag tag-nouveau">Nouveau</span><span>Déploiement des deux premières applications de terrain.</span></li>
+                <li><span class="cl-tag tag-nouveau">Nouveau</span><span>Saisie numérique complète remplaçant les formulaires papier.</span></li>
+                <li><span class="cl-tag tag-nouveau">Nouveau</span><span>Système de génération instantanée des rapports de chantiers PDF.</span></li>
+            </ul>
+        </section>
+
     </div>
+</div>
 
-    <!-- Activation du Mode Nuit -->
-    <script>
-        if (localStorage.getItem('darkMode') === 'enabled') {
-            document.body.classList.add('dark-mode');
-        }
-    </script>
+<!-- Activation du Mode Nuit -->
+<script>
+    if (localStorage.getItem('darkMode') === 'enabled') {
+        document.body.classList.add('dark-mode');
+    }
+</script>
 </body>
 </html>
