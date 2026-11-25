@@ -158,12 +158,12 @@
  "auto_pin_max": 25,
  "files": {
   "tree/ENG/ICI/GEO/fond-excav/app_fond-excav.js": {
-   "b": 52064,
-   "h": "3cbaaf15078d"
+   "b": 52065,
+   "h": "bb5ea6e83bac"
   },
   "tree/ENG/ICI/GEO/fond-excav/index_fond-excav.html": {
-   "b": 54174,
-   "h": "387afab9f4e6"
+   "b": 54175,
+   "h": "2c70ed014889"
   },
   "tree/ENG/ICI/GEO/fond-excav/logo_fond-excav.png": {
    "b": 14265,
@@ -174,8 +174,8 @@
    "h": "7ff9a6ac9185"
   },
   "tree/ENG/ICI/MAT/Coulis/app_coulis.js": {
-   "b": 27373,
-   "h": "5c20cbd0439c"
+   "b": 29510,
+   "h": "07aeefaae3b0"
   },
   "tree/ENG/ICI/MAT/Coulis/index_coulis.html": {
    "b": 26708,
@@ -222,12 +222,12 @@
    "h": "96b2b81bf237"
   },
   "tree/ENG/croquis/app_croquis.js": {
-   "b": 28179,
-   "h": "bedca4dad23d"
+   "b": 28180,
+   "h": "00a1af9bc311"
   },
   "tree/ENG/croquis/index_croquis.html": {
-   "b": 11173,
-   "h": "99296d0d402e"
+   "b": 11174,
+   "h": "cf7727dfe2ab"
   },
   "tree/ENG/croquis/logo_croquis.png": {
    "b": 14800,
@@ -266,8 +266,8 @@
    "h": "f3ae1bb62317"
   },
   "tree/HYB/beton/tpl_beton.js": {
-   "b": 2113603,
-   "h": "f0cd9f32d429"
+   "b": 2113635,
+   "h": "6eb6acc41827"
   },
   "tree/HYB/compaction/app_compaction.js": {
    "b": 40984,
@@ -334,5 +334,5 @@
    "h": "8f9c25ca8545"
   }
  },
- "version": "v0.5.0.0"
+ "version": "v0.5.0.1a"
 }

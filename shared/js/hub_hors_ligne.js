@@ -543,6 +543,17 @@
         window.hubHorsLigne = { pinApps, unpinApps, readState, scanReports, get state() { return state; }, get manifest() { return manifest; } };
     }
 
+    // Une nouvelle version du Hub vient de prendre le relais pendant que la page était ouverte :
+    // la page est rechargée une fois pour afficher la nouvelle version (numéro de version compris).
+    // Pas à la 1re installation (aucune version précédente ne contrôlait la page).
+    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+            if (window.__hubRechargement) return;
+            window.__hubRechargement = true;
+            location.reload();
+        });
+    }
+
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
     else init();
 })();

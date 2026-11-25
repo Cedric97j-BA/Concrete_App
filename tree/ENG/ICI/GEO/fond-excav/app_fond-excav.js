@@ -595,7 +595,7 @@ async function exportToPDF() {
   "prefix": "FEXC",
   "doc_num": "EQ-09-GE-02",
   "desc": "Vérification du fond d'excavation",
-  "version": "v0.5.0.0",
+  "version": "v0.5.0.1a",
   "logo": "logo_fond-excav.png",
   "pdf_path": "template_fond-excav.pdf",
   "output_mode": "hub",

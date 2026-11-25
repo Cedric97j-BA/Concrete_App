@@ -9,7 +9,7 @@
 // 3. Apps ouvertes en ligne : gardées jusqu'à la prochaine mise à jour.
 // Hors ligne, une app non gardée affiche une page d'explication au lieu d'une page blanche.
 
-const CACHE_NAME = 'hub-inspection-v0.5.0.1-4945041ac5';          // coquille (change dès qu'un fichier du Hub change)
+const CACHE_NAME = 'hub-inspection-v0.5.0.1a-ae9baee968';          // coquille (change dès qu'un fichier du Hub change)
 const PIN_CACHE = 'hub-apps-hors-ligne';      // apps gardées sur l'appareil (conservé entre les versions)
 const RECENT_CACHE = 'hub-apps-recentes';     // apps ouvertes depuis la dernière mise à jour
 const STATE_URL = 'hors_ligne_etat.json';     // liste des apps gardées + empreintes (entrée de PIN_CACHE)
@@ -21,13 +21,6 @@ const CORE_ASSETS = [
     "./manifest.json",
     "./changelog.html",
     "./logo.png",
-    "./icons/icon-128.webp",
-    "./icons/icon-192.webp",
-    "./icons/icon-256.webp",
-    "./icons/icon-48.webp",
-    "./icons/icon-512.webp",
-    "./icons/icon-72.webp",
-    "./icons/icon-96.webp",
     "./shared/css/styles.css",
     "./shared/fonts/tahoma.js",
     "./shared/fonts/tahoma.ttf",
@@ -55,24 +48,17 @@ const CORE_ASSETS = [
     "./hors_ligne.json"
 ];
 const CORE_HASHES = {
-    "./index.html": "e21baadab4f3",
+    "./index.html": "35bed9e8d2e7",
     "./manifest.json": "7e9f1eb7484d",
-    "./changelog.html": "9b59da6fde6f",
+    "./changelog.html": "8e0a088c70ee",
     "./logo.png": "012c2ea843e0",
-    "./icons/icon-128.webp": "e78047b6cf25",
-    "./icons/icon-192.webp": "55e1bc203e4d",
-    "./icons/icon-256.webp": "3af2d661a2dc",
-    "./icons/icon-48.webp": "7b5a4495fc0d",
-    "./icons/icon-512.webp": "1fa8507d1047",
-    "./icons/icon-72.webp": "af98c2bf8aa5",
-    "./icons/icon-96.webp": "660c9e9aed7c",
     "./shared/css/styles.css": "60c33e37089a",
     "./shared/fonts/tahoma.js": "584bf77c1f40",
     "./shared/fonts/tahoma.ttf": "ae34f679d7f3",
     "./shared/img/logo_entete.png": "ea1b3ab943f5",
     "./shared/js/croquis_addon.js": "55854df226f0",
     "./shared/js/gestion_rapports.js": "3f895fe41708",
-    "./shared/js/hub_hors_ligne.js": "f18b65cbb6ce",
+    "./shared/js/hub_hors_ligne.js": "518fb65e9abf",
     "./shared/js/photo_addon.js": "d419ca97b860",
     "./shared/js/tpl_croquis.js": "7259e398ee75",
     "./shared/js/tpl_photo.js": "73f6cfbfb8e1",
@@ -94,6 +80,14 @@ const CORE_HASHES = {
 
 const scoped = (path) => new URL(path, self.registration.scope).href;
 
+// Pages du Hub (accueil, historique, manifeste) : TOUJOURS la version du serveur quand on est en ligne,
+// la copie gardée seulement hors ligne. Ainsi le numéro de version affiché est toujours le bon, même si
+// sw.js n'a pas été régénéré correctement (empreintes périmées) ou que l'on revient d'une app.
+const HUB_PAGES = ['./', './index.html', './changelog.html', './manifest.json'];
+const HUB_PAGE_TIMEOUT_MS = 4000; // Wi-Fi de chantier sans Internet : on n'attend pas plus avant la copie gardée
+const pageKey = (url) => url.split('#')[0].split('?')[0];
+const isHubPage = (url) => HUB_PAGES.some((p) => scoped(p) === pageKey(url));
+
 self.addEventListener('install', (event) => {
     event.waitUntil((async () => {
         const core = await caches.open(CACHE_NAME);
@@ -107,7 +101,7 @@ self.addEventListener('install', (event) => {
         // Chaque fichier séparément : un fichier manquant ne bloque pas l'installation
         await Promise.allSettled(CORE_ASSETS.map(async (asset) => {
             const h = CORE_HASHES[asset];
-            if (oldCache && h && oldHashes[asset] === h) {
+            if (oldCache && h && oldHashes[asset] === h && !HUB_PAGES.includes(asset)) {
                 const r = await oldCache.match(scoped(asset));
                 if (r) return core.put(scoped(asset), r);
             }
@@ -188,10 +182,38 @@ function offlinePage() {
     return new Response(html, { status: 503, headers: { 'Content-Type': 'text/html; charset=utf-8' } });
 }
 
+// Pages du Hub : réseau d'abord (sans cache HTTP), copie gardée si pas de réponse à temps / hors ligne
+async function hubPage(req) {
+    try {
+        const res = await Promise.race([
+            fetch(pageKey(req.url), { cache: 'no-store', credentials: 'same-origin' }),
+            new Promise((_, fail) => setTimeout(() => fail(new Error('délai dépassé')), HUB_PAGE_TIMEOUT_MS)),
+        ]);
+        if (res && res.ok && res.type === 'basic' && !res.redirected) {
+            const copy = res.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(pageKey(req.url), copy));
+        }
+        if (res && res.ok) return res;
+        throw new Error('réponse ' + (res && res.status));
+    } catch (e) {
+        const cached = await caches.match(pageKey(req.url), { ignoreSearch: true })
+            || (pageKey(req.url) === scoped('./') ? await caches.match(scoped('index.html')) : null)
+            || (pageKey(req.url) === scoped('index.html') ? await caches.match(scoped('./')) : null);
+        if (cached) return cached;
+        if (req.mode === 'navigate') return offlinePage();
+        return new Response('Hors ligne', { status: 503, statusText: 'Service Unavailable' });
+    }
+}
+
 // Cache d'abord (coquille, apps gardées, apps récentes), sinon réseau
 self.addEventListener('fetch', (event) => {
     const req = event.request;
     if (req.method !== 'GET' || new URL(req.url).origin !== self.location.origin) return;
+
+    if (isHubPage(req.url)) {
+        event.respondWith(hubPage(req));
+        return;
+    }
 
     event.respondWith((async () => {
         const cached = await caches.match(req, { ignoreSearch: true });

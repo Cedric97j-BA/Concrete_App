@@ -614,7 +614,7 @@ async function embedSketches(pdfDoc, form) {
   "prefix": "CROQ",
   "doc_num": "EQ-09-IM-004 rév. 00 (99-02)",
   "desc": "Croquis technique de terrain",
-  "version": "v0.5.0.0",
+  "version": "v0.5.0.1a",
   "logo": "logo_croquis.png",
   "pdf_path": "",
   "output_mode": "hub",
