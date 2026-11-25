@@ -9,7 +9,7 @@
 // 3. Apps ouvertes en ligne : gardées jusqu'à la prochaine mise à jour.
 // Hors ligne, une app non gardée affiche une page d'explication au lieu d'une page blanche.
 
-const CACHE_NAME = 'hub-inspection-v0.5.0.0-4945041ac5';          // coquille (change dès qu'un fichier du Hub change)
+const CACHE_NAME = 'hub-inspection-v0.5.0.1-4945041ac5';          // coquille (change dès qu'un fichier du Hub change)
 const PIN_CACHE = 'hub-apps-hors-ligne';      // apps gardées sur l'appareil (conservé entre les versions)
 const RECENT_CACHE = 'hub-apps-recentes';     // apps ouvertes depuis la dernière mise à jour
 const STATE_URL = 'hors_ligne_etat.json';     // liste des apps gardées + empreintes (entrée de PIN_CACHE)
